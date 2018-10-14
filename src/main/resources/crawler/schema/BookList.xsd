@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<xsd:schema version="1.0"
+            targetNamespace="http://xml.netbeans.org/schema/books" 
+            xmlns="http://xml.netbeans.org/schema/books" 
+            xmlns:book="http://xml.netbeans.org/schema/book" 
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xsd:schemaLocation="http://xml.netbeans.org/schema/book src/main/java/namlt/xml/asm/prj/crawling/model/Book.xsd" 
+            elementFormDefault="qualified">
+    <xsd:element name="books">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="book" type="book:Book" maxOccurs="unbounded"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+    
+</xsd:schema>
