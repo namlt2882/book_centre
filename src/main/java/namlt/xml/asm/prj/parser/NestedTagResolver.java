@@ -16,7 +16,6 @@ import java.util.logging.Logger;
 import static javax.xml.stream.XMLStreamConstants.START_ELEMENT;
 import static javax.xml.stream.XMLStreamConstants.END_ELEMENT;
 import static javax.xml.stream.XMLStreamConstants.CHARACTERS;
-import static javax.xml.stream.XMLStreamConstants.COMMENT;
 
 /**
  *
@@ -34,6 +33,11 @@ public class NestedTagResolver {
         int tmp;
         String s;
         boolean isComment = false;
+        boolean isXMLDeclaration = false;
+        boolean isCharacterData = false;
+        boolean isInTag = false;
+        int xmlDeclarationStack = 0;
+        int cdataStack = 0;
         while (true) {
             try {
                 tmp = reader.read();
@@ -45,6 +49,7 @@ public class NestedTagResolver {
                     if (tmp == '-') {
                         reader.mark(2);
                         int c = reader.read();
+                        //[case]: end of comment
                         if (c == '-' && (c = reader.read()) == '>') {
                             isComment = false;
                             continue;
@@ -57,29 +62,112 @@ public class NestedTagResolver {
                 if (tmp == '<') {
                     reader.mark(3);
                     int c = reader.read();
-                    if (c == '!' && (c = reader.read()) == '-' && (c = reader.read()) == '-') {
-                        isComment = true;
-                        continue;
+                    if (c == '!') {
+                        if ((c = reader.read()) == '-' && (c = reader.read()) == '-') {
+                            //[case]: meet new comment
+                            isComment = true;
+                            continue;
+                        } else {
+                            //[case]: meet new xml declaration or CDATA
+                            //check if a CDATA
+                            if (!isXMLDeclaration) {
+                                reader.reset();
+                                reader.mark(7);
+                                reader.read();
+                                if ((c = reader.read()) == '[' && (c = reader.read()) == 'C'
+                                        && (c = reader.read()) == 'D' && (c = reader.read()) == 'A'
+                                        && (c = reader.read()) == 'T' && (c = reader.read()) == 'A') {
+                                    if (!isInTag) {
+                                        //[case]: meet a CDATA
+                                        isCharacterData = true;
+                                        reader.reset();
+                                    } else {
+                                        //[case]: skip CDATA in tag
+                                        cdataStack = 1;
+                                        do {
+                                            c = reader.read();
+                                            if (c == '>') {
+                                                cdataStack--;
+                                            } else if (c == '<') {
+                                                cdataStack++;
+                                            }
+                                        } while (c != -1 && cdataStack > 0);
+                                        continue;
+                                    }
+                                }
+                            }
+                            if (!isCharacterData) {
+                                //[case]: meet new xml declaration
+                                isXMLDeclaration = true;
+                                xmlDeclarationStack++;
+                                continue;
+                            }
+                        }
                     } else {
+                        //if not a xml declaration or comment
                         reader.reset();
-                    }
-                    if (localBuilder != null) {
-                        s = localBuilder.toString();
-                        if (s != null && !s.trim().equals("")) {
-                            rs.add(s);
+                        if (isXMLDeclaration) {
+                            //[case]: xml declaration tag is not closed
+                            xmlDeclarationStack = 0;
+                            isXMLDeclaration = false;
                         }
                     }
-                    localBuilder = new StringBuilder().append('<');
+                    if (localBuilder != null) {
+                        if (!isCharacterData) {
+                            //[case]: meet open tag
+                            s = localBuilder.toString();
+                            if (s != null && !s.trim().equals("")) {
+                                rs.add(s);
+                            }
+                            isInTag = true;
+                            localBuilder = new StringBuilder().append('<');
+                        } else {
+                            localBuilder.append('<');
+                            cdataStack++;
+                        }
+                    } else {
+                        //[case]: first time meet open tag
+                        isInTag = true;
+                        localBuilder = new StringBuilder().append('<');
+                    }
                 } else if (tmp == '>') {
+                    if (isXMLDeclaration) {
+                        xmlDeclarationStack--;
+                        if (xmlDeclarationStack == 0) {
+                            //[case]: xml declaration stack is empty
+                            isXMLDeclaration = false;
+                            continue;
+                        }
+                        if (xmlDeclarationStack > 0) {
+                            //[case]: xml declaration stack is not empty
+                            continue;
+                        }
+                    }
                     localBuilder.append('>');
+                    if (isCharacterData) {
+                        cdataStack--;
+                        if (cdataStack == 0) {
+                            isCharacterData = false;
+                        } else {
+                            continue;
+                        }
+                    }
+                    if (isInTag) {
+                        isInTag = false;
+                    }
                     rs.add(localBuilder.toString());
                     localBuilder = new StringBuilder();
-                } else if (localBuilder != null) {
+                } else if (localBuilder != null && !isXMLDeclaration) {
                     localBuilder.append((char) tmp);
                 }
             } catch (IOException ex) {
                 Logger.getLogger(NestedTagResolver.class.getName()).log(Level.SEVERE, null, ex);
             }
+        }
+        try {
+            reader.close();
+        } catch (IOException ex) {
+            Logger.getLogger(NestedTagResolver.class.getName()).log(Level.SEVERE, null, ex);
         }
         return rs;
     }
@@ -94,10 +182,7 @@ public class NestedTagResolver {
             } else if (s.charAt(1) == '?') {
                 return XML_DECLARATION;
             } else if (s.charAt(1) == '!') {
-                if (s.charAt(2) == '-' && s.charAt(3) == '-') {
-                    return COMMENT;
-                }
-                return XML_DECLARATION;
+                return CHARACTERS;
             }
             return START_ELEMENT;
         } else {
@@ -133,19 +218,11 @@ public class NestedTagResolver {
         return sb.toString();
     }
 
-    public static List<String> formatNestedTag(List<String> s) {
-        return formatNestedTag(s, null);
-    }
-
-    public static List<String> formatNestedTag(String s) {
-        return formatNestedTag(splitXmlDocument(s), null);
-    }
-
     public static List<String> formatNestedTag(String s, String rootTag) {
         return formatNestedTag(splitXmlDocument(s), rootTag);
     }
 
-    public static List<String> formatNestedTag(List<String> s, String rootTag) {
+    private static List<String> formatNestedTag(List<String> s, String rootTag) {
         LinkedList<String> formattedDoc = new LinkedList<>();
         LinkedList<String> queue = new LinkedList<>();
         String tagName;
@@ -174,21 +251,43 @@ public class NestedTagResolver {
             formattedDoc.add("</" + queue.getLast() + ">");
             queue.removeLast();
         }
-        if (rootTag != null) {
-            if (formattedDoc.getFirst().contains("<?") || formattedDoc.getFirst().contains("<!")) {
-                String tmpStr = formattedDoc.removeFirst();
-                formattedDoc.addFirst("<" + rootTag + ">");
-                formattedDoc.addFirst(tmpStr);
-            } else {
-                formattedDoc.addFirst("<" + rootTag + ">");
+        //add root tag
+        boolean addRootTag = true;
+        if (rootTag == null) {
+            rootTag = "root";
+        } else {
+            if (rootTag.equals("")) {
+                rootTag = "root";
             }
+            try {
+                String start = formattedDoc.getFirst();
+                String end = formattedDoc.getLast();
+                if (checkTagType(start) == START_ELEMENT && checkTagType(end) == END_ELEMENT
+                        && rootTag.equals(getLocalName(start)) && rootTag.equals(getLocalName(end))) {
+                    addRootTag = false;
+                }
+            } catch (Exception e) {
+            }
+        }
+        if (addRootTag) {
+            formattedDoc.addFirst("<" + rootTag + ">");
             formattedDoc.addLast("</" + rootTag + ">");
         }
         return formattedDoc;
     }
 
     public static void main(String[] args) {
-        String line = "<!--[if IEMobile 7]><html class=\"iem7\" lang=\"vi\" dir=\"ltr\"><![endif]--><xml abc=''>abcxyz</xml><input>ksdhs</aaa>akjd<input>hskj<!--jhsadhjgdhgj<a>-->dhsakd<hbc/>";
+        String line = "<!DOCTYPE library[\n"
+                + "<!ELEMENT library (book)*>\n"
+                + "<!ELEMENT book (booktitle+, author, price)+>\n"
+                + "<!ELEMENT booktitle ( p | PCDATA)*>\n"
+                + "<!ELEMENT author (#PCDATA)>\n"
+                + "<!ELEMENT price (#PCDATA)>\n"
+                + "<!ELEMENT p (#PCDATA)>\n"
+                + "<!ATTLIST book id ID #REQUIRED>\n"
+                + "]>"
+                + "<!--[if IEMobile 7]><html class=\"iem7\" lang=\"vi\" dir=\"ltr\"><![endif]-->"
+                + "<xml><xm<![CDATA[<i>Comma</i>]]>l abc='<![CDATA[<i>Comma</i>]]>'>abc<a><![CDATA[<i>Comma</i>]]></a>xyz<![CDATA[<i>Comma</i>]]></xml><input>ksdhs</aaa>akjd<input>hskj<!--jhsadhjgdhgj<a>-->dhsakd<hbc/></xml>";
         List<String> docStr = splitXmlDocument(line);
         docStr.forEach(s -> {
             int tagType = checkTagType(s);
@@ -203,13 +302,13 @@ public class NestedTagResolver {
                     System.out.print("Empty(" + getLocalName(s) + "): ");
                     break;
                 case CHARACTERS:
-                    System.out.print("Char(" + getLocalName(s) + "): ");
+                    System.out.print("Chars: ");
                     break;
             }
             System.out.println(s);
         });
-        System.out.println("Handling------");
-        docStr = formatNestedTag(docStr, "root");
-        docStr.forEach(System.out::print);
+        System.out.println("\nHandling------\n");
+        docStr = formatNestedTag(docStr, "xml");
+        docStr.forEach(System.out::println);
     }
 }
