@@ -20,6 +20,10 @@ import namlt.xml.asm.prj.crawler.Constant;
 public class InternetUtils {
 
     public static String crawl(String link) throws IOException {
+        return crawl(link, null);
+    }
+
+    public static String crawl(String link, UrlConnectionConfig config) throws IOException {
         String rs = null;
         InputStream inputStream = null;
         BufferedReader bufferedReader = null;
@@ -28,6 +32,9 @@ public class InternetUtils {
             URL url = new URL(link);
             URLConnection con = url.openConnection();
             con.addRequestProperty("User-agent", Constant.USER_AGENT);
+            if (config != null) {
+                config.config(con);
+            }
             inputStream = con.getInputStream();
             bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
 
@@ -48,6 +55,5 @@ public class InternetUtils {
         }
         return rs;
     }
-    
-    
+
 }

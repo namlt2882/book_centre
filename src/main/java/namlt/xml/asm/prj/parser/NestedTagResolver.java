@@ -235,6 +235,7 @@ public class NestedTagResolver {
             if (type == START_ELEMENT) {
                 tagName = getLocalName(string);
                 queue.add(tagName);//add to queue
+                string = string.replace(" & ", " ");
             } else if (type == END_ELEMENT) {
                 tagName = getLocalName(string);
                 lastTagName = queue.getLast();
@@ -244,8 +245,11 @@ public class NestedTagResolver {
                 } else {
                     queue.removeLast();
                 }
+                string = string.replace(" & ", " ");
+            } else if (type == CHARACTERS) {
+                string = string.replace(" & ", " <![CDATA[&]]> ");
             }
-            formattedDoc.add(string);
+            formattedDoc.add(string + '\n');
         }
         while (!queue.isEmpty()) {
             formattedDoc.add("</" + queue.getLast() + ">");
