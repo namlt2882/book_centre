@@ -5,19 +5,16 @@
  */
 package namlt.xml.asm.prj.crawler;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import namlt.xml.asm.prj.parser.BoundReachedException;
+import namlt.xml.asm.prj.parser.ParserHelper;
 import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
+import java.util.HashMap;
+import java.util.Map;
 import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import namlt.xml.asm.prj.crawler.model.Book;
 import namlt.xml.asm.prj.parser.NestedTagResolver;
+import static javax.xml.stream.XMLStreamConstants.START_ELEMENT;
 import static namlt.xml.asm.prj.utils.InternetUtils.crawl;
 
 /**
@@ -26,16 +23,17 @@ import static namlt.xml.asm.prj.utils.InternetUtils.crawl;
  */
 public class NxbTreCrawler {
 
-    XMLInputFactory inputFactory = XMLInputFactory.newFactory();
+    private XMLInputFactory inputFactory = XMLInputFactory.newFactory();
+    private ParserHelper parserHelper = new ParserHelper();
 
     public static void main(String[] args) {
         NxbTreCrawler crawler = new NxbTreCrawler();
-        crawler.crawBookPage(" https://www.nxbtre.com.vn/xem-them/44576.html");
+        crawler.crawBookPage("https://www.nxbtre.com.vn/sach/44576.html");
     }
-    int tagCount = 0;
 
     public Book crawBookPage(String url) {
         Book book = null;
+        ValueIdentifier identifier = new Book().getIdentifier();
         try {
             String htmlSource = crawl(url);
             if (htmlSource != null) {
@@ -44,46 +42,56 @@ public class NxbTreCrawler {
                 htmlSource = sb.toString();
 
             }
-//            System.out.println(htmlSource);
-            writeToFile(htmlSource);
+            parserHelper.writeToFile(htmlSource);
             inputFactory.setProperty(
                     XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
             XMLStreamReader reader = inputFactory.createXMLStreamReader(new StringReader(htmlSource));
             int event;
-            boolean inProduct = false;
             while (reader.hasNext()) {
                 event = reader.next();
-                if (event == XMLStreamConstants.START_ELEMENT && "div".equals(reader.getLocalName())
-                        && "aut-detail".equals(reader.getAttributeValue("", "class"))) {
-                    inProduct = true;
-                    skipTag(reader, 2);
-                    reader.next();
-                    System.out.println(reader.getText().trim());
-                    skipTag(reader, 4);
-                    reader.next();
-                    System.out.print(reader.getText().trim());
-                    reader.next();
-                    System.out.print(reader.getText().trim());
-                    reader.next();
-                    System.out.println(reader.getText().trim());
-                    skipTag(reader, 3);
-                    reader.next();
-                    System.out.println(reader.getText().trim());
-                    skipTag(reader, 2);
-                    reader.next();
-                    System.out.println(reader.getText().trim());
-                    skipTag(reader, 2);
-                    reader.next();
-                    System.out.println(reader.getText().trim());
-                    skipTag(reader, 2);
-                    reader.next();
-                    System.out.println(reader.getText().trim());
-                    skipTag(reader, 2);
-                    reader.next();
-                    System.out.println(reader.getText().trim());
-                    skipTag(reader, 3);
-                    reader.next();
-                    System.out.println(reader.getText().trim());
+                if (event == START_ELEMENT && "ul".equals(reader.getLocalName())
+                        && "itemDetail-cat".equals(reader.getAttributeValue("", "class"))) {
+                    Map<String, String> valueMap = new HashMap<>();
+                    int tagCount = 1;
+//                    String title = crawlerUtils.readTextInside(reader, 1);
+//                    System.out.println(title);
+                    StringBuilder sb;
+                    boolean isFinished = false;
+                    try {
+                        while (tagCount > 0) {
+                            parserHelper.setMaxTag(tagCount);
+                            tagCount += parserHelper.skipTag(reader, "li");
+                            parserHelper.setMaxTag(tagCount);
+                            tagCount += parserHelper.skipToCharacter(reader);
+                            tagCount += parserHelper.readTextInside(reader, (sb = new StringBuilder()));
+                            String key = sb.toString();
+
+                            parserHelper.setMaxTag(tagCount);
+                            tagCount += parserHelper.skipToCharacter(reader);
+                            tagCount += parserHelper.readTextInside(reader, (sb = new StringBuilder()));
+                            try {
+                                parserHelper.setMaxTag(tagCount);
+                                tagCount += parserHelper.skipTag(reader, "li", sb);
+                            } catch (BoundReachedException e) {
+                                isFinished = true;
+                            }
+                            String value = sb.toString();
+                            identifier.indentify(key != null ? key.trim() : null,
+                                    value != null ? value.trim() : null);
+                            if (isFinished) {
+                                break;
+                            }
+                        }
+                    } catch (Exception e) {
+                    }
+                    Map<String, String> values = identifier.values();
+                    System.out.println(values.get("AUTHOR"));
+                    System.out.println(values.get("TRANSLATOR"));
+                    System.out.println(values.get("SIZE"));
+                    System.out.println(values.get("PAGE_NUMBER"));
+                    System.out.println(values.get("ISBN"));
+                    System.out.println(values.get("PRICE"));
+                    System.out.println(values.get("DESCRIPTION"));
                     break;
                 }
             }
@@ -93,33 +101,4 @@ public class NxbTreCrawler {
         return book;
     }
 
-    public void skipTag(XMLStreamReader streamReader, int time) throws XMLStreamException {
-        while (streamReader.hasNext()) {
-            if (time <= 0) {
-                break;
-            }
-            try {
-                streamReader.nextTag();
-            } catch (Exception e) {
-                streamReader.next();
-            }
-            if (streamReader.getEventType() == XMLStreamConstants.START_ELEMENT) {
-                time--;
-            }
-        }
-    }
-
-    public static void writeToFile(String xmlSource) throws UnsupportedEncodingException, FileNotFoundException, IOException {
-        ClassLoader classLoader = NxbTreCrawler.class.getClassLoader();
-        String fileLocation = classLoader.getResource("crawler/schema/output.xml").getFile();
-        File file = new File(URLDecoder.decode(fileLocation, "UTF-8"));
-        FileOutputStream fw = new FileOutputStream(file);
-        StringReader reader = new StringReader(xmlSource);
-        int a;
-        while ((a = reader.read()) != -1) {
-            fw.write((char) a);
-        }
-        fw.flush();
-        fw.close();
-    }
 }

@@ -227,6 +227,7 @@ public class NestedTagResolver {
         LinkedList<String> queue = new LinkedList<>();
         String tagName;
         String lastTagName;
+        boolean notAppend = false;
         for (String string : s) {
             int type = checkTagType(string);
             if (type == XML_DECLARATION) {
@@ -234,10 +235,18 @@ public class NestedTagResolver {
             }
             if (type == START_ELEMENT) {
                 tagName = getLocalName(string);
+                if (tagName.equals("script")) {
+                    notAppend = true;
+                    continue;
+                }
                 queue.add(tagName);//add to queue
-                string = string.replace(" & ", " ");
+                string = string.replace("&", "");
             } else if (type == END_ELEMENT) {
                 tagName = getLocalName(string);
+                if (tagName.equals("script")) {
+                    notAppend = false;
+                    continue;
+                }
                 lastTagName = queue.getLast();
                 //thừa thẻ đóng
                 if (!lastTagName.equals(tagName)) {
@@ -247,9 +256,11 @@ public class NestedTagResolver {
                 }
                 string = string.replace(" & ", " ");
             } else if (type == CHARACTERS) {
-                string = string.replace(" & ", " <![CDATA[&]]> ");
+                string = string.replace("&", "<![CDATA[&]]>") + '\n';
             }
-            formattedDoc.add(string + '\n');
+            if (!notAppend) {
+                formattedDoc.add(string);
+            }
         }
         while (!queue.isEmpty()) {
             formattedDoc.add("</" + queue.getLast() + ">");

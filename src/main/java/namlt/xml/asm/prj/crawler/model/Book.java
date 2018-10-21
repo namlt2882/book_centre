@@ -5,13 +5,16 @@
  */
 package namlt.xml.asm.prj.crawler.model;
 
+import namlt.xml.asm.prj.crawler.ValueIdentifierImpl;
 import java.util.List;
+import namlt.xml.asm.prj.crawler.ValueIdentifiable;
+import namlt.xml.asm.prj.crawler.ValueIdentifier;
 
 /**
  *
  * @author ADMIN
  */
-public class Book {
+public class Book implements ValueIdentifiable {
 
     private String name;
     private List<String> author;
@@ -66,6 +69,11 @@ public class Book {
 
     public void setNumberOfPage(String numberOfPage) {
         this.numberOfPage = numberOfPage;
+    }
+
+    @Override
+    public ValueIdentifier getIdentifier() {
+        return new ValueIdentifierImpl(BookPropertiesEnum.class);
     }
 
 }
