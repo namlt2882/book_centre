@@ -6,8 +6,140 @@
         <title>Nhà sách vui vẻ</title>
     </head>
     <body class="html front not-logged-in one-sidebar sidebar-second site-name-hidden browserChrome browserChrome6">
-        <div class="container">
-            <jsp:include page="Header.jsp"/>
+        <div id="page" class="container">
+            <jsp:include page="HomePageHeader.jsp"/>
+            <div id="columns">
+                <div class="columns-inner clearfix">
+                    <div id="content-column" style="">
+                        <div class="content-inner">
+                            <section id="main-content" role="main">
+                                <header>
+                                    <h1 id="page-title">Chào mừng đến với Nhã Nam</h1>
+                                </header>
+                                <div id="content">
+                                    <div class="region region-content">
+                                        <section id="block-views-sach-moi-block" class="block block-views ">
+                                            <div class="block-inner clearfix">
+                                                <h2 class="block-title">Sách mới</h2>
+                                                <div class="block-content content">
+                                                    <div class="view view-sach-moi view-id-sach_moi view-display-id-block view-dom-id-4d0e7c14c2df0334da04712bf6aed109">
+                                                        <div class="view-content">
+                                                            <div class="item-list-sm">    
+                                                                <ul>          
+                                                                    <li class="views-row views-row-1 views-row-odd views-row-first">  
+                                                                        <div class="views-field views-field-field-sach-anh-dai-dien">        <div class="field-content"><a href="/sach/101-bo-phim-viet-nam-hay-nhat"><img data-hover-preview="http://nhanam.vn/sites/default/files/101_bo_phim_viet_nam_hay_nhat-02.jpg" class="hover-preview-imgpreview hover-preview hover-preview-imgpreview-processed" src="http://nhanam.vn/sites/default/files/styles/sach_moi_117x174/public/101_bo_phim_viet_nam_hay_nhat-02.jpg?itok=_xUtEhUc" alt=""></a></div>  </div>  
+                                                                        <div class="views-field views-field-nothing">        <span class="field-content"><div>
+                                                                                    <div><b><a href="/sach/101-bo-phim-viet-nam-hay-nhat">101 bộ phim Việt Nam hay nhất</a></b></div>
+                                                                                    <div><b>Tác giả:</b> <a href="/tac-gia/le-hong-lam">Lê Hồng Lâm</a></div>
+                                                                                    <div><b>Dịch giả:</b> </div>
+                                                                                    <div><b>NXB liên kết:</b> Thế Giới</div>
+                                                                                    <div><b>Giá bìa:</b> 210.000 VND</div>
+                                                                                    <div><b>Số trang:</b> 492</div>
+                                                                                    <div><b>Kích thước:</b> 15.5 x 21</div>
+                                                                                    <div><b>Ngày phát hành:</b> <span class="date-display-single">16-10-2018</span></div>
+                                                                                </div>
+
+                                                                            </span>  </div>
+                                                                    </li>
+                                                                    <li class="views-row views-row-2 views-row-even">  
+                                                                        <div class="views-field views-field-field-sach-anh-dai-dien">        <div class="field-content"><a href="/sach/thu-thi-kien-thuc-lop-2"><img data-hover-preview="http://nhanam.vn/sites/default/files/thu_thi_kien_thuc_lop_2-02.jpg" class="hover-preview-imgpreview hover-preview hover-preview-imgpreview-processed" src="http://nhanam.vn/sites/default/files/styles/sach_moi_117x174/public/thu_thi_kien_thuc_lop_2-02.jpg?itok=N1nl61Fz" alt=""></a></div>  </div>  
+                                                                        <div class="views-field views-field-nothing">        <span class="field-content"><div>
+                                                                                    <div><b><a href="/sach/thu-thi-kien-thuc-lop-2">Thủ thỉ kiến thức lớp 2</a></b></div>
+                                                                                    <div><b>Tác giả:</b> <a href="/tac-gia/mitsuharu-ohyama">Mitsuharu Ohyama</a></div>
+                                                                                    <div><b>Dịch giả:</b> Hà Hime</div>
+                                                                                    <div><b>NXB liên kết:</b> Thế Giới</div>
+                                                                                    <div><b>Giá bìa:</b> 75.000 VND</div>
+                                                                                    <div><b>Số trang:</b> 184</div>
+                                                                                    <div><b>Kích thước:</b> 15 x 20.5</div>
+                                                                                    <div><b>Ngày phát hành:</b> <span class="date-display-single">08-10-2018</span></div>
+                                                                                </div>
+
+                                                                            </span>  </div>
+                                                                    </li>
+                                                                    <li class="views-row views-row-3 views-row-odd">  
+                                                                        <div class="views-field views-field-field-sach-anh-dai-dien">        <div class="field-content"><a href="/sach/duoi-bong-nhung-co-gai-duong-hoa"><img data-hover-preview="http://nhanam.vn/sites/default/files/duoi_bong_nhung_co_gai_duong_hoa-02.jpg" class="hover-preview-imgpreview hover-preview hover-preview-imgpreview-processed" src="http://nhanam.vn/sites/default/files/styles/sach_moi_117x174/public/duoi_bong_nhung_co_gai_duong_hoa-02.jpg?itok=678dUFcm" alt=""></a></div>  </div>  
+                                                                        <div class="views-field views-field-nothing">        <span class="field-content"><div>
+                                                                                    <div><b><a href="/sach/duoi-bong-nhung-co-gai-duong-hoa">Dưới bóng những cô gái đương hoa</a></b></div>
+                                                                                    <div><b>Tác giả:</b> <a href="/tac-gia/marcel-proust">Marcel Proust</a></div>
+                                                                                    <div><b>Dịch giả:</b> Dương Tường</div>
+                                                                                    <div><b>NXB liên kết:</b> Văn Học</div>
+                                                                                    <div><b>Giá bìa:</b> 179.000 VND</div>
+                                                                                    <div><b>Số trang:</b> 600</div>
+                                                                                    <div><b>Kích thước:</b> 15.5 x 24</div>
+                                                                                    <div><b>Ngày phát hành:</b> <span class="date-display-single">08-10-2018</span></div>
+                                                                                </div>
+
+                                                                            </span>  </div>
+                                                                    </li>
+                                                                    <li class="views-row views-row-4 views-row-even">  
+                                                                        <div class="views-field views-field-field-sach-anh-dai-dien">        <div class="field-content"><a href="/sach/sach-mau-la-hoa-si-do-an-thuc-uong"><img data-hover-preview="http://nhanam.vn/sites/default/files/to_la_hoa_si_-_do_an_thuc_uong-01.jpg" class="hover-preview-imgpreview hover-preview hover-preview-imgpreview-processed" src="http://nhanam.vn/sites/default/files/styles/sach_moi_117x174/public/to_la_hoa_si_-_do_an_thuc_uong-01.jpg?itok=HpRvoesV" alt=""></a></div>  </div>  
+                                                                        <div class="views-field views-field-nothing">        <span class="field-content"><div>
+                                                                                    <div><b><a href="/sach/sach-mau-la-hoa-si-do-an-thuc-uong">[Sách tô màu] Tớ là họa sĩ - Đồ ăn thức uống</a></b></div>
+                                                                                    <div><b>Tác giả:</b> <a href="/tac-gia/thu-ngan-minh-hoa">Thu Ngân (minh họa)</a></div>
+                                                                                    <div><b>Dịch giả:</b> </div>
+                                                                                    <div><b>NXB liên kết:</b> Hội Nhà Văn</div>
+                                                                                    <div><b>Giá bìa:</b> 35.000 VND</div>
+                                                                                    <div><b>Số trang:</b> 32</div>
+                                                                                    <div><b>Kích thước:</b> 20.5 x 28.5</div>
+                                                                                    <div><b>Ngày phát hành:</b> <span class="date-display-single">06-10-2018</span></div>
+                                                                                </div>
+
+                                                                            </span>  </div>
+                                                                    </li>
+                                                                    <li class="views-row views-row-5 views-row-odd">  
+                                                                        <div class="views-field views-field-field-sach-anh-dai-dien">        <div class="field-content"><a href="/sach/sach-mau-la-hoa-si-ngoi-nha-cua-be"><img data-hover-preview="http://nhanam.vn/sites/default/files/to_la_hoa_si_-_ngoi_nha_cua_be-01.jpg" class="hover-preview-imgpreview hover-preview hover-preview-imgpreview-processed" src="http://nhanam.vn/sites/default/files/styles/sach_moi_117x174/public/to_la_hoa_si_-_ngoi_nha_cua_be-01.jpg?itok=_RkRRf9q" alt=""></a></div>  </div>  
+                                                                        <div class="views-field views-field-nothing">        <span class="field-content"><div>
+                                                                                    <div><b><a href="/sach/sach-mau-la-hoa-si-ngoi-nha-cua-be">[Sách tô màu] Tớ là họa sĩ - Ngôi nhà của bé</a></b></div>
+                                                                                    <div><b>Tác giả:</b> <a href="/tac-gia/luongdoo-minh-hoa">Luongdoo (minh họa)</a></div>
+                                                                                    <div><b>Dịch giả:</b> </div>
+                                                                                    <div><b>NXB liên kết:</b> Hội Nhà Văn</div>
+                                                                                    <div><b>Giá bìa:</b> 35.000 VND</div>
+                                                                                    <div><b>Số trang:</b> 32</div>
+                                                                                    <div><b>Kích thước:</b> 20.5 x 28.5</div>
+                                                                                    <div><b>Ngày phát hành:</b> <span class="date-display-single">06-10-2018</span></div>
+                                                                                </div>
+
+                                                                            </span>  </div>
+                                                                    </li>
+                                                                    <li class="views-row views-row-6 views-row-even views-row-last">  
+                                                                        <div class="views-field views-field-field-sach-anh-dai-dien">        <div class="field-content"><a href="/sach/sach-mau-la-hoa-si-trang-phuc"><img data-hover-preview="http://nhanam.vn/sites/default/files/to_la_hoa_si_-_trang_phuc.jpg" class="hover-preview-imgpreview hover-preview hover-preview-imgpreview-processed" src="http://nhanam.vn/sites/default/files/styles/sach_moi_117x174/public/to_la_hoa_si_-_trang_phuc.jpg?itok=BCQfogHp" alt=""></a></div>  </div>  
+                                                                        <div class="views-field views-field-nothing">        <span class="field-content"><div>
+                                                                                    <div><b><a href="/sach/sach-mau-la-hoa-si-trang-phuc">[Sách tô màu] Tớ là họa sĩ - Trang phục</a></b></div>
+                                                                                    <div><b>Tác giả:</b> <a href="/tac-gia/thu-ngan-minh-hoa">Thu Ngân (minh họa)</a></div>
+                                                                                    <div><b>Dịch giả:</b> </div>
+                                                                                    <div><b>NXB liên kết:</b> Hội Nhà Văn</div>
+                                                                                    <div><b>Giá bìa:</b> 35.000 VND</div>
+                                                                                    <div><b>Số trang:</b> 32</div>
+                                                                                    <div><b>Kích thước:</b> 20.5 x 28.5</div>
+                                                                                    <div><b>Ngày phát hành:</b> <span class="date-display-single">06-10-2018</span></div>
+                                                                                </div>
+
+                                                                            </span>  </div>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>    
+                                                        </div>
+                                                        <h2 class="element-invisible">Trang</h2>
+                                                        <div class="item-list">
+                                                            <ul class="pager">
+                                                                <li class="pager-current">1</li>
+                                                                <li class="pager-item">
+                                                                    <a title="Đến trang 2" href="/node?page=1">2</a></li>
+                                                                <li class="pager-item">
+                                                                    <a title="Đến trang 3" href="/node?page=2">3</a></li><li class="pager-item"><a title="Đến trang 4" href="/node?page=3">4</a></li><li class="pager-item"><a title="Đến trang 5" href="/node?page=4">5</a></li><li class="pager-item"><a title="Đến trang 6" href="/node?page=5">6</a></li><li class="pager-item"><a title="Đến trang 7" href="/node?page=6">7</a></li><li class="pager-item"><a title="Đến trang 8" href="/node?page=7">8</a></li><li class="pager-item"><a title="Đến trang 9" href="/node?page=8">9</a></li><li class="pager-ellipsis">…</li><li class="pager-next"><a title="Đến trang kế sau" href="/node?page=1">sau ›</a></li><li class="pager-last"><a title="Đến trang cuối cùng" href="/node?page=208">cuối »</a></li></ul></div>  
+                                                    </div>    
+                                                </div>
+                                            </div>
+                                        </section>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                    </div>
+                    <jsp:include page="SideBar.jsp"/>
+                </div>
+            </div>
+            <jsp:include page="Footer.jsp"/>
         </div>
     </body>
 </html>
