@@ -5,6 +5,7 @@
  */
 package namlt.xml.asm.prj.crawler;
 
+import namlt.xml.asm.prj.parser.BaseParser;
 import namlt.xml.asm.prj.parser.BoundReachedException;
 import namlt.xml.asm.prj.parser.ParserHelper;
 import java.io.StringReader;
@@ -16,12 +17,13 @@ import namlt.xml.asm.prj.crawler.model.Book;
 import namlt.xml.asm.prj.parser.NestedTagResolver;
 import static javax.xml.stream.XMLStreamConstants.START_ELEMENT;
 import static namlt.xml.asm.prj.utils.InternetUtils.crawl;
+import static namlt.xml.asm.prj.utils.InternetUtils.crawl;
 
 /**
  *
  * @author ADMIN
  */
-public class NxbTreCrawler {
+public class NxbTreCrawler extends BaseParser {
 
     private XMLInputFactory inputFactory = XMLInputFactory.newFactory();
     private ParserHelper parserHelper = new ParserHelper();
@@ -45,54 +47,63 @@ public class NxbTreCrawler {
             parserHelper.writeToFile(htmlSource);
             inputFactory.setProperty(
                     XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
+            inputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
             XMLStreamReader reader = inputFactory.createXMLStreamReader(new StringReader(htmlSource));
             int event;
             while (reader.hasNext()) {
                 event = reader.next();
-                if (event == START_ELEMENT && "ul".equals(reader.getLocalName())
-                        && "itemDetail-cat".equals(reader.getAttributeValue("", "class"))) {
-                    Map<String, String> valueMap = new HashMap<>();
-                    int tagCount = 1;
-//                    String title = crawlerUtils.readTextInside(reader, 1);
-//                    System.out.println(title);
-                    StringBuilder sb;
-                    boolean isFinished = false;
-                    try {
-                        while (tagCount > 0) {
-                            parserHelper.setMaxTag(tagCount);
-                            tagCount += parserHelper.skipTag(reader, "li");
-                            parserHelper.setMaxTag(tagCount);
-                            tagCount += parserHelper.skipToCharacter(reader);
-                            tagCount += parserHelper.readTextInside(reader, (sb = new StringBuilder()));
-                            String key = sb.toString();
+                if (event == START_ELEMENT) {
+                    if (isTag("div", reader) && equalClass(reader, null, "aut-detail")) {
+                        book = new Book();
+                        parserHelper.skipToCharacter(reader);
+                        StringBuilder sb = new StringBuilder();
+                        parserHelper.readTextInside(reader, sb);
+                        String title = sb.toString();
+                        
+                        System.out.println(title.trim());
+                    } else if (isTag("ul", reader) && equalClass(reader, null, "itemDetail-cat")) {
+                        Map<String, String> valueMap = new HashMap<>();
+                        int tagCount = 1;
 
-                            parserHelper.setMaxTag(tagCount);
-                            tagCount += parserHelper.skipToCharacter(reader);
-                            tagCount += parserHelper.readTextInside(reader, (sb = new StringBuilder()));
-                            try {
+                        StringBuilder sb;
+                        boolean isFinished = false;
+                        try {
+                            while (tagCount > 0) {
                                 parserHelper.setMaxTag(tagCount);
-                                tagCount += parserHelper.skipTag(reader, "li", sb);
-                            } catch (BoundReachedException e) {
-                                isFinished = true;
+                                tagCount += parserHelper.skipTag(reader, "li");
+                                parserHelper.setMaxTag(tagCount);
+                                tagCount += parserHelper.skipToCharacter(reader);
+                                tagCount += parserHelper.readTextInside(reader, (sb = new StringBuilder()));
+                                String key = sb.toString();
+
+                                parserHelper.setMaxTag(tagCount);
+                                tagCount += parserHelper.skipToCharacter(reader);
+                                tagCount += parserHelper.readTextInside(reader, (sb = new StringBuilder()));
+                                try {
+                                    parserHelper.setMaxTag(tagCount);
+                                    tagCount += parserHelper.skipTag(reader, "li", sb);
+                                } catch (BoundReachedException e) {
+                                    isFinished = true;
+                                }
+                                String value = sb.toString();
+                                identifier.indentify(key != null ? key.trim() : null,
+                                        value != null ? value.trim() : null);
+                                if (isFinished) {
+                                    break;
+                                }
                             }
-                            String value = sb.toString();
-                            identifier.indentify(key != null ? key.trim() : null,
-                                    value != null ? value.trim() : null);
-                            if (isFinished) {
-                                break;
-                            }
+                        } catch (Exception e) {
                         }
-                    } catch (Exception e) {
+                        Map<String, String> values = identifier.values();
+                        System.out.println(values.get("AUTHOR"));
+                        System.out.println(values.get("TRANSLATOR"));
+                        System.out.println(values.get("SIZE"));
+                        System.out.println(values.get("PAGE_NUMBER"));
+                        System.out.println(values.get("ISBN"));
+                        System.out.println(values.get("PRICE"));
+                        System.out.println(values.get("DESCRIPTION"));
+                        break;
                     }
-                    Map<String, String> values = identifier.values();
-                    System.out.println(values.get("AUTHOR"));
-                    System.out.println(values.get("TRANSLATOR"));
-                    System.out.println(values.get("SIZE"));
-                    System.out.println(values.get("PAGE_NUMBER"));
-                    System.out.println(values.get("ISBN"));
-                    System.out.println(values.get("PRICE"));
-                    System.out.println(values.get("DESCRIPTION"));
-                    break;
                 }
             }
         } catch (Exception ex) {
