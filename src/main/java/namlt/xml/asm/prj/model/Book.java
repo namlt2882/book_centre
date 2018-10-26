@@ -157,7 +157,7 @@ public class Book implements Serializable, ValueIdentifiable {
     public String toString() {
         return "[Book: '" + title + "'][id=" + id + "][isbn=" + isbn + "][author=" + author + "]"
                 + "[translator=" + translator + "][page size=" + pageSize + "][price=" + price + "]"
-                + "[page number=" + pageNumber + "][status=" + status + "][url='" + url + "'][description='" + description + "']";
+                + "[page number=" + pageNumber + "][status=" + status + "][url='" + url + "']";
     }
 
 }

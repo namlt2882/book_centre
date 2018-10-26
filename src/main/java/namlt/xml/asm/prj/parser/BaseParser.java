@@ -49,6 +49,9 @@ public abstract class BaseParser {
             nameSpace = "";
         }
         String classAttr = reader.getAttributeValue(nameSpace, "class");
+        if (classAttr == null) {
+            return false;
+        }
         List<String> classAttrs = Arrays.asList(classAttr.split(" ")).parallelStream().map(s -> {
             if (s != null && !"".equals(s.trim())) {
                 return s;
@@ -64,6 +67,6 @@ public abstract class BaseParser {
                 counter++;
             }
         }
-        return counter != className.length;
+        return counter == className.length;
     }
 }
