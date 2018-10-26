@@ -9,15 +9,18 @@ import java.io.Serializable;
 import java.util.List;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import namlt.xml.asm.prj.crawler.ValueIdentifiable;
+import namlt.xml.asm.prj.crawler.ValueIdentifier;
+import namlt.xml.asm.prj.crawler.ValueIdentifierImpl;
+import namlt.xml.asm.prj.crawler.model.BookPropertiesEnum;
 
 /**
  *
  * @author ADMIN
  */
 @XmlRootElement
-public class Book implements Serializable {
+public class Book implements Serializable, ValueIdentifiable {
 
-    private static final long serialVersionUID = 1L;
     private String id;
     private String title;
     private String pageSize;
@@ -25,24 +28,34 @@ public class Book implements Serializable {
     private String description;
     private String author;
     private String translator;
-    private double price;
-    private int status;
+    private Double price;
+    private Integer status;
+    private String isbn;
     private List<Tag> tagList;
     private List<OrderDetail> orderDetailList;
+    private String url;
 
     public Book() {
     }
 
-    public Book(String id) {
-        this.id = id;
+    public Book(String url) {
+        this.url = url;
     }
 
-    public Book(String id, String title, String author, double price, int status) {
-        this.id = id;
-        this.title = title;
-        this.author = author;
-        this.price = price;
-        this.status = status;
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getIsbn() {
+        return isbn;
+    }
+
+    public void setIsbn(String isbn) {
+        this.isbn = isbn;
     }
 
     public String getId() {
@@ -101,19 +114,19 @@ public class Book implements Serializable {
         this.translator = translator;
     }
 
-    public double getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 
-    public int getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(int status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 
@@ -133,6 +146,18 @@ public class Book implements Serializable {
 
     public void setOrderDetailList(List<OrderDetail> orderDetailList) {
         this.orderDetailList = orderDetailList;
+    }
+
+    @Override
+    public ValueIdentifier getIdentifier() {
+        return new ValueIdentifierImpl(BookPropertiesEnum.class);
+    }
+
+    @Override
+    public String toString() {
+        return "[Book: '" + title + "'][id=" + id + "][isbn=" + isbn + "][author=" + author + "]"
+                + "[translator=" + translator + "][page size=" + pageSize + "][price=" + price + "]"
+                + "[page number=" + pageNumber + "][status=" + status + "][url='" + url + "'][description='" + description + "']";
     }
 
 }

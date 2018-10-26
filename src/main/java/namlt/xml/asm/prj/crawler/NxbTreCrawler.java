@@ -13,10 +13,11 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
-import namlt.xml.asm.prj.crawler.model.Book;
 import namlt.xml.asm.prj.parser.NestedTagResolver;
 import static javax.xml.stream.XMLStreamConstants.START_ELEMENT;
-import static namlt.xml.asm.prj.utils.InternetUtils.crawl;
+import namlt.xml.asm.prj.model.Book;
+import static namlt.xml.asm.prj.utils.CommonUtils.parseInt;
+import static namlt.xml.asm.prj.utils.CommonUtils.parseDouble;
 import static namlt.xml.asm.prj.utils.InternetUtils.crawl;
 
 /**
@@ -24,15 +25,16 @@ import static namlt.xml.asm.prj.utils.InternetUtils.crawl;
  * @author ADMIN
  */
 public class NxbTreCrawler extends BaseParser {
-
+    
     private XMLInputFactory inputFactory = XMLInputFactory.newFactory();
     private ParserHelper parserHelper = new ParserHelper();
-
+    
     public static void main(String[] args) {
         NxbTreCrawler crawler = new NxbTreCrawler();
-        crawler.crawBookPage("https://www.nxbtre.com.vn/sach/44576.html");
+        Book book = crawler.crawBookPage("https://www.nxbtre.com.vn/sach/44576.html");
+        System.out.println(book);
     }
-
+    
     public Book crawBookPage(String url) {
         Book book = null;
         ValueIdentifier identifier = new Book().getIdentifier();
@@ -42,7 +44,7 @@ public class NxbTreCrawler extends BaseParser {
                 StringBuilder sb = new StringBuilder();
                 NestedTagResolver.formatNestedTag(htmlSource, "html").forEach(sb::append);
                 htmlSource = sb.toString();
-
+                
             }
             parserHelper.writeToFile(htmlSource);
             inputFactory.setProperty(
@@ -54,17 +56,16 @@ public class NxbTreCrawler extends BaseParser {
                 event = reader.next();
                 if (event == START_ELEMENT) {
                     if (isTag("div", reader) && equalClass(reader, null, "aut-detail")) {
-                        book = new Book();
+                        book = new Book(url);
                         parserHelper.skipToCharacter(reader);
                         StringBuilder sb = new StringBuilder();
                         parserHelper.readTextInside(reader, sb);
                         String title = sb.toString();
-                        
-                        System.out.println(title.trim());
+                        book.setTitle(title.trim());
                     } else if (isTag("ul", reader) && equalClass(reader, null, "itemDetail-cat")) {
                         Map<String, String> valueMap = new HashMap<>();
                         int tagCount = 1;
-
+                        
                         StringBuilder sb;
                         boolean isFinished = false;
                         try {
@@ -75,7 +76,7 @@ public class NxbTreCrawler extends BaseParser {
                                 tagCount += parserHelper.skipToCharacter(reader);
                                 tagCount += parserHelper.readTextInside(reader, (sb = new StringBuilder()));
                                 String key = sb.toString();
-
+                                
                                 parserHelper.setMaxTag(tagCount);
                                 tagCount += parserHelper.skipToCharacter(reader);
                                 tagCount += parserHelper.readTextInside(reader, (sb = new StringBuilder()));
@@ -95,13 +96,17 @@ public class NxbTreCrawler extends BaseParser {
                         } catch (Exception e) {
                         }
                         Map<String, String> values = identifier.values();
-                        System.out.println(values.get("AUTHOR"));
-                        System.out.println(values.get("TRANSLATOR"));
-                        System.out.println(values.get("SIZE"));
-                        System.out.println(values.get("PAGE_NUMBER"));
-                        System.out.println(values.get("ISBN"));
-                        System.out.println(values.get("PRICE"));
-                        System.out.println(values.get("DESCRIPTION"));
+                        book.setAuthor(values.get("AUTHOR"));
+                        book.setTranslator(values.get("TRANSLATOR"));
+                        book.setPageSize(values.get("SIZE"));
+                        String pageNumber = values.get("PAGE_NUMBER");
+                        //process page number here
+                        book.setPageNumber(parseInt(pageNumber).orElse(null));
+                        book.setIsbn(values.get("ISBN"));
+                        String price = values.get("PRICE");
+                        //process price here
+                        book.setPrice(parseDouble(price).orElse(null));
+                        book.setDescription(values.get("DESCRIPTION"));
                         break;
                     }
                 }
@@ -111,5 +116,5 @@ public class NxbTreCrawler extends BaseParser {
         }
         return book;
     }
-
+    
 }
