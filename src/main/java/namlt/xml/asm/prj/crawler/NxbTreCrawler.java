@@ -17,16 +17,16 @@ import static namlt.xml.asm.prj.utils.CommonUtils.parseInt;
 import static namlt.xml.asm.prj.utils.CommonUtils.parseDouble;
 import static namlt.xml.asm.prj.utils.InternetUtils.crawl;
 
-public class NxbTreCrawler extends BaseParser {
-    
+public class NxbTreCrawler extends BaseParser implements BookCrawler {
+
     private XMLInputFactory inputFactory = XMLInputFactory.newFactory();
-    
+
     public NxbTreCrawler() {
         inputFactory.setProperty(
                 XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
         inputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
     }
-    
+
     public static void main(String[] args) {
         NxbTreCrawler crawler = new NxbTreCrawler();
 //        Book book = crawler.crawlBookPage("https://www.nxbtre.com.vn/sach/24269.html");
@@ -34,9 +34,10 @@ public class NxbTreCrawler extends BaseParser {
         List<Book> books = crawler.crawlNextNewBooks(4, 5);
         System.out.println("Book number:" + books.size());
         books.forEach(System.out::println);
-        
+
     }
-    
+
+    @Override
     public Book crawlBookPage(String url) {
         Book book = null;
         ValueIdentifier identifier = new Book().getIdentifier();
@@ -116,7 +117,7 @@ public class NxbTreCrawler extends BaseParser {
                         Integer pageNumber = parseInt(values.get("PAGE_NUMBER")).orElse(null);
                         String isbn = values.get("ISBN");
                         Double price = parseDouble(values.get("PRICE")).orElse(null);
-                        
+
                         book.setAuthor(author != null ? author.replace("\n", "") : null);
                         book.setTranslator(translator != null ? translator.replace("\n", "") : null);
                         book.setPageSize(values.get("SIZE"));
@@ -135,7 +136,8 @@ public class NxbTreCrawler extends BaseParser {
         }
         return book;
     }
-    
+
+    @Override
     public List<String> crawlNewBookUrls(String url) {
         List<String> urls = new ArrayList<>();
         try {
@@ -144,7 +146,7 @@ public class NxbTreCrawler extends BaseParser {
                 StringBuilder sb = new StringBuilder();
                 NestedTagResolver.formatNestedTag(htmlSource, "html").forEach(sb::append);
                 htmlSource = sb.toString();
-                
+
             }
             XMLStreamReader reader = inputFactory.createXMLStreamReader(new StringReader(htmlSource));
             ParserHelper fragmentParser = new ParserHelper(reader);
@@ -168,7 +170,8 @@ public class NxbTreCrawler extends BaseParser {
         }
         return urls;
     }
-    
+
+    @Override
     public List<Book> crawlNextNewBooks(int start, int time) {
         List<Book> rs = new ArrayList<>();
         String tmp = "https://www.nxbtre.com.vn/tu-sach/trang-";
@@ -182,23 +185,17 @@ public class NxbTreCrawler extends BaseParser {
         }
         urls.parallelStream().map(s -> crawlBookPage(s))
                 .filter(b -> {
-                    //check not null
-                    if (b == null) {
+                    if (!validateData(b)) {
                         return false;
                     }
                     //normalize image url
                     b.setImageUrl("https://www.nxbtre.com.vn" + b.getImageUrl());
-                    //check title and price
-                    if (b.getTitle() == null || b.getPrice() == null) {
-                        return false;
-                    }
                     //generate id
-                    String url = b.getUrl().replace("https://www.nxbtre.com.vn/sach/", "");
-                    Integer id = parseInt(url).orElse(null);
+                    String id = generateId(b);
                     if (id == null) {
                         return false;
                     } else {
-                        b.setId("nxbtre-" + id);
+                        b.setId(id);
                     }
                     return true;
                 })
@@ -209,5 +206,17 @@ public class NxbTreCrawler extends BaseParser {
                 });
         return rs;
     }
-    
+
+    @Override
+    public String generateId(Book b) {
+        String url = b.getUrl().replace("https://www.nxbtre.com.vn/sach/", "");
+        Integer id = parseInt(url).orElse(null);
+        if (id == null) {
+            return null;
+        } else {
+            String newId = "nxbtre-" + id;
+            return newId;
+        }
+    }
+
 }
