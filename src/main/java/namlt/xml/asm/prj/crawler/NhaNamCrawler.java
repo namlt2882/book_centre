@@ -9,7 +9,6 @@ import javax.xml.stream.XMLStreamReader;
 import namlt.xml.asm.prj.parser.BaseParser;
 import namlt.xml.asm.prj.parser.NestedTagResolver;
 import namlt.xml.asm.prj.parser.ParserHelper;
-import static namlt.xml.asm.prj.utils.InternetUtils.crawl;
 import static javax.xml.stream.XMLStreamConstants.START_ELEMENT;
 import namlt.xml.asm.prj.model.Book;
 import namlt.xml.asm.prj.parser.BoundReachedException;
@@ -17,7 +16,7 @@ import static namlt.xml.asm.prj.utils.CommonUtils.parseInt;
 import static namlt.xml.asm.prj.utils.CommonUtils.parseDouble;
 import static namlt.xml.asm.prj.utils.InternetUtils.crawl;
 
-public class NhaNamCrawler extends BaseParser {
+public class NhaNamCrawler extends BaseParser implements BookCrawler {
 
     private XMLInputFactory inputFactory = XMLInputFactory.newFactory();
 
@@ -30,9 +29,13 @@ public class NhaNamCrawler extends BaseParser {
     public static void main(String[] args) {
         NhaNamCrawler crawler = new NhaNamCrawler();
 //        crawler.crawlNewBookUrls("http://nhanam.com.vn/sach-moi-xuat-ban?page=1").forEach(System.out::println);
-        System.out.println(crawler.crawlBookPage("http://nhanam.com.vn/sach/16684/gau-a-cau-on-chu"));
+//        System.out.println(crawler.crawlBookPage("http://nhanam.com.vn/sach/16684/gau-a-cau-on-chu"));
+        List<Book> books = crawler.crawlNextNewBooks(0, 20);
+        System.out.println("Book number:" + books.size());
+        books.forEach(System.out::println);
     }
 
+    @Override
     public Book crawlBookPage(String url) {
         Book book = null;
         ValueIdentifier identifier = new Book().getIdentifier();
@@ -77,7 +80,7 @@ public class NhaNamCrawler extends BaseParser {
                                 String key = null;
                                 String value = null;
                                 try {
-                                    detailParser.skipToWithClassName("li", "dataattr");
+                                    detailParser.skipTo("li");
                                 } catch (BoundReachedException e) {
                                     //end attribute
                                     break;
@@ -97,6 +100,10 @@ public class NhaNamCrawler extends BaseParser {
                                     detailParser.addCounter(-1);
                                 }
                                 value = sb.toString();
+                                if (isExceptionAttribute(key)) {
+                                    value = exceptionAttributeValue(key);
+                                    key = identifyExceptionAttributeKey(key);
+                                }
                                 identifier.indentify(key != null ? key.trim() : null,
                                         value != null ? value.trim() : null);
                             }
@@ -115,7 +122,7 @@ public class NhaNamCrawler extends BaseParser {
                             Integer pageNumber = parseInt(values.get("PAGE_NUMBER")).orElse(null);
                             String size = values.get("SIZE");
 
-                            book.setId("nxbnhanam-" + id);
+                            book.setId(id);
                             book.setAuthor(author != null ? author.replace("\n", "") : null);
                             book.setTranslator(translator != null ? translator.replace("\n", "") : null);
                             book.setPageNumber(pageNumber);
@@ -131,7 +138,6 @@ public class NhaNamCrawler extends BaseParser {
                             fragmentParser.skipToBound(sb);
                             String description = sb.toString();
                             book.setDescription(description);
-//                            System.out.println(description);
                         } catch (BoundReachedException e) {
                         }
                     }
@@ -143,6 +149,7 @@ public class NhaNamCrawler extends BaseParser {
         return book;
     }
 
+    @Override
     public List<String> crawlNewBookUrls(String url) {
         List<String> rs = new ArrayList<>();
         try {
@@ -176,5 +183,76 @@ public class NhaNamCrawler extends BaseParser {
         }
 
         return rs;
+    }
+
+    @Override
+    public List<Book> crawlNextNewBooks(int start, int time) {
+        List<Book> rs = new ArrayList<>();
+        String tmp = "http://nhanam.com.vn/sach-moi-xuat-ban?page=";
+        List<String> urls = new ArrayList<>();
+        if (start <= 0) {
+            start = 1;
+        }
+        for (int i = start; i < time; i++) {
+            String url = tmp + (i + 1);
+            crawlNewBookUrls(url).forEach(s -> urls.add("http://nhanam.com.vn" + s));
+        }
+        urls.parallelStream().map(s -> crawlBookPage(s))
+                .filter(b -> {
+                    if (!validateData(b)) {
+                        return false;
+                    }
+                    //generate id
+                    String id = generateId(b);
+                    if (id == null) {
+                        return false;
+                    } else {
+                        b.setId(id);
+                    }
+                    return true;
+                })
+                .forEach(b -> {
+                    synchronized (rs) {
+                        rs.add(b);
+                    }
+                });
+//        System.out.println("URL:" + urls.size());
+        return rs;
+    }
+
+    private boolean isExceptionAttribute(String key) {
+        if (key.contains("Số trang") || key.contains("Kích thước")) {
+            return true;
+        }
+        return false;
+    }
+
+    private String identifyExceptionAttributeKey(String key) {
+        if (key.contains("Số trang:")) {
+            return "Số trang:";
+        } else if (key.contains("Kích thước:")) {
+            return "Kích thước:";
+        }
+        return null;
+    }
+
+    private String exceptionAttributeValue(String s) {
+        if (s != null) {
+            if (s.contains("Số trang")) {
+                return s;
+            } else if (s.contains("Kích thước:")) {
+                return s.replace("Kích thước:", "").trim();
+            }
+            return null;
+        }
+        return null;
+    }
+
+    @Override
+    public String generateId(Book b) {
+        if (b.getId() == null) {
+            return null;
+        }
+        return "nxbnhanam-" + b.getId();
     }
 }
