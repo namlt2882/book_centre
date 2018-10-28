@@ -15,6 +15,9 @@ public class CommonUtils {
 
     public static Optional<Integer> parseInt(String s) {
         Optional<Integer> rs = Optional.empty();
+        if (s == null) {
+            return rs;
+        }
         StringBuilder numberOnly = new StringBuilder();
         int length = s.length();
         char c;
@@ -28,13 +31,16 @@ public class CommonUtils {
             Integer integerValue = new Integer(numberOnly.toString());
             rs = Optional.of(integerValue);
         } catch (Exception e) {
-            System.out.println("[ERROR] At [Common utility] Can not parse value \"" + s + "\" as Integer!");
+            System.out.println("[ERROR] [Common utility]: Can not parse value \"" + s + "\" as Integer!");
         }
         return rs;
     }
 
     public static Optional<Double> parseDouble(String s) {
         Optional<Double> rs = Optional.empty();
+        if (s == null) {
+            return rs;
+        }
         StringBuilder floatingNumberOnly = new StringBuilder();
         int length = s.length();
         char c;
@@ -48,7 +54,7 @@ public class CommonUtils {
             Double doubleValue = new Double(floatingNumberOnly.toString());
             rs = Optional.of(doubleValue);
         } catch (Exception e) {
-            System.out.println("[ERROR] At [Common utility] Can not parse value \"" + s + "\" as Double!");
+            System.out.println("[ERROR] [Common utility]: Can not parse value \"" + s + "\" as Double!");
         }
         return rs;
     }

@@ -21,33 +21,31 @@ import namlt.xml.asm.prj.model.Book;
 import static namlt.xml.asm.prj.utils.CommonUtils.parseInt;
 import static namlt.xml.asm.prj.utils.CommonUtils.parseDouble;
 import static namlt.xml.asm.prj.utils.InternetUtils.crawl;
-import static namlt.xml.asm.prj.utils.InternetUtils.crawl;
 
 /**
  *
  * @author ADMIN
  */
 public class NxbTreCrawler extends BaseParser {
-
+    
     private XMLInputFactory inputFactory = XMLInputFactory.newFactory();
-    private ParserHelper parserHelper = new ParserHelper();
-
+    
     public NxbTreCrawler() {
         inputFactory.setProperty(
                 XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
         inputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
     }
-
+    
     public static void main(String[] args) {
         NxbTreCrawler crawler = new NxbTreCrawler();
-//        Book book = crawler.crawlBookPage("https://www.nxbtre.com.vn/sach/44576.html");
+//        Book book = crawler.crawlBookPage("https://www.nxbtre.com.vn/sach/24269.html");
 //        System.out.println(book);
         List<Book> books = crawler.crawlNextNewBooks(50);
         System.out.println("Book number:" + books.size());
         books.forEach(System.out::println);
-
+        
     }
-
+    
     public Book crawlBookPage(String url) {
         Book book = null;
         ValueIdentifier identifier = new Book().getIdentifier();
@@ -57,57 +55,66 @@ public class NxbTreCrawler extends BaseParser {
                 StringBuilder sb = new StringBuilder();
                 NestedTagResolver.formatNestedTag(htmlSource, "html").forEach(sb::append);
                 htmlSource = sb.toString();
-
+                
             }
-//            parserHelper.writeToFile(htmlSource);
             XMLStreamReader reader = inputFactory.createXMLStreamReader(new StringReader(htmlSource));
+            ParserHelper fragmentParser = new ParserHelper(reader);
+            ParserHelper detailParser = new ParserHelper(reader);
             int event;
             while (reader.hasNext()) {
                 event = reader.next();
                 if (event == START_ELEMENT) {
                     if (isTag("div", reader) && equalClass(reader, null, "aut-detail")) {
                         book = new Book(url);
-                        parserHelper.skipToCharacter(reader);
-                        StringBuilder sb = new StringBuilder();
-                        parserHelper.readTextInside(reader, sb);
-                        String title = sb.toString();
-                        book.setTitle(title.trim());
+                        //read title
+                        fragmentParser.mark();
+                        try {
+                            fragmentParser.skipToCharacter();
+                            String title = fragmentParser.readTextInside();
+                            book.setTitle(title != null ? title.trim() : null);
+                        } catch (BoundReachedException e) {
+                            //end fragment
+                        }
                     } else if (isTag("ul", reader) && equalClass(reader, null, "itemDetail-cat")) {
                         Map<String, String> valueMap = new HashMap<>();
-                        int tagCount = 1;
-
-                        StringBuilder sb;
-                        boolean isFinished = false;
+                        StringBuilder sb = new StringBuilder();
                         try {
-                            while (tagCount > 0) {
-                                parserHelper.setMaxTag(tagCount);
-                                tagCount += parserHelper.skipTag(reader, "li");
-                                parserHelper.setMaxTag(tagCount);
-                                tagCount += parserHelper.skipToCharacter(reader);
-                                tagCount += parserHelper.readTextInside(reader, (sb = new StringBuilder()));
-                                String key = sb.toString();
-
-                                parserHelper.setMaxTag(tagCount);
-                                tagCount += parserHelper.skipToCharacter(reader);
-                                tagCount += parserHelper.readTextInside(reader, (sb = new StringBuilder()));
+                            while (true) {
+                                String key = null;
+                                String value = null;
+                                //skip to new fragment detail
                                 try {
-                                    parserHelper.setMaxTag(tagCount);
-                                    tagCount += parserHelper.skipTag(reader, "li", sb);
+                                    fragmentParser.skipTo("li");
                                 } catch (BoundReachedException e) {
-                                    isFinished = true;
-                                }
-                                String value = sb.toString();
-                                identifier.indentify(key != null ? key.trim() : null,
-                                        value != null ? value.trim() : null);
-                                if (isFinished) {
                                     break;
                                 }
+                                try {
+                                    detailParser.mark();
+                                    //get the key
+                                    detailParser.skipToCharacter();
+                                    key = detailParser.readTextInside();
+
+                                    //get the value
+                                    detailParser.skipToCharacter();
+                                    sb = new StringBuilder();
+                                    detailParser.skipToBound(sb);
+                                } catch (BoundReachedException e) {
+                                    //do nothing
+                                } finally {
+                                    //end fragment detail
+                                    fragmentParser.addCounter(-1);
+                                }
+                                value = sb.toString();
+                                identifier.indentify(key != null ? key.trim() : null,
+                                        value != null ? value.trim() : null);
                             }
                         } catch (Exception e) {
                         }
                         Map<String, String> values = identifier.values();
-                        book.setAuthor(values.get("AUTHOR"));
-                        book.setTranslator(values.get("TRANSLATOR"));
+                        String author = values.get("AUTHOR");
+                        book.setAuthor(author != null ? author.replace("\n", "") : null);
+                        String translator = values.get("TRANSLATOR");
+                        book.setTranslator(translator != null ? translator.replace("\n", "") : null);
                         book.setPageSize(values.get("SIZE"));
                         String pageNumber = values.get("PAGE_NUMBER");
                         //process page number here
@@ -126,7 +133,7 @@ public class NxbTreCrawler extends BaseParser {
         }
         return book;
     }
-
+    
     public List<String> crawlNewBookUrls(String url) {
         List<String> urls = new ArrayList<>();
         try {
@@ -135,17 +142,18 @@ public class NxbTreCrawler extends BaseParser {
                 StringBuilder sb = new StringBuilder();
                 NestedTagResolver.formatNestedTag(htmlSource, "html").forEach(sb::append);
                 htmlSource = sb.toString();
-
+                
             }
-            parserHelper.writeToFile(htmlSource);
             XMLStreamReader reader = inputFactory.createXMLStreamReader(new StringReader(htmlSource));
+            ParserHelper fragmentParser = new ParserHelper(reader);
             int event;
             String link;
             while (reader.hasNext()) {
                 event = reader.next();
                 if (event == START_ELEMENT) {
                     if (isTag("div", reader) && equalClasses(reader, null, "bBox", "book-item")) {
-                        parserHelper.skipTag(reader, "a");
+                        fragmentParser.mark();
+                        fragmentParser.skipTo("a");
                         link = reader.getAttributeValue("", "href");
                         if (link != null && !"".equals((link = link.trim()))) {
                             urls.add(link);
@@ -158,7 +166,7 @@ public class NxbTreCrawler extends BaseParser {
         }
         return urls;
     }
-
+    
     public List<Book> crawlNextNewBooks(int time) {
         List<Book> rs = new ArrayList<>();
         String tmp = "https://www.nxbtre.com.vn/tu-sach/trang-";
@@ -168,6 +176,7 @@ public class NxbTreCrawler extends BaseParser {
             crawlNewBookUrls(url).forEach(s -> urls.add("https://www.nxbtre.com.vn" + s.replace("xem-them", "sach")));
         }
         urls.parallelStream().map(s -> crawlBookPage(s))
+                .filter(s -> s != null)
                 .forEach(b -> {
                     synchronized (rs) {
                         rs.add(b);
@@ -175,5 +184,5 @@ public class NxbTreCrawler extends BaseParser {
                 });
         return rs;
     }
-
+    
 }

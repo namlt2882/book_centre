@@ -19,8 +19,6 @@ import static javax.xml.stream.XMLStreamConstants.CHARACTERS;
 import static javax.xml.stream.XMLStreamConstants.CDATA;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import namlt.xml.asm.prj.crawler.NxbTreCrawler;
-import namlt.xml.asm.prj.crawler.NxbTreCrawler;
 
 /**
  *
@@ -28,33 +26,39 @@ import namlt.xml.asm.prj.crawler.NxbTreCrawler;
  */
 public class ParserHelper {
 
-    private int maxTag = -1;
+    private XMLStreamReader reader;
+    private int counter;
 
-    public int getMaxTag() {
-        return maxTag;
+    public ParserHelper(XMLStreamReader reader) {
+        this.reader = reader;
+        counter = -1;
     }
 
-    public void setMaxTag(int maxTag) {
-        this.maxTag = maxTag;
+    public void mark() {
+        counter = 1;
     }
 
-    private void checkMaxTag(int i) {
-        if (maxTag == -1) {
+    public void unmark() {
+        counter = -1;
+    }
+
+    private void checkBound() {
+        if (counter == -1) {
             return;
         }
-        if (maxTag + i <= 0) {
+        if (counter == 0) {
             throw new BoundReachedException();
         }
     }
 
-    public int readTextInside(XMLStreamReader reader, StringBuilder sb) {
-        return readTextInside(reader, 0, sb);
+    public String readTextInside() {
+        return readTextInside(0);
     }
 
-    public int readTextInside(XMLStreamReader reader, int layerNumber, StringBuilder sb) {
-        int counter = 0;
+    public String readTextInside(int layerNumber) {
+        StringBuilder sb = new StringBuilder();
         try {
-            counter += skipTag(reader, layerNumber);
+            skipTag(layerNumber);
         } catch (XMLStreamException ex) {
         }
         int evntType;
@@ -64,27 +68,44 @@ public class ParserHelper {
                 if (evntType == XMLStreamConstants.CDATA || evntType == XMLStreamConstants.CHARACTERS) {
                     sb.append(reader.getText());
                 }
+                checkBound();
                 evntType = reader.next();
+                try {
+                } catch (BoundReachedException e) {
+                    break;
+                }
                 if (evntType == START_ELEMENT) {
-                    counter++;
+                    counterIncrement();
                     break;
                 } else if (evntType == END_ELEMENT) {
-                    counter--;
+                    counterDecrement();
                     break;
                 }
             }
         } catch (XMLStreamException ex) {
             ex.printStackTrace();
         }
-        return counter;
+        return sb.toString();
     }
 
-    public int skipTag(XMLStreamReader reader, int time) throws XMLStreamException {
-        int counter = 0;
+    private void counterIncrement() {
+        counter += (counter == -1) ? 0 : 1;
+    }
+
+    public void addCounter(int i) {
+        counter += (counter == -1) ? 0 : i;
+    }
+
+    private void counterDecrement() {
+        counter -= (counter == -1) ? 0 : 1;
+    }
+
+    public int skipTag(int time) throws XMLStreamException {
         while (reader.hasNext()) {
             if (time <= 0) {
                 break;
             }
+            checkBound();
             try {
                 reader.nextTag();
             } catch (Exception e) {
@@ -92,58 +113,56 @@ public class ParserHelper {
             }
             if (reader.getEventType() == START_ELEMENT) {
                 time--;
-                counter++;
+                counterIncrement();
             } else if (reader.getEventType() == END_ELEMENT) {
-                counter--;
+                counterDecrement();
             }
         }
         return counter;
     }
 
-    public int skipTag(XMLStreamReader reader, String tagName) throws XMLStreamException {
-        return skipTag(reader, tagName, null);
+    public int skipTo(String tagName) throws XMLStreamException {
+        return ParserHelper.this.skipTo(tagName, null);
     }
 
-    public int skipTag(XMLStreamReader reader, String tagName, StringBuilder sb) throws XMLStreamException {
+    public int skipTo(String tagName, StringBuilder sb) throws XMLStreamException {
         if (tagName == null || "".equals(tagName)) {
-            return 0;
+            return counter;
         }
-        if (reader.getEventType() == START_ELEMENT && reader.getLocalName().equals(tagName)) {
-            return 0;
+        int eventType = reader.getEventType();
+        if (eventType == START_ELEMENT && reader.getLocalName().equals(tagName)) {
+            return counter;
         }
-        int counter = 0;
-        int eventType;
         boolean readAllText = sb != null;
         while (reader.hasNext()) {
+            checkBound();
             try {
-                reader.next();
+                eventType = reader.next();
             } catch (Exception e) {
                 break;
             }
-            eventType = reader.getEventType();
             if (readAllText && (eventType == CHARACTERS || eventType == CDATA)) {
                 sb.append(reader.getText());
             }
-            if (reader.getEventType() == START_ELEMENT) {
-                counter++;
+            if (eventType == START_ELEMENT) {
+                counterIncrement();
                 if (reader.getLocalName().equals(tagName)) {
                     break;
                 }
-            } else if (reader.getEventType() == END_ELEMENT) {
-                counter--;
+            } else if (eventType == END_ELEMENT) {
+                counterDecrement();
             }
-            checkMaxTag(counter);
         }
         return counter;
     }
 
-    public int skipToCharacter(XMLStreamReader reader) throws XMLStreamException {
-        int counter = 0;
+    public int skipToCharacter() throws XMLStreamException {
         int evntType = reader.getEventType();
         if (evntType == XMLStreamConstants.CHARACTERS || evntType == XMLStreamConstants.CDATA) {
             return 0;
         }
         while (reader.hasNext()) {
+            checkBound();
             try {
                 evntType = reader.next();
             } catch (Exception e) {
@@ -151,36 +170,46 @@ public class ParserHelper {
             }
             if (evntType == XMLStreamConstants.CHARACTERS || evntType == XMLStreamConstants.CDATA) {
                 break;
-            } else if (evntType == START_ELEMENT) {
-                counter++;
-            } else if (evntType == END_ELEMENT) {
-                counter--;
             }
-            checkMaxTag(counter);
+            if (evntType == START_ELEMENT) {
+                counterIncrement();
+            } else if (evntType == END_ELEMENT) {
+                counterDecrement();
+            }
         }
         return counter;
     }
 
-    public void skipOutTag(XMLStreamReader reader, int time) throws XMLStreamException {
+    public void skipToBound(StringBuilder sb) throws XMLStreamException {
+        if (counter == -1) {
+            return;
+        }
+        int eventType = reader.getEventType();
+        boolean readAllText = sb != null;
         while (reader.hasNext()) {
-            if (time <= 0) {
-                return;
+            try {
+                checkBound();
+            } catch (BoundReachedException e) {
+                break;
+            }
+            if (readAllText && (eventType == CHARACTERS || eventType == CDATA)) {
+                sb.append(reader.getText());
             }
             try {
-                reader.nextTag();
+                eventType = reader.next();
             } catch (Exception e) {
-                reader.next();
+                break;
             }
-            if (reader.getEventType() == START_ELEMENT) {
-                time++;
-            } else if (reader.getEventType() == END_ELEMENT) {
-                time--;
+            if (eventType == START_ELEMENT) {
+                counterIncrement();
+            } else if (eventType == END_ELEMENT) {
+                counterDecrement();
             }
         }
     }
 
     public static void writeToFile(String xmlSource) throws UnsupportedEncodingException, FileNotFoundException, IOException {
-        ClassLoader classLoader = NxbTreCrawler.class.getClassLoader();
+        ClassLoader classLoader = ParserHelper.class.getClassLoader();
         String fileLocation = classLoader.getResource("crawler/schema/output.xml").getFile();
         File file = new File(URLDecoder.decode(fileLocation, "UTF-8"));
         FileOutputStream fw = new FileOutputStream(file);
