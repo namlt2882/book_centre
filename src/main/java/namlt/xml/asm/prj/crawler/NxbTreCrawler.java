@@ -22,30 +22,26 @@ import static namlt.xml.asm.prj.utils.CommonUtils.parseInt;
 import static namlt.xml.asm.prj.utils.CommonUtils.parseDouble;
 import static namlt.xml.asm.prj.utils.InternetUtils.crawl;
 
-/**
- *
- * @author ADMIN
- */
 public class NxbTreCrawler extends BaseParser {
-    
+
     private XMLInputFactory inputFactory = XMLInputFactory.newFactory();
-    
+
     public NxbTreCrawler() {
         inputFactory.setProperty(
                 XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
         inputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
     }
-    
+
     public static void main(String[] args) {
         NxbTreCrawler crawler = new NxbTreCrawler();
 //        Book book = crawler.crawlBookPage("https://www.nxbtre.com.vn/sach/24269.html");
 //        System.out.println(book);
-        List<Book> books = crawler.crawlNextNewBooks(50);
+        List<Book> books = crawler.crawlNextNewBooks(4, 5);
         System.out.println("Book number:" + books.size());
         books.forEach(System.out::println);
-        
+
     }
-    
+
     public Book crawlBookPage(String url) {
         Book book = null;
         ValueIdentifier identifier = new Book().getIdentifier();
@@ -55,7 +51,7 @@ public class NxbTreCrawler extends BaseParser {
                 StringBuilder sb = new StringBuilder();
                 NestedTagResolver.formatNestedTag(htmlSource, "html").forEach(sb::append);
                 htmlSource = sb.toString();
-                
+
             }
             XMLStreamReader reader = inputFactory.createXMLStreamReader(new StringReader(htmlSource));
             ParserHelper fragmentParser = new ParserHelper(reader);
@@ -112,15 +108,17 @@ public class NxbTreCrawler extends BaseParser {
                         }
                         Map<String, String> values = identifier.values();
                         String author = values.get("AUTHOR");
-                        book.setAuthor(author != null ? author.replace("\n", "") : null);
                         String translator = values.get("TRANSLATOR");
+                        String pageNumber = values.get("PAGE_NUMBER");
+                        String isbn = values.get("ISBN");
+                        String price = values.get("PRICE");
+
+                        book.setAuthor(author != null ? author.replace("\n", "") : null);
                         book.setTranslator(translator != null ? translator.replace("\n", "") : null);
                         book.setPageSize(values.get("SIZE"));
-                        String pageNumber = values.get("PAGE_NUMBER");
                         //process page number here
                         book.setPageNumber(parseInt(pageNumber).orElse(null));
-                        book.setIsbn(values.get("ISBN"));
-                        String price = values.get("PRICE");
+                        book.setIsbn(isbn != null ? isbn.replace("\n", "").replace(" ", "") : null);
                         //process price here
                         book.setPrice(parseDouble(price).orElse(null));
                         book.setDescription(values.get("DESCRIPTION"));
@@ -133,7 +131,7 @@ public class NxbTreCrawler extends BaseParser {
         }
         return book;
     }
-    
+
     public List<String> crawlNewBookUrls(String url) {
         List<String> urls = new ArrayList<>();
         try {
@@ -142,7 +140,7 @@ public class NxbTreCrawler extends BaseParser {
                 StringBuilder sb = new StringBuilder();
                 NestedTagResolver.formatNestedTag(htmlSource, "html").forEach(sb::append);
                 htmlSource = sb.toString();
-                
+
             }
             XMLStreamReader reader = inputFactory.createXMLStreamReader(new StringReader(htmlSource));
             ParserHelper fragmentParser = new ParserHelper(reader);
@@ -166,17 +164,38 @@ public class NxbTreCrawler extends BaseParser {
         }
         return urls;
     }
-    
-    public List<Book> crawlNextNewBooks(int time) {
+
+    public List<Book> crawlNextNewBooks(int start, int time) {
         List<Book> rs = new ArrayList<>();
         String tmp = "https://www.nxbtre.com.vn/tu-sach/trang-";
         List<String> urls = new ArrayList<>();
-        for (int i = 0; i < time; i++) {
+        if (start <= 0) {
+            start = 1;
+        }
+        for (int i = start; i < time; i++) {
             String url = tmp + (i + 1) + '/';
             crawlNewBookUrls(url).forEach(s -> urls.add("https://www.nxbtre.com.vn" + s.replace("xem-them", "sach")));
         }
         urls.parallelStream().map(s -> crawlBookPage(s))
-                .filter(s -> s != null)
+                .filter(b -> {
+                    //check not null
+                    if (b == null) {
+                        return false;
+                    }
+                    //check title and price
+                    if (b.getTitle() == null || b.getPrice() == null) {
+                        return false;
+                    }
+                    //generate id
+                    String url = b.getUrl().replace("https://www.nxbtre.com.vn/sach/", "");
+                    Integer id = parseInt(url).orElse(null);
+                    if (id == null) {
+                        return false;
+                    } else {
+                        b.setId("nxbtre-" + id);
+                    }
+                    return true;
+                })
                 .forEach(b -> {
                     synchronized (rs) {
                         rs.add(b);
@@ -184,5 +203,5 @@ public class NxbTreCrawler extends BaseParser {
                 });
         return rs;
     }
-    
+
 }
