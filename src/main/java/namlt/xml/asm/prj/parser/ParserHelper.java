@@ -24,7 +24,7 @@ import javax.xml.stream.XMLStreamReader;
  *
  * @author ADMIN
  */
-public class ParserHelper {
+public class ParserHelper extends BaseParser {
 
     private XMLStreamReader reader;
     private int counter;
@@ -122,7 +122,23 @@ public class ParserHelper {
     }
 
     public int skipTo(String tagName) throws XMLStreamException {
-        return ParserHelper.this.skipTo(tagName, null);
+        return skipTo(tagName, null);
+    }
+
+    public int skipToWithClassName(String tagName, String... className) throws XMLStreamException {
+        while (true) {
+            skipTo(tagName);
+            if (equalClasses(reader, "", className)) {
+                return counter;
+            } else {
+                int eventType = reader.next();
+                if (eventType == START_ELEMENT) {
+                    counterIncrement();
+                } else if (eventType == END_ELEMENT) {
+                    counterDecrement();
+                }
+            }
+        }
     }
 
     public int skipTo(String tagName, StringBuilder sb) throws XMLStreamException {

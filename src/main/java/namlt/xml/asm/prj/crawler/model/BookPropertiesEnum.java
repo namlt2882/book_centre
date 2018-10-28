@@ -10,9 +10,9 @@ package namlt.xml.asm.prj.crawler.model;
  * @author ADMIN
  */
 public enum BookPropertiesEnum implements ValueProperties {
-    TRANSLATOR("Dịch giả:"), AUTHOR("Tác giả:"), SIZE("Khổ sách:"),
-    PAGE_NUMBER("Số trang:"), PRICE("Giá bán:"), ISBN("ISBN:"),
-    DESCRIPTION("Giới thiệu tóm tắt tác phẩm:");
+    ID("Mã sản phẩm:"), TRANSLATOR("Dịch giả:"), AUTHOR("Tác giả:"),
+    SIZE("Khổ sách:", "Kích thước:"), PAGE_NUMBER("Số trang:"), PRICE("Giá bán:"),
+    ISBN("ISBN:"), DESCRIPTION("Giới thiệu tóm tắt tác phẩm:");
 
     private final String[] verifyKey;
 

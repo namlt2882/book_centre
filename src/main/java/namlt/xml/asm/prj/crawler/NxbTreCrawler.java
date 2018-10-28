@@ -113,18 +113,18 @@ public class NxbTreCrawler extends BaseParser {
                         Map<String, String> values = identifier.values();
                         String author = values.get("AUTHOR");
                         String translator = values.get("TRANSLATOR");
-                        String pageNumber = values.get("PAGE_NUMBER");
+                        Integer pageNumber = parseInt(values.get("PAGE_NUMBER")).orElse(null);
                         String isbn = values.get("ISBN");
-                        String price = values.get("PRICE");
+                        Double price = parseDouble(values.get("PRICE")).orElse(null);
                         
                         book.setAuthor(author != null ? author.replace("\n", "") : null);
                         book.setTranslator(translator != null ? translator.replace("\n", "") : null);
                         book.setPageSize(values.get("SIZE"));
                         //process page number here
-                        book.setPageNumber(parseInt(pageNumber).orElse(null));
+                        book.setPageNumber(pageNumber);
                         book.setIsbn(isbn != null ? isbn.replace("\n", "").replace(" ", "") : null);
                         //process price here
-                        book.setPrice(parseDouble(price).orElse(null));
+                        book.setPrice(price);
                         book.setDescription(values.get("DESCRIPTION"));
                         break;
                     }

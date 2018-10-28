@@ -235,7 +235,7 @@ public class NestedTagResolver {
             }
             if (type == START_ELEMENT) {
                 tagName = getLocalName(string);
-                if (tagName.equals("script")) {
+                if (tagName.equals("script") || tagName.equals("noscript")) {
                     notAppend = true;
                     continue;
                 }
@@ -243,7 +243,7 @@ public class NestedTagResolver {
                 string = string.replace("&", "");
             } else if (type == END_ELEMENT) {
                 tagName = getLocalName(string);
-                if (tagName.equals("script")) {
+                if (tagName.equals("script") || tagName.equals("noscript")) {
                     notAppend = false;
                     continue;
                 }
