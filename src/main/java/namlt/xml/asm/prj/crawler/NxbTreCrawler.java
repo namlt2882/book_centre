@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package namlt.xml.asm.prj.crawler;
 
 import namlt.xml.asm.prj.parser.BaseParser;
@@ -23,15 +18,15 @@ import static namlt.xml.asm.prj.utils.CommonUtils.parseDouble;
 import static namlt.xml.asm.prj.utils.InternetUtils.crawl;
 
 public class NxbTreCrawler extends BaseParser {
-
+    
     private XMLInputFactory inputFactory = XMLInputFactory.newFactory();
-
+    
     public NxbTreCrawler() {
         inputFactory.setProperty(
                 XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
         inputFactory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
     }
-
+    
     public static void main(String[] args) {
         NxbTreCrawler crawler = new NxbTreCrawler();
 //        Book book = crawler.crawlBookPage("https://www.nxbtre.com.vn/sach/24269.html");
@@ -39,9 +34,9 @@ public class NxbTreCrawler extends BaseParser {
         List<Book> books = crawler.crawlNextNewBooks(4, 5);
         System.out.println("Book number:" + books.size());
         books.forEach(System.out::println);
-
+        
     }
-
+    
     public Book crawlBookPage(String url) {
         Book book = null;
         ValueIdentifier identifier = new Book().getIdentifier();
@@ -51,7 +46,6 @@ public class NxbTreCrawler extends BaseParser {
                 StringBuilder sb = new StringBuilder();
                 NestedTagResolver.formatNestedTag(htmlSource, "html").forEach(sb::append);
                 htmlSource = sb.toString();
-
             }
             XMLStreamReader reader = inputFactory.createXMLStreamReader(new StringReader(htmlSource));
             ParserHelper fragmentParser = new ParserHelper(reader);
@@ -60,8 +54,18 @@ public class NxbTreCrawler extends BaseParser {
             while (reader.hasNext()) {
                 event = reader.next();
                 if (event == START_ELEMENT) {
-                    if (isTag("div", reader) && equalClass(reader, null, "aut-detail")) {
-                        book = new Book(url);
+                    if (isTag("div", reader) && equalClass(reader, null, "autBigImg")) {
+                        fragmentParser.mark();
+                        try {
+                            fragmentParser.skipTo("img");
+                            //in case book has no image
+                            book = (book == null) ? new Book(url) : book;
+                            String imageUrl = reader.getAttributeValue("", "src");
+                            book.setImageUrl(imageUrl);
+                        } catch (BoundReachedException e) {
+                        }
+                    } else if (isTag("div", reader) && equalClass(reader, null, "aut-detail")) {
+                        book = (book == null) ? new Book(url) : book;
                         //read title
                         fragmentParser.mark();
                         try {
@@ -112,7 +116,7 @@ public class NxbTreCrawler extends BaseParser {
                         String pageNumber = values.get("PAGE_NUMBER");
                         String isbn = values.get("ISBN");
                         String price = values.get("PRICE");
-
+                        
                         book.setAuthor(author != null ? author.replace("\n", "") : null);
                         book.setTranslator(translator != null ? translator.replace("\n", "") : null);
                         book.setPageSize(values.get("SIZE"));
@@ -131,7 +135,7 @@ public class NxbTreCrawler extends BaseParser {
         }
         return book;
     }
-
+    
     public List<String> crawlNewBookUrls(String url) {
         List<String> urls = new ArrayList<>();
         try {
@@ -140,7 +144,7 @@ public class NxbTreCrawler extends BaseParser {
                 StringBuilder sb = new StringBuilder();
                 NestedTagResolver.formatNestedTag(htmlSource, "html").forEach(sb::append);
                 htmlSource = sb.toString();
-
+                
             }
             XMLStreamReader reader = inputFactory.createXMLStreamReader(new StringReader(htmlSource));
             ParserHelper fragmentParser = new ParserHelper(reader);
@@ -164,7 +168,7 @@ public class NxbTreCrawler extends BaseParser {
         }
         return urls;
     }
-
+    
     public List<Book> crawlNextNewBooks(int start, int time) {
         List<Book> rs = new ArrayList<>();
         String tmp = "https://www.nxbtre.com.vn/tu-sach/trang-";
@@ -182,6 +186,8 @@ public class NxbTreCrawler extends BaseParser {
                     if (b == null) {
                         return false;
                     }
+                    //normalize image url
+                    b.setImageUrl("https://www.nxbtre.com.vn" + b.getImageUrl());
                     //check title and price
                     if (b.getTitle() == null || b.getPrice() == null) {
                         return false;
@@ -203,5 +209,5 @@ public class NxbTreCrawler extends BaseParser {
                 });
         return rs;
     }
-
+    
 }

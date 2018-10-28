@@ -34,8 +34,17 @@ public class Book implements Serializable, ValueIdentifiable {
     private List<Tag> tagList;
     private List<OrderDetail> orderDetailList;
     private String url;
+    private String imageUrl;
 
     public Book() {
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public Book(String url) {
@@ -157,7 +166,7 @@ public class Book implements Serializable, ValueIdentifiable {
     public String toString() {
         return "[Book: '" + title + "'][id=" + id + "][isbn=" + isbn + "][author=" + author + "]"
                 + "[translator=" + translator + "][page size=" + pageSize + "][price=" + price + "]"
-                + "[page number=" + pageNumber + "][status=" + status + "][url='" + url + "']";
+                + "[page number=" + pageNumber + "][status=" + status + "][image url='" + imageUrl + "'][url='" + url + "']";
     }
 
 }
