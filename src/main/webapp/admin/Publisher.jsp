@@ -6,6 +6,15 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Dữ liệu nhà xuất bản</title>
+        <script>
+            function getNewBook() {
+                var url = "http://" + window.location.hostname + ":" + window.location.port + "/admin/Publisher.jsp?publisher=";
+                var element = document.getElementById("publisher");
+                url += element.value;
+                window.location.href = url;
+                return false;
+            }
+        </script>
     </head>
     <body class="html front not-logged-in one-sidebar sidebar-second site-name-hidden browserChrome browserChrome6">
         <div id="page" class="container">
@@ -23,14 +32,14 @@
                                                     <form action="Publisher.jsp" style="margin-left: 500px;">
                                                         <div>
                                                             Chọn nhà xuất bản:
-                                                            <select name="publisher">
+                                                            <select name="publisher" id="publisher">
                                                                 <option value="nxb-nhanam">Nhã Nam</option>
                                                                 <option value="nxb-tre">Trẻ</option>
                                                             </select>
-                                                            <button>Sản phẩm mới</button>
+                                                            <button onclick="return getNewBook()">Sản phẩm mới</button>
                                                         </div>
                                                         <input type="text" name="search"/>
-                                                        <button>Tìm kiếm</button>
+                                                        <input type="submit" value="Tìm kiếm"/>
                                                     </form>
                                                 </div>
                                                 <c:if test="${empty param.search}">
@@ -43,6 +52,7 @@
                                                 <c:if test="${not empty param.search}">
                                                     <h2 class="block-title">Kết quả tìm kiếm cho "${param.search}" 
                                                         của nxb 
+                                                        <c:if test="${empty param.publisher}">Nhã Nam</c:if>
                                                         <c:if test="${param.publisher=='nxb-nhanam'}">Nhã Nam</c:if>
                                                         <c:if test="${param.publisher=='nxb-tre'}">Trẻ</c:if>
                                                         </h2>

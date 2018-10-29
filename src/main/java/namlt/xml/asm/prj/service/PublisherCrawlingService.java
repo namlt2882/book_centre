@@ -33,7 +33,12 @@ public class PublisherCrawlingService {
     }
 
     private List<Book> getFromCache(String key) {
-        List<Book> rs = bookCache.apply(key);
+        List<Book> rs = null;
+        try {
+            rs = bookCache.apply(key);
+        } catch (Exception e) {
+            System.out.println("[ERROR]: " + e.getMessage());
+        }
         if (rs == null) {
             return new ArrayList<>();
         }
