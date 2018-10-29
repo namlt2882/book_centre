@@ -74,9 +74,9 @@
                                                                     <a title="Đến trang 2" href="/node?page=1">2</a></li>
                                                                 <li class="pager-item">
                                                                     <a title="Đến trang 3" href="/node?page=2">3</a></li><li class="pager-item"><a title="Đến trang 4" href="/node?page=3">4</a></li><li class="pager-item"><a title="Đến trang 5" href="/node?page=4">5</a></li><li class="pager-item"><a title="Đến trang 6" href="/node?page=5">6</a></li><li class="pager-item"><a title="Đến trang 7" href="/node?page=6">7</a></li><li class="pager-item"><a title="Đến trang 8" href="/node?page=7">8</a></li><li class="pager-item"><a title="Đến trang 9" href="/node?page=8">9</a></li><li class="pager-ellipsis">…</li><li class="pager-next"><a title="Đến trang kế sau" href="/node?page=1">sau ›</a></li><li class="pager-last"><a title="Đến trang cuối cùng" href="/node?page=208">cuối »</a></li></ul></div>  
+                                                        </div>  
                                                     </div>    
                                                 </div>
-                                            </div>
                                         </section>
                                     </div>
                                 </div>

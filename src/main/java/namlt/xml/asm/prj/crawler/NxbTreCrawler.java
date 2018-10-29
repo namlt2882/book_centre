@@ -137,7 +137,7 @@ public class NxbTreCrawler extends BaseParser implements BookCrawler {
                 }
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            System.out.println("[ERROR]: " + ex.getMessage());
         }
         return book;
     }
@@ -174,7 +174,7 @@ public class NxbTreCrawler extends BaseParser implements BookCrawler {
                 }
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
+            System.out.println("[ERROR]: " + ex.getMessage());
         }
         return urls;
     }

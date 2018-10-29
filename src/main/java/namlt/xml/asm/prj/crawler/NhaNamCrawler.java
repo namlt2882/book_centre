@@ -99,7 +99,6 @@ public class NhaNamCrawler extends BaseParser implements BookCrawler {
                                     sb = new StringBuilder();
                                     attributeParser.skipToBound(sb);
                                 } catch (BoundReachedException e) {
-                                    e.printStackTrace();
                                 } finally {
                                     //end attribute
                                     detailParser.addCounter(-1);
@@ -149,7 +148,7 @@ public class NhaNamCrawler extends BaseParser implements BookCrawler {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("[ERROR]: " + e.getMessage());
         }
         return book;
     }
@@ -179,12 +178,12 @@ public class NhaNamCrawler extends BaseParser implements BookCrawler {
                         bookUrl = reader.getAttributeValue("", "href");
                         rs.add(bookUrl);
                     } catch (BoundReachedException e) {
-                        e.printStackTrace();
+                        System.out.println("[ERROR]: " + e.getMessage());
                     }
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("[ERROR]: " + e.getMessage());
         }
 
         return rs;

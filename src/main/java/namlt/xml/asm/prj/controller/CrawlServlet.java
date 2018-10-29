@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package namlt.xml.asm.prj.controller;
 
 import java.io.IOException;
@@ -16,10 +11,6 @@ import javax.servlet.http.HttpServletResponse;
 import namlt.xml.asm.prj.model.Book;
 import namlt.xml.asm.prj.service.PublisherCrawlingService;
 
-/**
- *
- * @author ADMIN
- */
 @WebServlet(name = "CrawlServlet", urlPatterns = {"/crawl"})
 public class CrawlServlet extends HttpServlet {
 
@@ -37,7 +28,6 @@ public class CrawlServlet extends HttpServlet {
         if (search != null) {
             rs = crawlingService.search(publisher, search);
         } else {
-            System.out.println("GET NEW BOOK");
             rs = crawlingService.getNewBook(publisher, 0, 1);
         }
         request.setAttribute("books", rs);
