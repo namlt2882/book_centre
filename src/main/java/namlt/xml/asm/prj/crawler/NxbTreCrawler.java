@@ -4,10 +4,14 @@ import namlt.xml.asm.prj.parser.BaseParser;
 import namlt.xml.asm.prj.parser.BoundReachedException;
 import namlt.xml.asm.prj.parser.ParserHelper;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 import namlt.xml.asm.prj.parser.NestedTagResolver;
@@ -31,7 +35,8 @@ public class NxbTreCrawler extends BaseParser implements BookCrawler {
         NxbTreCrawler crawler = new NxbTreCrawler();
 //        Book book = crawler.crawlBookPage("https://www.nxbtre.com.vn/sach/24269.html");
 //        System.out.println(book);
-        List<Book> books = crawler.crawlNextNewBooks(4, 5);
+//        List<Book> books = crawler.crawlNextNewBooks(4, 5);
+        List<Book> books = crawler.search("Hoàng tử bé");
         System.out.println("Book number:" + books.size());
         books.forEach(System.out::println);
 
@@ -139,6 +144,9 @@ public class NxbTreCrawler extends BaseParser implements BookCrawler {
 
     @Override
     public List<String> crawlNewBookUrls(String url) {
+        if (url == null) {
+            return new ArrayList<>();
+        }
         List<String> urls = new ArrayList<>();
         try {
             String htmlSource = crawl(url);
@@ -146,10 +154,10 @@ public class NxbTreCrawler extends BaseParser implements BookCrawler {
                 StringBuilder sb = new StringBuilder();
                 NestedTagResolver.formatNestedTag(htmlSource, "html").forEach(sb::append);
                 htmlSource = sb.toString();
-
             }
             XMLStreamReader reader = inputFactory.createXMLStreamReader(new StringReader(htmlSource));
             ParserHelper fragmentParser = new ParserHelper(reader);
+            ParserHelper.writeToFile(htmlSource);
             int event;
             String link;
             while (reader.hasNext()) {
@@ -217,6 +225,41 @@ public class NxbTreCrawler extends BaseParser implements BookCrawler {
             String newId = "nxbtre-" + id;
             return newId;
         }
+    }
+
+    @Override
+    public List<Book> search(String s) {
+        List<Book> rs = new ArrayList<>();
+        String tmp = null;
+        try {
+            tmp = "https://www.nxbtre.com.vn/tim-kiem?q=" + URLEncoder.encode(s, "UTF-8");
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(NxbTreCrawler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        List<String> urls = new ArrayList<>();
+        crawlNewBookUrls(tmp).forEach(u -> urls.add("https://www.nxbtre.com.vn" + u.replace("xem-them", "sach")));
+        urls.parallelStream().map(u -> crawlBookPage(u))
+                .filter(b -> {
+                    if (!validateData(b)) {
+                        return false;
+                    }
+                    //normalize image url
+                    b.setImageUrl("https://www.nxbtre.com.vn" + b.getImageUrl());
+                    //generate id
+                    String id = generateId(b);
+                    if (id == null) {
+                        return false;
+                    } else {
+                        b.setId(id);
+                    }
+                    return true;
+                })
+                .forEach(b -> {
+                    synchronized (rs) {
+                        rs.add(b);
+                    }
+                });
+        return rs;
     }
 
 }

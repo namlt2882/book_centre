@@ -1,9 +1,13 @@
 package namlt.xml.asm.prj.crawler;
 
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 import namlt.xml.asm.prj.parser.BaseParser;
@@ -30,7 +34,8 @@ public class NhaNamCrawler extends BaseParser implements BookCrawler {
         NhaNamCrawler crawler = new NhaNamCrawler();
 //        crawler.crawlNewBookUrls("http://nhanam.com.vn/sach-moi-xuat-ban?page=1").forEach(System.out::println);
 //        System.out.println(crawler.crawlBookPage("http://nhanam.com.vn/sach/16684/gau-a-cau-on-chu"));
-        List<Book> books = crawler.crawlNextNewBooks(0, 20);
+//        List<Book> books = crawler.crawlNextNewBooks(0, 20);
+        List<Book> books = crawler.search("Mẹ");
         System.out.println("Book number:" + books.size());
         books.forEach(System.out::println);
     }
@@ -217,6 +222,39 @@ public class NhaNamCrawler extends BaseParser implements BookCrawler {
                     }
                 });
 //        System.out.println("URL:" + urls.size());
+        return rs;
+    }
+
+    @Override
+    public List<Book> search(String s) {
+        List<Book> rs = new ArrayList<>();
+        String tmp = null;
+        try {
+            tmp = "http://nhanam.com.vn/tim-kiem?q=" + URLEncoder.encode(s, "UTF-8");
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(NxbTreCrawler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        List<String> urls = new ArrayList<>();
+        crawlNewBookUrls(tmp).forEach(u -> urls.add("http://nhanam.com.vn" + u));
+        urls.parallelStream().map(u -> crawlBookPage(u))
+                .filter(b -> {
+                    if (!validateData(b)) {
+                        return false;
+                    }
+                    //generate id
+                    String id = generateId(b);
+                    if (id == null) {
+                        return false;
+                    } else {
+                        b.setId(id);
+                    }
+                    return true;
+                })
+                .forEach(b -> {
+                    synchronized (rs) {
+                        rs.add(b);
+                    }
+                });
         return rs;
     }
 

@@ -21,7 +21,9 @@ public interface BookCrawler {
     List<Book> crawlNextNewBooks(int start, int time);
 
     String generateId(Book b);
-    
+
+    List<Book> search(String s);
+
     default boolean validateData(Book b) {
         //check not null
         if (b == null) {
@@ -33,6 +35,5 @@ public interface BookCrawler {
         }
         return true;
     }
-    
-    
+
 }
