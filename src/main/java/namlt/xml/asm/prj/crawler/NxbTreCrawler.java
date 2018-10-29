@@ -187,7 +187,7 @@ public class NxbTreCrawler extends BaseParser implements BookCrawler {
         if (start <= 0) {
             start = 1;
         }
-        for (int i = start; i < time; i++) {
+        for (int i = start; i <= time; i++) {
             String url = tmp + (i + 1) + '/';
             crawlNewBookUrls(url).forEach(s -> urls.add("https://www.nxbtre.com.vn" + s.replace("xem-them", "sach")));
         }
