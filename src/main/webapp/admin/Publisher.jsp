@@ -33,12 +33,12 @@
                                                         <div>
                                                             Chọn nhà xuất bản:
                                                             <select name="publisher" id="publisher">
-                                                                <option value="nxb-nhanam">Nhã Nam</option>
-                                                                <option value="nxb-tre">Trẻ</option>
-                                                            </select>
-                                                            <button onclick="return getNewBook()">Sản phẩm mới</button>
-                                                        </div>
-                                                        <input type="text" name="search"/>
+                                                                <option value="nxb-nhanam" <c:if test="${param.publisher=='nxb-nhanam'}">selected=""</c:if>>Nhã Nam</option>
+                                                                <option value="nxb-tre" <c:if test="${param.publisher=='nxb-tre'}">selected=""</c:if>>Trẻ</option>
+                                                                </select>
+                                                                <button onclick="return getNewBook()">Sản phẩm mới</button>
+                                                            </div>
+                                                            <input type="text" name="search" value="${param.search}"/>
                                                         <input type="submit" value="Tìm kiếm"/>
                                                     </form>
                                                 </div>
@@ -67,15 +67,23 @@
                                                                             <li class="views-row">  
                                                                                 <div class="views-field views-field-field-sach-anh-dai-dien">        
                                                                                     <div class="field-content">
-                                                                                        <img class="hover-preview-imgpreview hover-preview hover-preview-imgpreview-processed" 
-                                                                                             src="${book.imageUrl}">
-
+                                                                                        <div style="width: 100px;height: 250px;">
+                                                                                            <img src="${book.imageUrl}" style="max-width: 100%;max-height: 100%;margin: 0px;">
+                                                                                        </div>
                                                                                     </div>  
                                                                                 </div>  
-                                                                                <div class="views-field views-field-nothing">        <span class="field-content"><div>
-                                                                                            <div><b><a href="/sach/101-bo-phim-viet-nam-hay-nhat">${book.title}</a></b></div>
-                                                                                            <div><b>Tác giả:</b> <a href="/tac-gia/le-hong-lam">${book.author}</a></div>
-                                                                                            <div><b>Giá bìa:</b> ${book.price} VND</div>
+                                                                                <div class="views-field views-field-nothing">        
+                                                                                    <span class="field-content">
+                                                                                        <div>
+                                                                                            <div style="margin-bottom: 20px;">
+                                                                                                <font style="color: #00562f"><b>${book.title}</b></font>
+                                                                                            </div>
+                                                                                            <div>
+                                                                                                <b>Tác giả:</b> ${book.author}
+                                                                                            </div>
+                                                                                            <div>
+                                                                                                <b>Giá bìa:</b> ${book.price} VND
+                                                                                            </div>
                                                                                         </div>
                                                                                     </span>  
                                                                                 </div>
@@ -83,22 +91,55 @@
                                                                         </c:forEach>
                                                                     </ul>
                                                                 </c:if>
-                                                            </div>    
-                                                        </div>
-                                                    </div>    
-                                                </div>
-                                                <div class="block-content content">
-                                                    <input type="submit" value="Trang kế tiếp"/>
-                                                </div>  
+                                                            </div>
+                                                            <c:if test="${empty param.search}">
+                                                                <div class="item-list">
+                                                                    <ul class="pager">
+                                                                        <c:if test="${not empty param.page and param.page>1}">
+                                                                            <li class="pager-next">
+                                                                                <a title="Đến trang trước" href="
+                                                                                   <c:url value="/admin/Publisher.jsp">
+                                                                                       <c:if test="${not empty param.publisher}">
+                                                                                           <c:param name="publisher" value="${param.publisher}"/>
+                                                                                       </c:if>
+                                                                                       <c:if test="${not empty param.page}">
+                                                                                           <c:param name="page" value="${param.page - 1}"/>
+                                                                                       </c:if>
+                                                                                   </c:url>">< Sản phẩm mới hơn
+                                                                                </a>
+                                                                            </li>
+                                                                        </c:if>
+                                                                        <li class="pager-next">
+                                                                            <a title="Đến trang kế sau" href="
+                                                                               <c:url value="/admin/Publisher.jsp">
+                                                                                   <c:if test="${not empty param.publisher}">
+                                                                                       <c:param name="publisher" value="${param.publisher}"/>
+                                                                                   </c:if>
+                                                                                   <c:if test="${not empty param.page}">
+                                                                                       <c:param name="page" value="${param.page + 1}"/>
+                                                                                   </c:if>
+                                                                                   <c:if test="${empty param.page}">
+                                                                                       <c:param name="page" value="2"/>
+                                                                                   </c:if>
+                                                                               </c:url>">Sản phẩm cũ hơn >
+                                                                            </a>
+                                                                        </li>
+                                                                    </ul>
+                                                                </div>  
+                                                            </c:if>
+                                                        </div>  
+                                                    </div>
+                                                </div>    
                                             </div>
-                                        </section>
                                     </div>
-                                </div>
                             </section>
                         </div>
                     </div>
+                    </section>
                 </div>
             </div>
         </div>
-    </body>
+    </div>
+</div>
+</body>
 </html>

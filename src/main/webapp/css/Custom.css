@@ -5,6 +5,10 @@
 .menu-item{
 
 }
+.views-row{
+    max-width: 30%;
+    max-height: 200px;
+}
 .content-column *{
     float: left;
 }
@@ -281,6 +285,7 @@ ul.nice-menu ul {
     list-style: none;
     width: 30%;
     float: left;
+    margin-top: 20px;
     padding: 26px 0;
 }
 

@@ -28,7 +28,19 @@ public class CrawlServlet extends HttpServlet {
         if (search != null) {
             rs = crawlingService.search(publisher, search);
         } else {
-            rs = crawlingService.getNewBook(publisher, 0, 1);
+            String pageStr = request.getParameter("page");
+            int page = 1;
+            if (pageStr != null && !"".equals(pageStr.trim())) {
+                try {
+                    page = Integer.parseInt(pageStr);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            if (page <= 0) {
+                page = 1;
+            }
+            rs = crawlingService.getNewBook(publisher, page - 1, page);
         }
         request.setAttribute("books", rs);
     }
