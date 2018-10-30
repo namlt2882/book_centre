@@ -1,7 +1,7 @@
 var xmlTree;
-window.onload = function () {
+window.addEventListener('load', function () {
     initData();
-}
+}, false);
 function initData() {
     var holder = document.getElementById("xmlData");
     if (holder == null) {
@@ -34,5 +34,9 @@ function getBookAttribute(book, attributeName) {
     if (attr == null) {
         return null;
     }
-    return attr.childNodes[0].nodeValue;
+    var childNode = attr.childNodes[0];
+    if (childNode == null) {
+        return "";
+    }
+    return childNode.nodeValue;
 }

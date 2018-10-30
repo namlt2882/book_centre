@@ -18,7 +18,7 @@ public class PublisherCrawlingService {
     static {
         bookCache = CacheBuilder.newBuilder()
                 .maximumSize(100)
-                .expireAfterWrite(5, TimeUnit.MINUTES)
+                .expireAfterWrite(15, TimeUnit.MINUTES)
                 .build(new BookCacheLoader());
     }
 

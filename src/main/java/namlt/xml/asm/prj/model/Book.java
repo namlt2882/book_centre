@@ -15,34 +15,41 @@ import namlt.xml.asm.prj.crawler.ValueIdentifierImpl;
 import namlt.xml.asm.prj.crawler.model.BookPropertiesEnum;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "Book")
-@XmlRootElement
+@XmlType(name = "Book", propOrder = {
+    "id", "title", "author", "isbn",
+    "translator", "pageSize", "pageNumber",
+    "price", "url", "imageUrl", "status", "description"})
+@XmlRootElement(name = "book")
 public class Book implements Serializable, ValueIdentifiable {
 
-    @XmlAttribute
+    @XmlAttribute(name = "id")
     private String id;
-    @XmlElement
+    @XmlElement(name = "title")
     private String title;
-    @XmlElement
+    @XmlElement(name = "pageSize")
     private String pageSize;
-    @XmlElement
+    @XmlElement(name = "pageNumber")
     private Integer pageNumber;
-    @XmlElement
+    @XmlElement(name = "description")
     private String description;
-    @XmlElement
+    @XmlElement(name = "author")
     private String author;
-    @XmlElement
+    @XmlElement(name = "translator")
     private String translator;
-    @XmlElement
+    @XmlElement(name = "price")
     private Double price;
-    @XmlElement
+    @XmlElement(name = "status")
     private Integer status;
-    @XmlElement
+    @XmlElement(name = "isbn")
     private String isbn;
-    private List<Tag> tagList;
-    private List<OrderDetail> orderDetailList;
+    @XmlElement(name = "url")
     private String url;
+    @XmlElement(name = "imageUrl")
     private String imageUrl;
+    @XmlTransient
+    private List<Tag> tagList;
+    @XmlTransient
+    private List<OrderDetail> orderDetailList;
 
     public Book() {
     }

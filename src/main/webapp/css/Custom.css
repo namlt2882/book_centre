@@ -5,6 +5,9 @@
 .menu-item{
 
 }
+.book_detail_trigger{
+    cursor: pointer;
+}
 .views-row{
     max-width: 30%;
     max-height: 200px;
@@ -22,7 +25,7 @@
     -webkit-border-radius: 10px;
     border-radius: 10px;
     padding: 10px;
-    z-index: 999;
+    z-index: 12;
     border: none;
 }
 ul.menu li ul.menu {
@@ -198,12 +201,12 @@ ul.nice-menu ul {
     border-radius: 5px;
     border: 1px solid #ffffff;
     background: #f3f3f3;
-    z-index: 9999999;
+    z-index: 12;
 }
 
 #block-nice-menus-1 ul li ul li {
     width: 140px;
-    z-index: 100;
+    z-index: 12;
 }
 
 #block-nice-menus-1 ul li ul li {
@@ -893,7 +896,7 @@ ul.nice-menu ul {
 #block-menu-menu-menu-footer {
     width: 670px;
     float: left;
-    z-index: 999;
+    z-index: 12;
 }
 
 .browserIE #block-menu-menu-menu-footer {
