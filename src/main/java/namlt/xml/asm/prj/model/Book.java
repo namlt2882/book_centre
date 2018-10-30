@@ -1,35 +1,43 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package namlt.xml.asm.prj.model;
 
 import java.io.Serializable;
 import java.util.List;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 import namlt.xml.asm.prj.crawler.ValueIdentifiable;
 import namlt.xml.asm.prj.crawler.ValueIdentifier;
 import namlt.xml.asm.prj.crawler.ValueIdentifierImpl;
 import namlt.xml.asm.prj.crawler.model.BookPropertiesEnum;
 
-/**
- *
- * @author ADMIN
- */
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "Book")
 @XmlRootElement
 public class Book implements Serializable, ValueIdentifiable {
 
+    @XmlAttribute
     private String id;
+    @XmlElement
     private String title;
+    @XmlElement
     private String pageSize;
+    @XmlElement
     private Integer pageNumber;
+    @XmlElement
     private String description;
+    @XmlElement
     private String author;
+    @XmlElement
     private String translator;
+    @XmlElement
     private Double price;
+    @XmlElement
     private Integer status;
+    @XmlElement
     private String isbn;
     private List<Tag> tagList;
     private List<OrderDetail> orderDetailList;

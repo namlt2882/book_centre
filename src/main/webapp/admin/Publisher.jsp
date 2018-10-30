@@ -6,6 +6,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Dữ liệu nhà xuất bản</title>
+        <script type="text/javascript" src="/js/BookCache.js"></script>
         <script>
             function getNewBook() {
                 var url = "http://" + window.location.hostname + ":" + window.location.port + "/admin/Publisher.jsp?publisher=";
@@ -15,6 +16,9 @@
                 return false;
             }
         </script>
+        <c:if test='${not empty xmlData}'>
+            <script id="xmlData" type="text/xmldata">${xmlData}</script>
+        </c:if>
     </head>
     <body class="html front not-logged-in one-sidebar sidebar-second site-name-hidden browserChrome browserChrome6">
         <div id="page" class="container">
