@@ -22,17 +22,44 @@ public class PublisherCrawlingService {
                 .build(new BookCacheLoader());
     }
 
-    public List<Book> getNewBook(String publisher, int start, int time) {
+    public String buildSearchCacheKey(String publisher, String search) {
+        String key = "search\n" + publisher + '\n' + search;
+        return key;
+    }
+
+    public String buildGetNewBookCacheKey(String publisher, int start, int time) {
         String key = "new\n" + publisher + '\n' + start + '\n' + time;
-        return getFromCache(key);
+        return key;
+    }
+
+    public static void removeBookFromCache(String id) {
+        if (id == null || "".equals(id)) {
+            return;
+        }
+        bookCache.asMap().values().parallelStream().forEach(lb -> {
+            lb.removeIf(b -> id.equals(b.getId()));
+        });
+    }
+
+    public List<Book> getNewBook(String publisher, int start, int time) {
+        return getFromCache(buildGetNewBookCacheKey(publisher, start, time));
     }
 
     public List<Book> search(String publisher, String search) {
-        String key = "search\n" + publisher + '\n' + search;
-        return getFromCache(key);
+        return getFromCache(buildSearchCacheKey(publisher, search));
     }
 
-    private List<Book> getFromCache(String key) {
+    public List<Book> getFromCacheIfPresent(String cacheKey) {
+        List<Book> rs = null;
+        try {
+            rs = bookCache.getIfPresent(cacheKey);
+        } catch (Exception e) {
+            System.out.println("[ERROR]: " + e.getMessage());
+        }
+        return rs;
+    }
+
+    public List<Book> getFromCache(String key) {
         List<Book> rs = null;
         try {
             rs = bookCache.apply(key);

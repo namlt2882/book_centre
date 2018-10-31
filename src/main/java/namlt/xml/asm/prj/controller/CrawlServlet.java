@@ -1,7 +1,8 @@
 package namlt.xml.asm.prj.controller;
 
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,11 +29,16 @@ public class CrawlServlet extends HttpServlet {
         PublisherCrawlingService crawlingService = new PublisherCrawlingService();
         List<Book> rs = null;
         String xmlData = "";
+        String cacheKey = request.getParameter("cache_key");
         if (tmp != null) {
             publisher = tmp;
         }
-        if (search != null) {
+        if (cacheKey != null) {
+            cacheKey = URLDecoder.decode(cacheKey, "UTF-8");
+            rs = crawlingService.getFromCache(cacheKey);
+        } else if (search != null) {
             rs = crawlingService.search(publisher, search);
+            cacheKey = crawlingService.buildSearchCacheKey(publisher, search);
         } else {
             String pageStr = request.getParameter("page");
             int page = 1;
@@ -47,6 +53,9 @@ public class CrawlServlet extends HttpServlet {
                 page = 1;
             }
             rs = crawlingService.getNewBook(publisher, page - 1, page);
+            cacheKey = crawlingService.buildGetNewBookCacheKey(publisher, page - 1, page);
+        }
+        if (rs != null) {
             try {
                 BookList bl = new BookList(rs);
                 xmlData = MarshallerUtils.marshall(bl);
@@ -56,7 +65,8 @@ public class CrawlServlet extends HttpServlet {
         }
         request.setAttribute("books", rs);
         request.setAttribute("xmlData", xmlData);
-        
+        request.setAttribute("cacheKey", URLEncoder.encode(cacheKey, "UTF-8"));
+
     }
 
 }
