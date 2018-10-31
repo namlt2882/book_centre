@@ -5,9 +5,11 @@
  */
 package namlt.xml.asm.prj.service;
 
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.naming.NamingException;
 import namlt.xml.asm.prj.common.BookCommon;
 import namlt.xml.asm.prj.model.Book;
 import namlt.xml.asm.prj.repository.BookRepository;
@@ -31,5 +33,14 @@ public class BookService implements BookCommon {
             Logger.getLogger(BookService.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
+    }
+
+    public Book find(String id) {
+        try {
+            return new BookRepository().find(id);
+        } catch (Exception ex) {
+            Logger.getLogger(BookService.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
     }
 }

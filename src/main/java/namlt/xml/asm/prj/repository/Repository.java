@@ -12,8 +12,8 @@ import javax.sql.DataSource;
 public abstract class Repository<K, T> {
 
     private Connection connection;
-    private ResultSet resultSet;
-    private PreparedStatement preparedStatement;
+    protected ResultSet resultSet;
+    protected PreparedStatement preparedStatement;
     protected final Object TRANSACTION_KEY = new Object();
 
     public Repository() {

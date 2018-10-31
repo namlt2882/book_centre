@@ -3,6 +3,7 @@ package namlt.xml.asm.prj.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import jersey.repackaged.com.google.common.cache.CacheBuilder;
 import jersey.repackaged.com.google.common.cache.CacheLoader;
 import jersey.repackaged.com.google.common.cache.LoadingCache;
@@ -74,20 +75,42 @@ public class PublisherCrawlingService {
 
     private static class BookCacheLoader extends CacheLoader<String, List<Book>> {
 
+        private CommonCacheService commonCacheService = new CommonCacheService();
+
         @Override
         public List<Book> load(String k) throws Exception {
             String[] tmp = k.split("\n");
+            List<Book> rs = null;
             if (tmp != null) {
                 switch (tmp[0]) {
                     case "new":
                         System.out.println("[WARNNING] Start to get new book from " + tmp[1]);
-                        return getNewBook(tmp[1], Integer.parseInt(tmp[2]), Integer.parseInt(tmp[3]));
+                        rs = getNewBook(tmp[1], Integer.parseInt(tmp[2]), Integer.parseInt(tmp[3]));
+                        break;
                     case "search":
                         System.out.println("[WARNNING] Start to search '" + tmp[2] + "' from " + tmp[1]);
-                        return search(tmp[1], tmp[2]);
+                        rs = search(tmp[1], tmp[2]);
+                        break;
                 }
             }
-            return new ArrayList<>();
+            if (rs == null) {
+                rs = new ArrayList<>();
+            } else if (rs.size() > 0) {
+                List<String> existedId = rs.parallelStream()
+                        .map(b -> {
+                            boolean isExisted = commonCacheService.isBookExisted(b.getId());
+                            if (isExisted) {
+                                return b.getId();
+                            } else {
+                                return null;
+                            }
+                        })
+                        .filter(id -> id != null).collect(Collectors.toList());
+                for (String string : existedId) {
+                    rs.removeIf(b -> string.equals(b.getId()));
+                }
+            }
+            return rs;
         }
 
         public List<Book> search(String publisher, String search) {
