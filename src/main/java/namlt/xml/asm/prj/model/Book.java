@@ -1,6 +1,7 @@
 package namlt.xml.asm.prj.model;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -18,7 +19,7 @@ import namlt.xml.asm.prj.crawler.model.BookPropertiesEnum;
 @XmlType(name = "Book", propOrder = {
     "id", "title", "author", "isbn",
     "translator", "pageSize", "pageNumber",
-    "price", "url", "imageUrl", "status", "description"})
+    "price", "url", "imageUrl", "status", "quantity", "description"})
 @XmlRootElement(name = "book")
 public class Book implements Serializable, ValueIdentifiable {
 
@@ -46,12 +47,39 @@ public class Book implements Serializable, ValueIdentifiable {
     private String url;
     @XmlElement(name = "imageUrl")
     private String imageUrl;
+    @XmlElement(required = false, name = "quantity")
+    private int quantity = 0;
+    @XmlTransient
+    private Date insertDate;
     @XmlTransient
     private List<Tag> tagList;
     @XmlTransient
     private List<OrderDetail> orderDetailList;
 
     public Book() {
+    }
+
+    public Book(String id, String title, String author, Double price) {
+        this.id = id;
+        this.title = title;
+        this.author = author;
+        this.price = price;
+    }
+
+    public Date getInsertDate() {
+        return insertDate;
+    }
+
+    public void setInsertDate(Date insertDate) {
+        this.insertDate = insertDate;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 
     public String getImageUrl() {

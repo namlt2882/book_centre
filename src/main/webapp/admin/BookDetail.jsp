@@ -16,10 +16,18 @@
             <h2 id="book_detail_title">Giấc mơ hóa rồng</h2>
             <form action="/rest/product" method="POST">
                 <c:if test="${not empty cacheKey}"><input type="hidden" name="cache_key" value="${cacheKey}"></c:if>
+                <input type="hidden" name="title" id="book_detail_title_input">
+                <input type="hidden" name="image_url" id="book_detail_imageUrl_input">
+                <input type="hidden" name="url" id="book_detail_url_input">
+                
                 <table class="book_detail_attributes">
                     <tr>
                         <td>Mã sản phẩm:</td>
                         <td><input id="book_detail_id" type="text" name="id" readonly="true"></td>
+                    </tr>
+                    <tr>
+                        <td>ISBN:</td>
+                        <td><input id="book_detail_isbn" type="text" name="isbn"></td>
                     </tr>
                     <tr>
                         <td>Tác giả:</td>

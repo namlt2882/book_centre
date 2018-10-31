@@ -6,6 +6,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Dữ liệu nhà xuất bản</title>
+        <script type="text/javascript" src="/js/Common.js"></script>
         <script type="text/javascript" src="/js/BookCache.js"></script>
         <script>
             function getNewBook() {
@@ -21,6 +22,7 @@
         </c:if>
     </head>
     <body class="html front not-logged-in one-sidebar sidebar-second site-name-hidden browserChrome browserChrome6">
+        <jsp:include page="BookDetail.jsp"/>
         <div id="page" class="container">
             <jsp:include page="AdminPageHeader.jsp"/>
             <div id="columns">
@@ -144,6 +146,5 @@
                 </div>
             </div>
         </div>
-        <jsp:include page="BookDetail.jsp"/>
     </body>
 </html>
