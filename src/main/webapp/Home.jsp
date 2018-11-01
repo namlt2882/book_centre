@@ -47,9 +47,6 @@
                                                                                             <div>
                                                                                                 <b>Giá bìa:</b> ${book.price} VND
                                                                                             </div>
-                                                                                            <div>
-                                                                                                <b>Số lượng trong kho:</b> ${book.quantity}
-                                                                                            </div>
                                                                                         </div>
                                                                                     </span>  
                                                                                 </div>
@@ -71,9 +68,6 @@
                                                                                    <c:url value="/Home.jsp">
                                                                                    <c:if test="${not empty param.search}">
                                                                                         <c:param name="search" value="${param.search}"/>
-                                                                                    </c:if>
-                                                                                    <c:if test="${not empty param.type}">
-                                                                                        <c:param name="type" value="${param.type}"/>
                                                                                     </c:if>
                                                                                     <c:param name="page" value="${counter.index}"/>
                                                                                     </c:url>">${counter.index}</a>

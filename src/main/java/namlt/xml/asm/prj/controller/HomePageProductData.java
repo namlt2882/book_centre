@@ -13,12 +13,13 @@ import namlt.xml.asm.prj.service.BookService;
 
 @WebServlet(name = "HomePageProductData", urlPatterns = {"/home_page_product_data"})
 public class HomePageProductData extends HttpServlet {
-
+    
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         Integer page = null;
         String tmp = request.getParameter("page");
+        String search = request.getParameter("search");
         if (tmp != null) {
             try {
                 page = Integer.parseInt(tmp);
@@ -38,8 +39,13 @@ public class HomePageProductData extends HttpServlet {
         int maxPage = 0;
         double var = 0;
         BookService bookService = new BookService();
-        rs = bookService.getNew(startAt, nextRow);
-        var = Math.ceil(bookService.countActive() * 1.0 / MAX_ITEM_PER_PAGE);
+        if (search == null) {
+            rs = bookService.getNew(startAt, nextRow);
+            var = Math.ceil(bookService.countActive() * 1.0 / MAX_ITEM_PER_PAGE);
+        } else {
+            rs = bookService.search(search, startAt, nextRow);
+            var = Math.ceil(bookService.countSearch(search) * 1.0 / MAX_ITEM_PER_PAGE);
+        }
         maxPage = (int) var;
         request.setAttribute("books", rs);
         request.setAttribute("page", page);

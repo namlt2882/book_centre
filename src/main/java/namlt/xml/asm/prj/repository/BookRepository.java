@@ -26,6 +26,9 @@ public class BookRepository extends Repository<String, Book> implements BookComm
     public static final String QUERY_COUNT_OUT_OF_STOCK = "SELECT COUNT(*) AS 'COUNT' FROM Book WHERE Status=" + STATUS_OUT_OF_STOCK;
     public static final String QUERY_COUNT_DISABLE = "SELECT COUNT(*) AS 'COUNT' FROM Book WHERE Status=" + STATUS_DISABLE;
     public static final String QUERY_BOOK_BY_ID = "SELECT * FROM Book WHERE Id=?";
+    public static final String QUERY_BOOK_BY_TITLE = "SELECT * FROM Book WHERE Title LIKE ? ORDER BY InsertDate DESC "
+            + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+    public static final String QUERY_COUNT_BOOK_BY_TITLE = "SELECT COUNT(*) AS 'COUNT' FROM Book WHERE Title LIKE ?";
 
     @Override
     public Book insert(Book b) throws NamingException, SQLException {
@@ -138,16 +141,33 @@ public class BookRepository extends Repository<String, Book> implements BookComm
 
     @Override
     public List<Book> find(String s, Integer startAt, Integer nextRow) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        List<Book> rs = null;
+        synchronized (TRANSACTION_KEY) {
+            try {
+                preparedStatement = newPreparedStatement(QUERY_BOOK_BY_TITLE);
+                preparedStatement.setString(1, '%' + s + '%');
+                preparedStatement.setInt(2, startAt);
+                preparedStatement.setInt(3, nextRow);
+                resultSet = preparedStatement.executeQuery();
+                rs = extractDataFromResultSet();
+            } finally {
+                closeResources();
+            }
+        }
+        return rs;
     }
 
     @Override
     public int count() throws Exception {
         synchronized (TRANSACTION_KEY) {
-            preparedStatement = newPreparedStatement(QUERY_COUNT);
-            resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()) {
-                return resultSet.getInt("COUNT");
+            try {
+                preparedStatement = newPreparedStatement(QUERY_COUNT);
+                resultSet = preparedStatement.executeQuery();
+                if (resultSet.next()) {
+                    return resultSet.getInt("COUNT");
+                }
+            } finally {
+                closeResources();
             }
         }
         return 0;
@@ -155,10 +175,30 @@ public class BookRepository extends Repository<String, Book> implements BookComm
 
     public int countActive() throws Exception {
         synchronized (TRANSACTION_KEY) {
-            preparedStatement = newPreparedStatement(QUERY_COUNT_ACTIVE);
-            resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()) {
-                return resultSet.getInt("COUNT");
+            try {
+                preparedStatement = newPreparedStatement(QUERY_COUNT_ACTIVE);
+                resultSet = preparedStatement.executeQuery();
+                if (resultSet.next()) {
+                    return resultSet.getInt("COUNT");
+                }
+            } finally {
+                closeResources();
+            }
+        }
+        return 0;
+    }
+
+    public int countSearch(String s) throws Exception {
+        synchronized (TRANSACTION_KEY) {
+            try {
+                preparedStatement = newPreparedStatement(QUERY_COUNT_BOOK_BY_TITLE);
+                preparedStatement.setString(1, '%' + s + '%');
+                resultSet = preparedStatement.executeQuery();
+                if (resultSet.next()) {
+                    return resultSet.getInt("COUNT");
+                }
+            } finally {
+                closeResources();
             }
         }
         return 0;
@@ -166,10 +206,14 @@ public class BookRepository extends Repository<String, Book> implements BookComm
 
     public int countOutOfStock() throws Exception {
         synchronized (TRANSACTION_KEY) {
-            preparedStatement = newPreparedStatement(QUERY_COUNT_OUT_OF_STOCK);
-            resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()) {
-                return resultSet.getInt("COUNT");
+            try {
+                preparedStatement = newPreparedStatement(QUERY_COUNT_OUT_OF_STOCK);
+                resultSet = preparedStatement.executeQuery();
+                if (resultSet.next()) {
+                    return resultSet.getInt("COUNT");
+                }
+            } finally {
+                closeResources();
             }
         }
         return 0;
@@ -177,10 +221,14 @@ public class BookRepository extends Repository<String, Book> implements BookComm
 
     public int countDisable() throws Exception {
         synchronized (TRANSACTION_KEY) {
-            preparedStatement = newPreparedStatement(QUERY_COUNT_DISABLE);
-            resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()) {
-                return resultSet.getInt("COUNT");
+            try {
+                preparedStatement = newPreparedStatement(QUERY_COUNT_DISABLE);
+                resultSet = preparedStatement.executeQuery();
+                if (resultSet.next()) {
+                    return resultSet.getInt("COUNT");
+                }
+            } finally {
+                closeResources();
             }
         }
         return 0;
