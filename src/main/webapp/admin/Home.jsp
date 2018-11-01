@@ -1,9 +1,20 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<jsp:include page="/product_data"/>
 <!DOCTYPE html>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Kho sách</title>
+        <script>
+            function filterByType() {
+                var url = "http://" + window.location.hostname + ":" + window.location.port + "/admin/Home.jsp?type=";
+                var element = document.getElementById("type");
+                url += element.value;
+                window.location.href = url;
+                return false;
+            }
+        </script>
     </head>
     <body class="html front not-logged-in one-sidebar sidebar-second site-name-hidden browserChrome browserChrome6">
         <div id="page" class="container">
@@ -16,73 +27,99 @@
                                 <div id="content">
                                     <div class="region region-content">
                                         <section id="block-views-sach-moi-block" class="block block-views ">
+                                            <div class="block-content content">
+                                                <form action="Home.jsp" style="margin-left: 500px;">
+                                                    <div>
+                                                        Lọc:
+                                                        <select name="type" id="type">
+                                                            <option value="active" <c:if test="${param.type=='active'}">selected=""</c:if>>Đang kinh doanh</option>
+                                                            <option value="out-of-stock" <c:if test="${param.type=='out-of-stock'}">selected=""</c:if>>Hết hàng</option>
+                                                            <option value="disable" <c:if test="${param.type=='disable'}">selected=""</c:if>>Ngừng kinh doanh</option>
+                                                            </select>
+                                                            <button onclick="return filterByType()">Lọc</button>
+                                                        </div>
+                                                        <input type="text" name="search" value="${param.search}"/>
+                                                    <input type="submit" value="Tìm kiếm"/>
+                                                </form>
+                                            </div>
                                             <div class="block-inner clearfix">
                                                 <h2 class="block-title">Danh mục sản phẩm mới</h2>
                                                 <div class="block-content content">
                                                     <div class="view view-sach-moi view-id-sach_moi view-display-id-block view-dom-id-4d0e7c14c2df0334da04712bf6aed109">
                                                         <div class="view-content">
-                                                            <div class="item-list-sm">    
-                                                                <ul>          
-                                                                    <li class="views-row views-row-odd views-row-first">  
-                                                                        <div class="views-field views-field-field-sach-anh-dai-dien">        
-                                                                            <div class="field-content"><a href="/sach/101-bo-phim-viet-nam-hay-nhat">
-                                                                                    <img data-hover-preview="http://nhanam.vn/sites/default/files/101_bo_phim_viet_nam_hay_nhat-02.jpg" class="hover-preview-imgpreview hover-preview hover-preview-imgpreview-processed" src="http://nhanam.vn/sites/default/files/styles/sach_moi_117x174/public/101_bo_phim_viet_nam_hay_nhat-02.jpg?itok=_xUtEhUc" alt="">
-                                                                                </a>
-                                                                            </div>  
-                                                                        </div>  
-                                                                        <div class="views-field views-field-nothing">        <span class="field-content"><div>
-                                                                                    <div><b><a href="/sach/101-bo-phim-viet-nam-hay-nhat">101 bộ phim Việt Nam hay nhất</a></b></div>
-                                                                                    <div><b>Tác giả:</b> <a href="/tac-gia/le-hong-lam">Lê Hồng Lâm</a></div>
-                                                                                    <div><b>Giá bìa:</b> 210.000 VND</div>
+                                                            <div class="item-list-sm">  
+                                                                <c:if test="${not empty books}">
+                                                                    <ul>
+                                                                        <c:forEach items="${books}" var="book">
+                                                                            <li class="views-row">  
+                                                                                <div class="views-field views-field-field-sach-anh-dai-dien">        
+                                                                                    <div class="field-content">
+                                                                                        <div style="width: 100px;height: 250px;">
+                                                                                            <img src="${book.imageUrl}" style="max-width: 100%;max-height: 100%;margin: 0px;"
+                                                                                                 class="book_detail_trigger" onclick="showBookDetailModel('${book.id}');">
+                                                                                        </div>
+                                                                                    </div>  
+                                                                                </div>  
+                                                                                <div class="views-field views-field-nothing">        
+                                                                                    <span class="field-content">
+                                                                                        <div>
+                                                                                            <div style="margin-bottom: 20px;">
+                                                                                                <font style="color: #00562f"><b>${book.title}</b></font>
+                                                                                            </div>
+                                                                                            <div>
+                                                                                                <b>Tác giả:</b> ${book.author}
+                                                                                            </div>
+                                                                                            <div>
+                                                                                                <b>Giá bìa:</b> ${book.price} VND
+                                                                                            </div>
+                                                                                            <div>
+                                                                                                <b>Số lượng trong kho:</b> ${book.quantity}
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </span>  
                                                                                 </div>
-                                                                            </span>  
-                                                                        </div>
-                                                                    </li>
-                                                                    <li class="views-row views-row-even">  
-                                                                        <div class="views-field views-field-field-sach-anh-dai-dien">        <div class="field-content"><a href="/sach/thu-thi-kien-thuc-lop-2"><img data-hover-preview="http://nhanam.vn/sites/default/files/thu_thi_kien_thuc_lop_2-02.jpg" class="hover-preview-imgpreview hover-preview hover-preview-imgpreview-processed" src="http://nhanam.vn/sites/default/files/styles/sach_moi_117x174/public/thu_thi_kien_thuc_lop_2-02.jpg?itok=N1nl61Fz" alt=""></a></div>  </div>  
-                                                                        <div class="views-field views-field-nothing">        <span class="field-content"><div>
-                                                                                    <div><b><a href="/sach/thu-thi-kien-thuc-lop-2">Thủ thỉ kiến thức lớp 2</a></b></div>
-                                                                                    <div><b>Tác giả:</b> <a href="/tac-gia/mitsuharu-ohyama">Mitsuharu Ohyama</a></div>
-                                                                                    <div><b>Giá bìa:</b> 75.000 VND</div>
-                                                                                </div>
-                                                                            </span>  
-                                                                        </div>
-                                                                    </li>
-                                                                    <li class="views-row views-row-even">  
-                                                                        <div class="views-field views-field-field-sach-anh-dai-dien">        
-                                                                            <div class="field-content">
-                                                                                <a href="/sach/duoi-bong-nhung-co-gai-duong-hoa">
-                                                                                    <img data-hover-preview="http://nhanam.vn/sites/default/files/duoi_bong_nhung_co_gai_duong_hoa-02.jpg" class="hover-preview-imgpreview hover-preview hover-preview-imgpreview-processed" src="http://nhanam.vn/sites/default/files/styles/sach_moi_117x174/public/duoi_bong_nhung_co_gai_duong_hoa-02.jpg?itok=678dUFcm" alt=""></a></div>  </div>  
-                                                                        <div class="views-field views-field-nothing">        <span class="field-content"><div>
-                                                                                    <div><b><a href="/sach/duoi-bong-nhung-co-gai-duong-hoa">Dưới bóng những cô gái đương hoa</a></b></div>
-                                                                                    <div><b>Tác giả:</b> <a href="/tac-gia/marcel-proust">Marcel Proust</a></div>
-                                                                                    <div><b>Giá bìa:</b> 179.000 VND</div>
-                                                                                </div>
-                                                                            </span>  
-                                                                        </div>
-                                                                    </li>
+                                                                            </li>
+                                                                        </c:forEach>
+                                                                    </ul>
+                                                                </c:if>
+                                                            </div>
+                                                            <h2 class="element-invisible">Trang</h2>
+                                                            <div class="item-list">
+                                                                <ul class="pager">
+                                                                    <c:forEach begin="1" end="${pageQuantity}" varStatus="counter">
+                                                                        <c:if test="${page==counter.index}">
+                                                                            <li class="pager-current">${counter.index}</li>
+                                                                            </c:if>
+                                                                            <c:if test="${page!=counter.index}">
+                                                                            <li class="pager-item">
+                                                                                <a title="Đến trang ${counter.index}" href="
+                                                                                   <c:url value="/admin/Home.jsp">
+                                                                                       <c:if test="${not empty param.search}">
+                                                                                           <c:param name="search" value="${param.search}"/>
+                                                                                       </c:if>
+                                                                                       <c:if test="${not empty param.type}">
+                                                                                           <c:param name="type" value="${param.type}"/>
+                                                                                       </c:if>
+                                                                                       <c:param name="page" value="${counter.index}"/>
+                                                                                   </c:url>">${counter.index}</a>
+                                                                            </li>
+                                                                        </c:if>
+                                                                    </c:forEach>
                                                                 </ul>
-                                                            </div>    
+                                                            </div>  
                                                         </div>
-                                                        <h2 class="element-invisible">Trang</h2>
-                                                        <div class="item-list">
-                                                            <ul class="pager">
-                                                                <li class="pager-current">1</li>
-                                                                <li class="pager-item">
-                                                                    <a title="Đến trang 2" href="/node?page=1">2</a></li>
-                                                                <li class="pager-item">
-                                                                    <a title="Đến trang 3" href="/node?page=2">3</a></li><li class="pager-item"><a title="Đến trang 4" href="/node?page=3">4</a></li><li class="pager-item"><a title="Đến trang 5" href="/node?page=4">5</a></li><li class="pager-item"><a title="Đến trang 6" href="/node?page=5">6</a></li><li class="pager-item"><a title="Đến trang 7" href="/node?page=6">7</a></li><li class="pager-item"><a title="Đến trang 8" href="/node?page=7">8</a></li><li class="pager-item"><a title="Đến trang 9" href="/node?page=8">9</a></li><li class="pager-ellipsis">…</li><li class="pager-next"><a title="Đến trang kế sau" href="/node?page=1">sau ›</a></li><li class="pager-last"><a title="Đến trang cuối cùng" href="/node?page=208">cuối »</a></li></ul></div>  
-                                                    </div>    
+                                                    </div>  
                                                 </div>
-                                            </div>
-                                        </section>
+                                            </div>    
                                     </div>
-                                </div>
                             </section>
                         </div>
                     </div>
+                    </section>
                 </div>
             </div>
         </div>
-    </body>
+    </div>
+</div>
+</body>
 </html>

@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -65,5 +66,9 @@ public abstract class Repository<K, T> {
 
     public abstract void update(T t) throws Exception;
 
-    public abstract T find(K key) throws Exception;
+    public abstract T get(K key) throws Exception;
+
+    public abstract List<T> find(String s, Integer startAt, Integer nextRow) throws Exception;
+
+    public abstract int count() throws Exception;
 }

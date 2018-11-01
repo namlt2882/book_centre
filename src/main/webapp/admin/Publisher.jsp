@@ -99,10 +99,10 @@
                                                                     </ul>
                                                                 </c:if>
                                                             </div>
-                                                            <c:if test="${empty param.search}">
-                                                                <c:if test="${not empty param.page and empty page}">
-                                                                    <c:set var="page" value="${param.page}"/>
-                                                                </c:if>
+                                                            <c:if test="${not empty param.page and empty page}">
+                                                                <c:set var="page" value="${param.page}"/>
+                                                            </c:if>
+                                                            <c:if test="${empty param.search and not empty page}">
                                                                 <div class="item-list">
                                                                     <ul class="pager">
                                                                         <c:if test="${not empty page and page > 1}">

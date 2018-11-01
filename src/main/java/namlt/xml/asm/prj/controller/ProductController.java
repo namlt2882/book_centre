@@ -1,9 +1,14 @@
 package namlt.xml.asm.prj.controller;
 
 import java.net.URI;
+import java.util.List;
+import javax.enterprise.inject.Default;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
@@ -17,6 +22,8 @@ public class ProductController {
 
     @Context
     private UriInfo uriInfo;
+
+    public static final int MAX_ITEM_PER_PAGE = 10;
 
     @POST
     public Response addNewBook(@FormParam("cache_key") String cacheKey, @FormParam("id") String id,
