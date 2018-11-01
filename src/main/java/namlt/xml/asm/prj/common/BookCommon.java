@@ -11,8 +11,7 @@ package namlt.xml.asm.prj.common;
  */
 public interface BookCommon {
 
-    public static final int STATUS_NEW = 0;
+    public static final int STATUS_DISABLE = 0;
     public static final int STATUS_ACTIVE = 1;
     public static final int STATUS_OUT_OF_STOCK = 2;
-    public static final int STATUS_DISABLE = 3;
 }

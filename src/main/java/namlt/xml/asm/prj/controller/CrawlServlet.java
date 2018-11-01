@@ -35,6 +35,10 @@ public class CrawlServlet extends HttpServlet {
         }
         if (cacheKey != null) {
             cacheKey = URLDecoder.decode(cacheKey, "UTF-8");
+            String[] keys = cacheKey.split("\n");
+            if (keys != null && "new".equals(keys[0])) {
+                request.setAttribute("page", keys[keys.length - 1]);
+            }
             rs = crawlingService.getFromCache(cacheKey);
         } else if (search != null) {
             rs = crawlingService.search(publisher, search);
@@ -45,6 +49,7 @@ public class CrawlServlet extends HttpServlet {
             if (pageStr != null && !"".equals(pageStr.trim())) {
                 try {
                     page = Integer.parseInt(pageStr);
+                    request.setAttribute("page", page);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

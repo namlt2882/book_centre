@@ -100,17 +100,20 @@
                                                                 </c:if>
                                                             </div>
                                                             <c:if test="${empty param.search}">
+                                                                <c:if test="${not empty param.page and empty page}">
+                                                                    <c:set var="page" value="${param.page}"/>
+                                                                </c:if>
                                                                 <div class="item-list">
                                                                     <ul class="pager">
-                                                                        <c:if test="${not empty param.page and param.page>1}">
+                                                                        <c:if test="${not empty page and page > 1}">
                                                                             <li class="pager-next">
                                                                                 <a title="Đến trang trước" href="
                                                                                    <c:url value="/admin/Publisher.jsp">
                                                                                        <c:if test="${not empty param.publisher}">
                                                                                            <c:param name="publisher" value="${param.publisher}"/>
                                                                                        </c:if>
-                                                                                       <c:if test="${not empty param.page}">
-                                                                                           <c:param name="page" value="${param.page - 1}"/>
+                                                                                       <c:if test="${not empty page}">
+                                                                                           <c:param name="page" value="${page - 1}"/>
                                                                                        </c:if>
                                                                                    </c:url>">< Sản phẩm mới hơn
                                                                                 </a>
@@ -122,10 +125,10 @@
                                                                                    <c:if test="${not empty param.publisher}">
                                                                                        <c:param name="publisher" value="${param.publisher}"/>
                                                                                    </c:if>
-                                                                                   <c:if test="${not empty param.page}">
-                                                                                       <c:param name="page" value="${param.page + 1}"/>
+                                                                                   <c:if test="${not empty page}">
+                                                                                       <c:param name="page" value="${page + 1}"/>
                                                                                    </c:if>
-                                                                                   <c:if test="${empty param.page}">
+                                                                                   <c:if test="${empty page}">
                                                                                        <c:param name="page" value="2"/>
                                                                                    </c:if>
                                                                                </c:url>">Sản phẩm cũ hơn >
