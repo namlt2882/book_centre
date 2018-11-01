@@ -1,4 +1,5 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ page session="false" %>
 <!--<div class="region region-sidebar-second sidebar">
     <nav id="block-menu-menu-danh-muc-chinh" class="block block-menu " role="navigation">
         <div class="block-inner clearfix">

@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page session="false" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <link type="text/css" rel="stylesheet" href="/css/Custom.css">
 <div class="region region-leaderboard">

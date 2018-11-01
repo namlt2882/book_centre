@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page session="false" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <jsp:include page="/book"/>
 <!DOCTYPE html>
@@ -67,7 +68,7 @@
                                                                         <div class="field-items">
                                                                             <div class="field-item even">
                                                                                 <div class="buttom-buy">
-                                                                                    <button>Thêm vào giỏ hàng</button>
+                                                                                    <button onclick="addProduct('${book.id}','${book.author}','${book.title}',${book.price},'${book.imageUrl}')">Thêm vào giỏ hàng</button>
                                                                                 </div>
                                                                             </div>
                                                                         </div>

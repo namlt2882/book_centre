@@ -1,4 +1,5 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ page session="false" %>
 <footer role="contentinfo" style="background-color: #f3f3f3; border-radius: 5px;">  
     <div class="region region-footer">
         <div id="block-nodeblock-51" class="block block-nodeblock ">

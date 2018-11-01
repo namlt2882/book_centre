@@ -1,10 +1,5 @@
-<%-- 
-    Document   : Cart
-    Created on : Oct 24, 2018, 5:01:17 PM
-    Author     : ADMIN
---%>
-
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page session="false" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -20,7 +15,23 @@
                 <div class="columns-inner clearfix">
                     <div id="content-column" style="">
                         <div class="content-inner">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Mã sản phẩm</th>
+                                        <th>Tên sách</th>
+                                        <th>Tác giả</th>
+                                        <th>Giá</th>
+                                        <th>Số lượng</th>
+                                        <th>Tổng</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cart_container">
 
+                                </tbody>
+                            </table>
+                            <button style="float: right;" onclick="checkout();">Đặt hàng</button>
                         </div>
                     </div>
                     <jsp:include page="SideBar.jsp"/>

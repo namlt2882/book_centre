@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page session="false" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <script type="text/javascript" src="/js/BookDetail.js"></script>
 <link type="text/css" href="/css/BookDetail.css" rel="stylesheet">
