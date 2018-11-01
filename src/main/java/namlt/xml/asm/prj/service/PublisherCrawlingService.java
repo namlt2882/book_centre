@@ -78,13 +78,13 @@ public class PublisherCrawlingService {
         }
         while (rs.size() < MAX_NEW_PAGE_QUANTITY) {
             String keyCode = buildCrawlNewBookCacheKey(publisher, i, (i + 1));
+            i++;
             List<Book> cacheData = getFromCache(keyCode);
             for (Book book : cacheData) {
                 if (rs.size() >= MAX_NEW_PAGE_QUANTITY) {
                     break;
                 }
                 rs.add(book);
-                i++;
             }
         }
         return rs;

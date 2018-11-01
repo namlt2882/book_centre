@@ -37,7 +37,11 @@ public class CrawlServlet extends HttpServlet {
             cacheKey = URLDecoder.decode(cacheKey, "UTF-8");
             String[] keys = cacheKey.split("\n");
             if (keys != null && "new".equals(keys[0])) {
-                request.setAttribute("page", keys[keys.length - 1]);
+                try {
+                    request.setAttribute("page", keys[keys.length - 1]);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
             rs = crawlingService.getFromCache(cacheKey);
         } else if (search != null) {

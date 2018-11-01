@@ -26,6 +26,43 @@ public class ProductController {
     public static final int MAX_ITEM_PER_PAGE = 10;
 
     @POST
+    @Path("/list")
+    public Response addAllBookInPage(@FormParam("publisher") String publisher,
+            @FormParam("search") String search, @FormParam("cache_key") String cacheKey,
+            @FormParam("page") Integer page) {
+        String redirectUrl = "/admin/Publisher.jsp";
+        redirectUrl = getCurrentHost() + redirectUrl;
+        UriBuilder uriBuilder = UriBuilder.fromUri(redirectUrl).queryParam("cache_key", cacheKey);
+        List<Book> listToAdd;
+        if (publisher == null) {
+            publisher = "nxb-nhanam";
+        }
+        if (page == null) {
+            page = 1;
+        }
+        PublisherCrawlingService crawlingService = new PublisherCrawlingService();
+        if (search != null) {
+            listToAdd = crawlingService.search(publisher, search);
+        } else {
+            listToAdd = crawlingService.getNewBook(publisher, page - 1, page);
+        }
+        BookService bookService = new BookService();
+        int successCase = 0;
+        for (Book book : listToAdd) {
+            Book rs = bookService.add(book);
+            if (rs != null) {
+                //remove item from crawling cache
+                PublisherCrawlingService.removeBookFromCache(book.getId());
+                successCase++;
+            } else {
+                System.out.println("[Error] Fail to insert book: [id=" + book.getId() + ",title='" + book.getTitle() + "']");
+            }
+        }
+        uriBuilder.queryParam("msg", "Thêm thành công " + successCase + " sản phẩm, " + (listToAdd.size() - successCase) + " sản phẩm thất bại!");
+        return Response.seeOther(uriBuilder.build()).build();
+    }
+
+    @POST
     public Response addNewBook(@FormParam("cache_key") String cacheKey, @FormParam("id") String id,
             @FormParam("author") String author, @FormParam("translator") String translator,
             @FormParam("size") String size, @FormParam("page_number") String pageNumber,
@@ -40,7 +77,10 @@ public class ProductController {
         Book b = new Book(id, title, author, price);
         b.setTranslator(translator);
         b.setPageSize(size);
-        b.setPageNumber(Integer.parseInt(pageNumber));
+        try {
+            b.setPageNumber(Integer.parseInt(pageNumber));
+        } catch (Exception e) {
+        }
         b.setDescription(description);
         b.setImageUrl(imageUrl);
         b.setUrl(url);
@@ -51,9 +91,9 @@ public class ProductController {
         if (rs != null) {
             //remove item from crawling cache
             PublisherCrawlingService.removeBookFromCache(id);
-            uriBuilder.queryParam("msg", "Success to insert new book with id = '" + id + "'!");
+            uriBuilder.queryParam("msg", "THÀNH CÔNG! Thêm sách mới với id = '" + id + "'!");
         } else {
-            uriBuilder.queryParam("msg", "Fail to insert new book with id = '" + id + "'!");
+            uriBuilder.queryParam("msg", "THẤT BẠI! Thử lại nhé!");
         }
         return Response.seeOther(uriBuilder.build()).build();
     }

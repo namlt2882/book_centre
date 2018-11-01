@@ -2,6 +2,7 @@ package namlt.xml.asm.prj.repository;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import javax.naming.NamingException;
@@ -41,7 +42,11 @@ public class BookRepository extends Repository<String, Book> implements BookComm
                 preparedStatement.setString(4, b.getTranslator());
                 preparedStatement.setDouble(5, b.getPrice());
                 preparedStatement.setString(6, b.getPageSize());
-                preparedStatement.setInt(7, b.getPageNumber());
+                if (b.getPageNumber() != null) {
+                    preparedStatement.setInt(7, b.getPageNumber());
+                } else {
+                    preparedStatement.setNull(7, Types.INTEGER);
+                }
                 preparedStatement.setString(8, b.getIsbn());
                 preparedStatement.setInt(9, b.getStatus());
                 preparedStatement.setString(10, b.getImageUrl());
