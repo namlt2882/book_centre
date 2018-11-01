@@ -53,7 +53,6 @@ public class CrawlServlet extends HttpServlet {
             if (pageStr != null && !"".equals(pageStr.trim())) {
                 try {
                     page = Integer.parseInt(pageStr);
-                    request.setAttribute("page", page);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -61,6 +60,7 @@ public class CrawlServlet extends HttpServlet {
             if (page <= 0) {
                 page = 1;
             }
+            request.setAttribute("page", page);
             rs = crawlingService.getNewBook(publisher, page - 1, page);
             cacheKey = crawlingService.buildGetNewBookCacheKey(publisher, page - 1, page);
         }
