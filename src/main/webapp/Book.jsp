@@ -1,10 +1,6 @@
-<%-- 
-    Document   : Book
-    Created on : Oct 24, 2018, 4:39:09 PM
-    Author     : ADMIN
---%>
-
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<jsp:include page="/book"/>
 <!DOCTYPE html>
 <html>
     <head>
@@ -26,43 +22,48 @@
                                     <div class="region region-content">
                                         <section id="block-views-sach-moi-block" class="block block-views ">
                                             <div class="block-inner clearfix">
-                                                <h2 class="block-title">101 bộ phim Việt Nam hay nhất</h2>
+                                                <h2 class="block-title">${book.title}</h2>
                                                 <div class="block-content content">
                                                     <article id="article-4327" class="article article-type-sach clearfix" role="article">
                                                         <div class="article-content">
                                                             <div class="field field-name-field-sach-anh-dai-dien field-type-image field-label-hidden">
                                                                 <div class="field-items">
                                                                     <div class="field-item even">
-                                                                        <img src="http://nhanam.vn/sites/default/files/styles/sach_chi_tiet/public/yeu_song_phong_cach.jpg?itok=zsVzQGli" width="157" height="214" alt=""></div></div></div><fieldset class="field-group-fieldset group-thong-tin-sach  form-wrapper" id="node_sach_full_group_thong_tin_sach">
+                                                                        <img src="${book.imageUrl}" width="157" height="214" alt="">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <fieldset class="field-group-fieldset  form-wrapper" id="node_sach_full_group_thong_tin_sach">
                                                                 <div class="fieldset-wrapper">
-                                                                    <section class="field field-name-field-sach-dich-gia field-type-text field-label-inline clearfix">
-                                                                        <h2 class="field-label">Dịch giả:&nbsp;</h2>
+                                                                    <section class="field field-type-text field-label-inline clearfix">
+                                                                        <h2 class="field-label">Tác giả:&nbsp;</h2>
                                                                         <div class="field-items">
-                                                                            <div class="field-item even">Linh Quang</div>
+                                                                            <div class="field-item even">${book.author}</div>
 
                                                                         </div>
                                                                     </section>
-                                                                    <section class="field field-name-field-sach-nxb field-type-text field-label-inline clearfix">
-                                                                        <h2 class="field-label">Nhà xuất bản liên kết:&nbsp;</h2>
-                                                                        <div class="field-items"><div class="field-item even">Thế Giới</div></div>
-                                                                    </section>
-                                                                    <section class="field field-name-field-sach-so-trang field-type-number-integer field-label-inline clearfix">
+                                                                    <c:if test="${book.translator!=null and book.translator!=''}">
+                                                                        <section class="field field-type-text field-label-inline clearfix">
+                                                                            <h2 class="field-label">Dịch giả:&nbsp;</h2>
+                                                                            <div class="field-items">
+                                                                                <div class="field-item even">${book.translator}</div>
+
+                                                                            </div>
+                                                                        </section>
+                                                                    </c:if>
+                                                                    <section class="field field-type-number-integer field-label-inline clearfix">
                                                                         <h2 class="field-label">Số trang:&nbsp;</h2>
-                                                                        <div class="field-items"><div class="field-item even">266</div></div>
+                                                                        <div class="field-items"><div class="field-item even">${book.pageNumber}</div></div>
                                                                     </section>
-                                                                    <section class="field field-name-field-sach-kich-thuoc field-type-text field-label-inline clearfix">
+                                                                    <section class="field field-type-text field-label-inline clearfix">
                                                                         <h2 class="field-label">Kích thước:&nbsp;</h2>
-                                                                        <div class="field-items"><div class="field-item even">17.8 x 23</div></div>
+                                                                        <div class="field-items"><div class="field-item even">${book.pageSize}</div></div>
                                                                     </section>
-                                                                    <section class="field field-name-field--sach-gia-bia field-type-number-decimal field-label-inline clearfix">
+                                                                    <section class="field field-type-number-decimal field-label-inline clearfix">
                                                                         <h2 class="field-label">Giá bìa:&nbsp;</h2>
-                                                                        <div class="field-items"><div class="field-item even">199 000 VND</div></div>
+                                                                        <div class="field-items"><div class="field-item even">${book.price} VND</div></div>
                                                                     </section>
-                                                                    <section class="field field-name-field-sach-pubdate field-type-datetime field-label-inline clearfix">
-                                                                        <h2 class="field-label">Ngày phát hành:&nbsp;</h2>
-                                                                        <div class="field-items"><div class="field-item even"><span class="date-display-single">22-10-2018</span></div></div>
-                                                                    </section>
-                                                                    <div class="field field-name-field-sach-buy field-type-markup field-label-hidden">
+                                                                    <div class="field field-type-markup field-label-hidden">
                                                                         <div class="field-items">
                                                                             <div class="field-item even">
                                                                                 <div class="buttom-buy">
@@ -72,6 +73,10 @@
                                                                         </div>
                                                                     </div>
                                                                 </div>
+                                                            </fieldset>
+                                                            <fieldset class="field-group-fieldset">
+                                                                <h3>Giới thiệu sách:</h3>
+                                                                <p>${book.description}}</p>
                                                             </fieldset>
                                                         </div>
                                                     </article>

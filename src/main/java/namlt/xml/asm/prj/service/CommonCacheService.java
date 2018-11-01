@@ -41,7 +41,7 @@ public class CommonCacheService {
 
         @Override
         public Boolean load(String k) throws Exception {
-            Book book = new BookService().find(k);
+            Book book = new BookService().get(k);
             if (book == null) {
                 return false;
             } else {

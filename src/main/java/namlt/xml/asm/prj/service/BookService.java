@@ -26,7 +26,7 @@ public class BookService implements BookCommon {
         return null;
     }
 
-    public Book find(String id) {
+    public Book get(String id) {
         try {
             return new BookRepository().get(id);
         } catch (Exception ex) {
