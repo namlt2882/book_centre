@@ -6,6 +6,12 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Giỏ hàng</title>
+        <script>
+            function redirectToLogin() {
+                var url = "http://" + window.location.hostname + ":" + window.location.port + "/Login.jsp?redirectPage=Cart.jsp";
+                window.location.href = url;
+            }
+        </script>
     </head>
     <body class="html front not-logged-in one-sidebar sidebar-second site-name-hidden browserChrome browserChrome6">
         <div id="page" class="container">
@@ -31,7 +37,14 @@
 
                                 </tbody>
                             </table>
-                            <button style="float: right;" onclick="checkout();">Đặt hàng</button>
+                            <c:choose>
+                                <c:when test="${pageContext.session!=null && not empty sessionContext.USERNAME}">
+                                    <button style="float: right;" onclick="checkout();">Đặt hàng</button>
+                                </c:when>
+                                <c:otherwise>
+                                    <button style="float: right;" onclick="redirectToLogin();">Đặt hàng</button>
+                                </c:otherwise>
+                            </c:choose>
                         </div>
                     </div>
                     <jsp:include page="SideBar.jsp"/>
