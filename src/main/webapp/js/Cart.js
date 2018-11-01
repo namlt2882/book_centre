@@ -1,6 +1,7 @@
-var productList;
 var sumOfAllTag;
+var productService;
 window.addEventListener("load", function () {
+    productService = new ProductService();
     initData();
     initLayout();
 }, false);
@@ -12,8 +13,8 @@ function initLayout() {
     }
     cartContainer.innerHTML = "";
     var tr, td, book, sum, input, button;
-    for (var i = 0; i < productList.length; i++) {
-        book = productList[i];
+    for (var i = 0; i < productService.productList.length; i++) {
+        book = productService.productList[i];
         //create tr and append to context
         tr = document.createElement("tr");
         cartContainer.appendChild(tr);
@@ -56,7 +57,7 @@ function initLayout() {
         button.textContent = "Xóa";
         button.book_id = book.id;
         button.onclick = function () {
-            removeProduct(this.book_id);
+            productService.removeProduct(this.book_id);
         };
         td.appendChild(button);
         tr.appendChild(td);
@@ -84,29 +85,19 @@ function checkout() {
 }
 
 function countSumOfAll() {
-    sumOfAllTag.textContent = calculateSum();
+    sumOfAllTag.textContent = productService.calculateSum();
 }
 
-function calculateSum(){
-    var book;
-    var sum = 0;
-    for (var i = 0; i < productList.length; i++) {
-        book = productList[i];
-        if (book !== null) {
-            sum += book.price * book.quantity;
-        }
-    }
-    return sum;
-}
+
 function changeProductQuantity(id, quantity, sumTag) {
     initData();
-    var product = getProduct(id);
+    var product = productService.getProduct(id);
     if (product !== null) {
         if (quantity <= 0) {
-            removeProduct(id);
+            productService.removeProduct(id);
         } else {
             product.quantity = quantity;
-            saveProductList();
+            productService.saveProductList();
             //update price
             sumTag.textContent = product.price * product.quantity;
             countSumOfAll();
@@ -114,32 +105,20 @@ function changeProductQuantity(id, quantity, sumTag) {
     }
 }
 
-function removeProduct(id) {
-    initData();
-    var book;
-    for (var i = 0; i < productList.length; i++) {
-        book = productList[i];
-        if (book != null && book.id === id) {
-            productList.splice(i, 1);
-            saveProductList();
-            initLayout();
-        }
-    }
-    countSumOfAll();
-}
 function initData() {
-    productList = localStorage.getItem("productList");
-    if (productList === null) {
+    var productList = localStorage.getItem("productList");
+    if (productList === null || productList === "undefined") {
         productList = new Array();
-        saveProductList();
+        productService.saveProductList();
     } else {
         productList = JSON.parse(productList);
     }
+    productService.productList = productList;
 }
 
 function addProduct(id, author, title, price, imageUrl) {
     initData();
-    var product = getProduct(id);
+    var product = productService.getProduct(id);
     if (product != null) {
         product.quantity++;
     } else {
@@ -151,22 +130,51 @@ function addProduct(id, author, title, price, imageUrl) {
             imageUrl: imageUrl,
             quantity: 1
         }
-        productList.push(product);
+        productService.productList.push(product);
     }
-    saveProductList();
+    productService.saveProductList();
     alert("Đã thêm giỏ hàng!");
 }
 
-function getProduct(id) {
-    var book;
-    for (var i = 0; i < productList.length; i++) {
-        book = productList[i];
-        if (book.id === id) {
-            return book;
+function ProductService() {
+    this.productList;
+    this.calculateSum = function calculateSum() {
+        var book;
+        var sum = 0;
+        for (var i = 0; i < this.productList.length; i++) {
+            book = this.productList[i];
+            if (book !== null) {
+                sum += book.price * book.quantity;
+            }
         }
-    }
-    return null;
-}
-function saveProductList() {
-    localStorage.setItem("productList", JSON.stringify(productList));
+        return sum;
+    };
+
+    this.removeProduct = function removeProduct(id) {
+        initData();
+        var book;
+        for (var i = 0; i < this.productList.length; i++) {
+            book = this.productList[i];
+            if (book != null && book.id === id) {
+                this.productList.splice(i, 1);
+                this.saveProductList();
+                initLayout();
+            }
+        }
+    };
+
+    this.getProduct = function getProduct(id) {
+        var book;
+        for (var i = 0; i < this.productList.length; i++) {
+            book = this.productList[i];
+            if (book.id === id) {
+                return book;
+            }
+        }
+        return null;
+    };
+
+    this.saveProductList = function saveProductList() {
+        localStorage.setItem("productList", JSON.stringify(this.productList));
+    };
 }
