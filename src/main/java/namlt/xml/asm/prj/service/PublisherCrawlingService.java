@@ -1,6 +1,5 @@
 package namlt.xml.asm.prj.service;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -62,6 +61,7 @@ public class PublisherCrawlingService {
                     try {
                         return bookDetailCache.apply(u);
                     } catch (Exception e) {
+                        e.printStackTrace();
                     }
                     return null;
                 })
@@ -140,6 +140,9 @@ public class PublisherCrawlingService {
         public Book load(String url) throws Exception {
             String host = InternetUtils.identifyHost(url);
             BookCrawler crawler = getCrawler(host);
+            if (crawler == null) {
+                throw new Exception("Not found crawler for host '" + host + "'");
+            }
             System.out.println("[WARNING] [" + new Date() + "] Crawling book detail from '" + url + "'");
             Book rs = crawler.crawlBookPage(url);
             if (rs == null) {
@@ -211,6 +214,8 @@ public class PublisherCrawlingService {
             case "nxb-tre":
                 return new NxbTreCrawler();
             case "nxbtre.com.vn":
+                return new NxbTreCrawler();
+            case "www.nxbtre.com.vn":
                 return new NxbTreCrawler();
         }
         return null;
