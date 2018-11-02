@@ -3,6 +3,7 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <link type="text/css" rel="stylesheet" href="/css/Custom.css">
 <script type="text/javascript" src="/js/Cart.js"></script>
+<script type="text/javascript" src="/js/Common.js"></script>
 <div class="region region-leaderboard">
     <div id="block-block-3" class="block block-block ">
         <div class="block-inner clearfix">
