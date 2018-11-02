@@ -5,6 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -16,24 +18,29 @@ public abstract class Repository<K, T> {
     protected ResultSet resultSet;
     protected PreparedStatement preparedStatement;
     protected final Object TRANSACTION_KEY = new Object();
+    private static DataSource dataSource;
+
+    static {
+        try {
+            dataSource = initNewDataSource();
+        } catch (Exception ex) {
+            Logger.getLogger(Repository.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 
     public Repository() {
     }
 
-    private static Connection initNewConnection() throws NamingException, SQLException {
+    private static DataSource initNewDataSource() throws NamingException, SQLException {
         Context context = (Context) new InitialContext();
         Context tomcatContext = (Context) context.lookup("java:comp/env");
         DataSource dataSource = (DataSource) tomcatContext.lookup("BookStoreDatabase");
-        if (dataSource != null) {
-            Connection connection = dataSource.getConnection();
-            return connection;
-        }
-        return null;
+        return dataSource;
     }
 
     protected Connection getConnection() throws NamingException, SQLException {
         if (connection == null) {
-            connection = initNewConnection();
+            connection = dataSource.getConnection();
         }
         return connection;
     }

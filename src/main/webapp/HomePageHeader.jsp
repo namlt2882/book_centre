@@ -51,9 +51,23 @@
                             </div>
                         </div>
                     </div>
+                    <%
+                        HttpSession httpSession = request.getSession(false);
+                        if (httpSession != null && httpSession.getAttribute("USER") != null) {
+                    %>
+                    <br/>
+                    <h4>Chào <%= httpSession.getAttribute("USERNAME")%>, chúc một ngày tốt lành!</h4>
+                    <form action="Logout" method="POST">
+                        <input type="submit" value="Đăng xuất">
+                    </form>
+                    <%
+                        }
+                    %>
                     <div id="search-form">
+
                         <div id="block-search-form" class="block block-search ">
                             <div class="block-inner clearfix">
+
                                 <div class="block-content content">
                                     <form action="/" id="search-block-form" accept-charset="UTF-8">
                                         <div>
@@ -64,6 +78,7 @@
                                                 </div>
                                                 <div class="form-actions form-wrapper" id="edit-actions">
                                                     <input type="submit" value="Tìm kiếm" class="form-submit">
+
                                                 </div>
                                             </div>
                                         </div>

@@ -37,14 +37,18 @@
 
                                 </tbody>
                             </table>
-                            <c:choose>
-                                <c:when test="${pageContext.session!=null && not empty sessionContext.USERNAME}">
-                                    <button style="float: right;" onclick="checkout();">Đặt hàng</button>
-                                </c:when>
-                                <c:otherwise>
-                                    <button style="float: right;" onclick="redirectToLogin();">Đặt hàng</button>
-                                </c:otherwise>
-                            </c:choose>
+                            <%
+                                HttpSession httpSession = request.getSession(false);
+                                if (httpSession != null && httpSession.getAttribute("USER") != null) {
+                            %>
+                            <button style="float: right;" onclick="checkout();">Đặt hàng</button>
+                            <%
+                            } else {
+                            %>
+                            <button style="float: right;" onclick="redirectToLogin();">Đặt hàng</button>
+                            <%
+                                }
+                            %>
                         </div>
                     </div>
                     <jsp:include page="SideBar.jsp"/>
