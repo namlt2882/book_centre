@@ -1,27 +1,17 @@
 package namlt.xml.asm.prj.controller;
 
-import java.net.URI;
 import java.util.List;
-import javax.enterprise.inject.Default;
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.FormParam;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
-import javax.ws.rs.core.UriInfo;
 import namlt.xml.asm.prj.model.Book;
 import namlt.xml.asm.prj.service.BookService;
 import namlt.xml.asm.prj.service.PublisherCrawlingService;
 
 @Path("/product")
-public class ProductController {
-
-    @Context
-    private UriInfo uriInfo;
+public class ProductController extends BaseController {
 
     public static final int MAX_ITEM_PER_PAGE = 10;
 
@@ -98,9 +88,4 @@ public class ProductController {
         return Response.seeOther(uriBuilder.build()).build();
     }
 
-    private String getCurrentHost() {
-        URI baseUri = uriInfo.getBaseUri();
-        String host = baseUri.getScheme() + "://" + baseUri.getHost() + ':' + baseUri.getPort();
-        return host;
-    }
 }
