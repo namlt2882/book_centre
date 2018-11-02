@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import jersey.repackaged.com.google.common.cache.CacheBuilder;
 import jersey.repackaged.com.google.common.cache.CacheLoader;
@@ -53,6 +54,15 @@ public class PublisherCrawlingService {
             return;
         }
         bookDetailCache.invalidate(url);
+    }
+
+    public static boolean editBookFromCache(String key, Consumer<Book> consumer) {
+        Book book = bookDetailCache.getIfPresent(key);
+        if (book != null) {
+            consumer.accept(book);
+            return true;
+        }
+        return false;
     }
 
     private List<Book> getBooks(List<String> url) {

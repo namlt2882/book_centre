@@ -1,6 +1,7 @@
 package namlt.xml.asm.prj.controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -36,13 +37,16 @@ public class ProductController extends BaseController {
         } else {
             listToAdd = crawlingService.getNewBook(publisher, page - 1, page);
         }
+        listToAdd = listToAdd.parallelStream().filter(b -> !b.isExistedInDb()).collect(Collectors.toList());
         BookService bookService = new BookService();
         int successCase = 0;
         for (Book book : listToAdd) {
             Book rs = bookService.add(book);
             if (rs != null) {
                 //remove item from crawling cache
-                PublisherCrawlingService.removeBookFromCache(book.getId());
+                PublisherCrawlingService.editBookFromCache(rs.getUrl(), b -> {
+                    b.setExistedInDb(true);
+                });
                 successCase++;
             } else {
                 System.out.println("[Error] Fail to insert book: [id=" + book.getId() + ",title='" + book.getTitle() + "']");
