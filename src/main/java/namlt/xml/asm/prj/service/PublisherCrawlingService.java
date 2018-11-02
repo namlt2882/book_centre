@@ -65,7 +65,7 @@ public class PublisherCrawlingService {
         return false;
     }
 
-    private List<Book> getBooks(List<String> url) {
+    private List<Book> getBookFromUrls(List<String> url) {
         return url.parallelStream()
                 .map(u -> {
                     try {
@@ -132,7 +132,7 @@ public class PublisherCrawlingService {
         }
         try {
             List<String> urls = pageCache.apply(key);
-            rs = getBooks(urls);
+            rs = getBookFromUrls(urls);
         } catch (Exception e) {
             System.out.println("[ERROR]: " + e.getMessage());
         }

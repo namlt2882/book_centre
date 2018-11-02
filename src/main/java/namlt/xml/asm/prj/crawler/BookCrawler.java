@@ -3,6 +3,7 @@ package namlt.xml.asm.prj.crawler;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import namlt.xml.asm.prj.model.Book;
 import namlt.xml.asm.prj.parser.NestedTagResolver;
 import static namlt.xml.asm.prj.utils.InternetUtils.crawl;
@@ -30,20 +31,13 @@ public interface BookCrawler {
     }
 
     default List<Book> crawlBookPages(List<String> urls) {
-        List<Book> rs = new ArrayList<>();
-        urls.parallelStream().map(s -> crawlBookPage(s))
+        return urls.parallelStream().map(s -> crawlBookPage(s))
                 .filter(b -> {
                     if (!BookCrawler.validateData(b)) {
                         return false;
                     }
                     return true;
-                })
-                .forEach(b -> {
-                    synchronized (rs) {
-                        rs.add(b);
-                    }
-                });
-        return rs;
+                }).collect(Collectors.toList());
     }
 
     static boolean validateData(Book b) {
