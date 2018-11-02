@@ -1,30 +1,52 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package namlt.xml.asm.prj.crawler;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import namlt.xml.asm.prj.model.Book;
+import namlt.xml.asm.prj.parser.NestedTagResolver;
+import static namlt.xml.asm.prj.utils.InternetUtils.crawl;
 
-/**
- *
- * @author ADMIN
- */
 public interface BookCrawler {
 
     Book crawlBookPage(String url);
 
     List<String> crawlNewBookUrls(String url);
 
-    List<Book> crawlNextNewBooks(int start, int time);
+    List<String> crawlNextNewBookUrls(int start, int time);
 
     String generateId(Book b);
 
-    List<Book> search(String s);
+    List<String> search(String s);
 
-    default boolean validateData(Book b) {
+    default String getHtmlSource(String url) throws IOException {
+        String htmlSource = crawl(url);
+        if (htmlSource != null) {
+            StringBuilder sb = new StringBuilder();
+            NestedTagResolver.formatNestedTag(htmlSource, "html").forEach(sb::append);
+            htmlSource = sb.toString();
+        }
+        return htmlSource;
+    }
+
+    default List<Book> crawlBookPages(List<String> urls) {
+        List<Book> rs = new ArrayList<>();
+        urls.parallelStream().map(s -> crawlBookPage(s))
+                .filter(b -> {
+                    if (!BookCrawler.validateData(b)) {
+                        return false;
+                    }
+                    return true;
+                })
+                .forEach(b -> {
+                    synchronized (rs) {
+                        rs.add(b);
+                    }
+                });
+        return rs;
+    }
+
+    static boolean validateData(Book b) {
         //check not null
         if (b == null) {
             return false;

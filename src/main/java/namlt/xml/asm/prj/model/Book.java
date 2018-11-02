@@ -19,7 +19,7 @@ import namlt.xml.asm.prj.crawler.model.BookPropertiesEnum;
 @XmlType(name = "Book", propOrder = {
     "id", "title", "author", "isbn",
     "translator", "pageSize", "pageNumber",
-    "price", "url", "imageUrl", "status", "quantity", "description"})
+    "price", "url", "imageUrl", "status", "quantity", "existedInDb", "description"})
 @XmlRootElement(name = "book")
 public class Book implements Serializable, ValueIdentifiable {
 
@@ -49,6 +49,8 @@ public class Book implements Serializable, ValueIdentifiable {
     private String imageUrl;
     @XmlElement(required = false, name = "quantity")
     private int quantity = 0;
+    @XmlElement(required = false, name = "existedInDb")
+    private boolean existedInDb = false;
     @XmlTransient
     private Date insertDate;
     @XmlTransient
@@ -64,6 +66,14 @@ public class Book implements Serializable, ValueIdentifiable {
         this.title = title;
         this.author = author;
         this.price = price;
+    }
+
+    public boolean isExistedInDb() {
+        return existedInDb;
+    }
+
+    public void setExistedInDb(boolean existedInDb) {
+        this.existedInDb = existedInDb;
     }
 
     public Date getInsertDate() {

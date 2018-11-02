@@ -107,6 +107,11 @@
                                                                                             <div>
                                                                                                 <b>Giá bìa:</b> ${book.price} VND
                                                                                             </div>
+                                                                                            <c:if test="${book.existedInDb}">
+                                                                                                <div>
+                                                                                                    <font style="color: red">Đã tồn tại</font>
+                                                                                                </div>
+                                                                                            </c:if>
                                                                                         </div>
                                                                                     </span>  
                                                                                 </div>
