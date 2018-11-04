@@ -16,6 +16,11 @@ public class BookRepository extends Repository<String, Book> implements BookComm
             + "Price, PageSize, PageNumber, Isbn, "
             + "Status, ImageUrl, Url, InsertDate, Quantity, Description) "
             + "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+    public static final String UPDATE_QUERY = "UPDATE Book "
+            + "SET Title=?, Author=?, Translator=?, "
+            + "Price=?, PageSize=?, PageNumber=?, Isbn=?, "
+            + "Status=?, ImageUrl=?, Url=?, Quantity=?, Description=? "
+            + "WHERE Id=?";
     public static final String QUERY_GET_NEW_BOOK = "SELECT * FROM Book WHERE Status=" + STATUS_ACTIVE + " ORDER BY InsertDate DESC "
             + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
     public static final String QUERY_GET_OUT_OF_STOCK_BOOK = "SELECT * FROM Book WHERE Status=" + STATUS_OUT_OF_STOCK + " ORDER BY InsertDate DESC "
@@ -66,11 +71,35 @@ public class BookRepository extends Repository<String, Book> implements BookComm
     }
 
     @Override
-    public void update(Book t) {
+    public void update(Book b) throws NamingException, SQLException {
         synchronized (TRANSACTION_KEY) {
-
+            try {
+                preparedStatement = newPreparedStatement(UPDATE_QUERY);
+                preparedStatement.setString(1, b.getTitle());
+                preparedStatement.setString(2, b.getAuthor());
+                preparedStatement.setString(3, b.getTranslator());
+                preparedStatement.setDouble(4, b.getPrice());
+                preparedStatement.setString(5, b.getPageSize());
+                if (b.getPageNumber() != null) {
+                    preparedStatement.setInt(6, b.getPageNumber());
+                } else {
+                    preparedStatement.setNull(6, Types.INTEGER);
+                }
+                preparedStatement.setString(7, b.getIsbn());
+                preparedStatement.setInt(8, b.getStatus());
+                preparedStatement.setString(9, b.getImageUrl());
+                preparedStatement.setString(10, b.getUrl());
+                preparedStatement.setInt(11, b.getQuantity());
+                preparedStatement.setString(12, b.getDescription());
+                preparedStatement.setString(13, b.getId());
+                int tmp = preparedStatement.executeUpdate();
+                if (tmp <= 0) {
+                    throw new SQLException("Update book with id '" + b.getId() + "' fail!");
+                }
+            } finally {
+                closeResources();
+            }
         }
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override

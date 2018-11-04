@@ -21,21 +21,43 @@ function BookDetailFrame() {
     var _bookDetailImageUrl_input;
     var _bookDetailUrl_input;
     var _bookDetailIsbn;
+    var _bookDetailSubmit;
 
     this.addOrUpdate = function () {
         var id = this._bookDetailId.value;
         var book = bookCache.findBook(id);
         if (book != null) {
-            var existedInDb = bookCache.getBookAttribute(book, "existedInDb");
-            if (existedInDb == true) {
-
+            this.updateBookObj(book);
+            var isExisted = (book.existedInDb == 'true');
+            if (!isExisted) {
+                bookController.add(book, function (xhr) {
+                    alert("Thêm sản phẩm thành công với id '" + xhr.responseText + "'!");
+                    window.location.reload();
+                }, function (xhr) {
+                    alert("Thất bại toàn tập!");
+                });
             } else {
-
+                bookController.update(book, function (xhr) {
+                    alert("Cập nhật sản phẩm thành công với id '" + xhr.responseText + "'!");
+                    window.location.reload();
+                }, function (xhr) {
+                    alert("Thất bại toàn tập!");
+                });
             }
         } else {
             alert("Đã xảy ra lỗi! Vui lòng thử lại sau!");
         }
         return false;
+    }
+
+    this.updateBookObj = function (book) {
+        book.isbn = this._bookDetailIsbn.value;
+        book.author = this._bookDetailAuthor.value;
+        book.translator = this._bookDetailTranslator.value;
+        book.pageSize = this._bookDetailSize.value;
+        book.pageNumber = this._bookDetailPageNumber.value;
+        book.price = this._bookDetailPrice.value;
+        book.description = this._bookDetailDescription.value;
     }
 
     this.init = function () {
@@ -60,6 +82,7 @@ function BookDetailFrame() {
         this._bookDetailImageUrl_input = document.getElementById("book_detail_imageUrl_input");
         this._bookDetailUrl_input = document.getElementById("book_detail_url_input");
         //error
+        this._bookDetailSubmit = document.getElementById("book_detail_submit");
     }
 
     this.htmlEntitiesDecode = function (s) {
@@ -87,6 +110,11 @@ function BookDetailFrame() {
         var imageUrl = bookObj.imageUrl;
         var url = bookObj.url;
         var isbn = bookObj.isbn;
+        if (bookObj.existedInDb == 'true') {
+            this._bookDetailSubmit.value = "Cập nhật sản phẩm";
+        } else {
+            this._bookDetailSubmit.value = "Thêm sản phẩm";
+        }
         this._bookDetailId.value = id;
         this._bookDetailAuthor.value = this.htmlEntitiesDecode(author);
         this._bookDetailTranslator.value = this.htmlEntitiesDecode(translator);

@@ -15,8 +15,7 @@
         </div>
         <div class="book_detail_info">
             <h2 id="book_detail_title">Giấc mơ hóa rồng</h2>
-            <form action="/rest/product" method="POST">
-                <c:if test="${not empty cacheKey}"><input type="hidden" name="cache_key" value="${cacheKey}"></c:if>
+            <form action="/rest/product" method="POST" onsubmit="return bookDetailFrame.addOrUpdate()">
                 <input type="hidden" name="title" id="book_detail_title_input">
                 <input type="hidden" name="image_url" id="book_detail_imageUrl_input">
                 <input type="hidden" name="url" id="book_detail_url_input">
@@ -58,7 +57,7 @@
                     </tr>
                     <tr>
                         <td></td>
-                        <td><input type="submit" value="Thêm sản phẩm"></td>
+                        <td><input id="book_detail_submit" type="submit" value="Thêm sản phẩm"></td>
                     </tr>
                 </table>
             </form>

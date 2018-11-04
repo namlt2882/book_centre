@@ -84,7 +84,7 @@ function Book() {
     var description;
 
     this.toXml = function () {
-        var rs = "<?xml version='1.0'?><book id=\"" + this.id + "\">";
+        var rs = "<book id=\"" + this.id + "\">";
         rs += "<title>" + this.title + "</title>";
         rs += "<author>" + this.author + "</author>";
         rs += "<isbn>" + this.isbn + "</isbn>";

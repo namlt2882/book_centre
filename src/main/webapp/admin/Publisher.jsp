@@ -8,6 +8,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Dữ liệu nhà xuất bản</title>
         <script type="text/javascript" src="/js/Common.js"></script>
+        <script type="text/javascript" src="/js/BookController.js"></script>
         <script type="text/javascript" src="/js/BookCache.js"></script>
         <script>
             function getNewBook() {
@@ -56,7 +57,7 @@
                                                         <c:if test="${param.publisher=='nxb-tre'}">Trẻ</c:if>
                                                         </h2>
                                                         <!--Add all form-->
-                                                        <form action="/rest/product/list" method="POST">
+                                                        <form action="/rest/product/list" method="POST" onsubmit="">
                                                         <c:if test="${not empty param.publisher}">
                                                             <input type="hidden" name="publisher" value="${param.publisher}">
                                                         </c:if>
