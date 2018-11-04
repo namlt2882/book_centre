@@ -91,7 +91,7 @@
                                                                                     <div class="field-content">
                                                                                         <div style="width: 100px;height: 250px;">
                                                                                             <img src="${book.imageUrl}" style="max-width: 100%;max-height: 100%;margin: 0px;"
-                                                                                                 class="book_detail_trigger" onclick="showBookDetailModel('${book.id}');">
+                                                                                                 class="book_detail_trigger" onclick="bookDetailFrame.showBookDetailModel('${book.id}');">
                                                                                         </div>
                                                                                     </div>  
                                                                                 </div>  
