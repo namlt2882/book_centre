@@ -56,22 +56,12 @@
                                                         <c:if test="${empty param.publisher or param.publisher=='nxb-nhanam'}">Nhã Nam</c:if>
                                                         <c:if test="${param.publisher=='nxb-tre'}">Trẻ</c:if>
                                                         </h2>
-                                                        <!--Add all form-->
-                                                        <form action="/rest/product/list" method="POST" onsubmit="">
-                                                        <c:if test="${not empty param.publisher}">
-                                                            <input type="hidden" name="publisher" value="${param.publisher}">
-                                                        </c:if>
-                                                        <c:if test="${not empty param.search}">
-                                                            <input type="hidden" name="search" value="${param.search}">
-                                                        </c:if>
-                                                        <c:if test="${not empty param.page}">
-                                                            <input type="hidden" name="page" value="${param.page}">
-                                                        </c:if>
-                                                        <c:if test="${not empty cacheKey}"><input type="hidden" name="cache_key" value="${cacheKey}"></c:if>
-                                                            <input type="submit" value="Thêm tất cả" onclick="return confirm('Chắc không?');"/>
-                                                        </form>
-                                                        <!--End add all form-->
                                                 </c:if>
+                                                <!--Add all form-->
+                                                <form action="/rest/product/list" method="POST" onsubmit="return bookDetailFrame.addAllBook();">
+                                                    <input type="submit" value="Thêm tất cả"/>
+                                                </form>
+                                                <!--End add all form-->
                                                 <c:if test="${not empty param.search}">
                                                     <h2 class="block-title">Kết quả tìm kiếm cho "${param.search}" 
                                                         của nxb 

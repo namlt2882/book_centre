@@ -1,6 +1,7 @@
 package namlt.xml.asm.prj.controller;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -11,10 +12,12 @@ import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import namlt.xml.asm.prj.model.Book;
+import namlt.xml.asm.prj.model.BookList;
 import namlt.xml.asm.prj.service.BookService;
 import namlt.xml.asm.prj.service.PublisherCrawlingService;
 
@@ -25,47 +28,31 @@ public class ProductController extends BaseController {
 
     @POST
     @Path("/list")
-    public Response addAllBookInPage(@FormParam("publisher") String publisher,
-            @FormParam("search") String search, @FormParam("cache_key") String cacheKey,
-            @FormParam("page") Integer page) {
-        String redirectUrl = "/admin/Publisher.jsp";
-        redirectUrl = getCurrentHost() + redirectUrl;
-        UriBuilder uriBuilder = UriBuilder.fromUri(redirectUrl).queryParam("cache_key", cacheKey);
-        List<Book> listToAdd;
-        if (publisher == null) {
-            publisher = "nxb-nhanam";
+    @Consumes(MediaType.APPLICATION_XML)
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response addAllBookInPage(BookList bookList) {
+        List<Book> listToAdd = bookList.getBook();
+        if (listToAdd == null) {
+            listToAdd = new ArrayList<>();
         }
-        if (page == null) {
-            page = 1;
-        }
-        PublisherCrawlingService crawlingService = new PublisherCrawlingService();
-        if (search != null) {
-            listToAdd = crawlingService.search(publisher, search);
-        } else {
-            listToAdd = crawlingService.getNewBook(publisher, page - 1, page);
-        }
-        listToAdd = listToAdd.parallelStream().filter(b -> !b.isExistedInDb()).collect(Collectors.toList());
         BookService bookService = new BookService();
         int successCase = 0;
         for (Book book : listToAdd) {
-            Book rs = null;
             try {
-                rs = bookService.add(book);
-            } catch (Exception ex) {
-                Logger.getLogger(ProductController.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            if (rs != null) {
+                Book rs = bookService.add(book);
                 //edit status of book in cache
                 PublisherCrawlingService.editBookFromCache(rs.getUrl(), b -> {
+                    BookService.copyBook(rs, b);
                     b.setExistedInDb(true);
                 });
                 successCase++;
-            } else {
+            } catch (Exception ex) {
                 System.out.println("[Error] Fail to insert book: [id=" + book.getId() + ",title='" + book.getTitle() + "']");
+                Logger.getLogger(ProductController.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        uriBuilder.queryParam("msg", "Thêm thành công " + successCase + " sản phẩm, " + (listToAdd.size() - successCase) + " sản phẩm thất bại!");
-        return Response.seeOther(uriBuilder.build()).build();
+        String message = successCase + "";
+        return Response.ok(message).build();
     }
 
     @POST

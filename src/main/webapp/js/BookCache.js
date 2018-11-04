@@ -24,6 +24,16 @@ function BookCache() {
         }
     }
 
+    this.getAll = function () {
+        var rs = [];
+        var books = this.xmlTree.getElementsByTagName("book");
+        for (var i = 0; i < books.length; i++) {
+            var book = books[i];
+            rs.push(this.transformBookToObject(book));
+        }
+        return rs;
+    }
+
     this.findBook = function (id) {
         var books = this.xmlTree.getElementsByTagName("book");
         for (var i = 0; i < books.length; i++) {
@@ -84,20 +94,20 @@ function Book() {
     var description;
 
     this.toXml = function () {
-        var rs = "<book id=\"" + this.id + "\">";
-        rs += "<title>" + this.title + "</title>";
-        rs += "<author>" + this.author + "</author>";
-        rs += "<isbn>" + this.isbn + "</isbn>";
-        rs += "<translator>" + this.translator + "</translator>";
-        rs += "<pageSize>" + this.pageSize + "</pageSize>";
-        rs += "<pageNumber>" + this.pageNumber + "</pageNumber>";
-        rs += "<price>" + this.price + "</price>";
-        rs += "<url>" + this.url + "</url>";
-        rs += "<imageUrl>" + this.imageUrl + "</imageUrl>";
-        rs += "<status>" + this.status + "</status>";
-        rs += "<quantity>" + this.quantity + "</quantity>";
-        rs += "<existedInDb>" + this.existedInDb + "</existedInDb>";
-        rs += "<description>" + this.description + "</description>";
+        var rs = "<book id=\"" + (this.id === null ? "" : this.id) + "\">";
+        rs += "<title>" + (this.title === null ? "" : this.title) + "</title>";
+        rs += "<author>" + (this.author === null ? "" : this.author) + "</author>";
+        rs += "<isbn>" + (this.isbn === null ? "" : this.isbn) + "</isbn>";
+        rs += "<translator>" + (this.translator === null ? "" : this.translator) + "</translator>";
+        rs += "<pageSize>" + (this.pageSize === null ? "" : this.pageSize) + "</pageSize>";
+        rs += "<pageNumber>" + (this.pageNumber === null ? "" : this.pageNumber) + "</pageNumber>";
+        rs += "<price>" + (this.price === null ? "" : this.price) + "</price>";
+        rs += "<url>" + (this.url === null ? "" : this.url) + "</url>";
+        rs += "<imageUrl>" + (this.imageUrl === null ? "" : this.imageUrl) + "</imageUrl>";
+        rs += "<status>" + (this.status === null ? "" : this.status) + "</status>";
+        rs += "<quantity>" + (this.quantity === null ? "" : this.quantity) + "</quantity>";
+        rs += "<existedInDb>" + (this.existedInDb === null ? "" : this.existedInDb) + "</existedInDb>";
+        rs += "<description>" + (this.description === null ? "" : this.description) + "</description>";
         rs += "</book>"
         return rs;
     }

@@ -23,6 +23,53 @@ function BookDetailFrame() {
     var _bookDetailIsbn;
     var _bookDetailSubmit;
 
+    this.addAllBook = function () {
+        var tmp = bookCache.getAll();
+        var books = [];
+        for (var i = 0; i < tmp.length; i++) {
+            var b = tmp[i];
+            if (b.existedInDb == 'false') {
+                books.push(b);
+            }
+        }
+        var validateBooks = [];
+        for (var i = 0; i < books.length; i++) {
+            var b = books[i];
+            if (this.validateBook(b)) {
+                validateBooks.push(b);
+            }
+        }
+        var invalidateBookCounter = books.length - validateBooks.length;
+        var confirmMessage = "Có " + invalidateBookCounter + " sản phẩm lỗi trên \n\
+tổng số " + books.length + " sản phẩm có thể thêm. Hành động này sẽ thêm " + validateBooks.length + " sản phẩm, chắc chứ?";
+        if (confirm(confirmMessage)) {
+            bookController.addListBook(validateBooks, function (xhr) {
+                var success = parseInt(xhr.responseText);
+                alert("Thêm thành công " + success + " sản phẩm!");
+                window.location.reload();
+            }, function (xhr) {
+                alert("Fail hết rồi :v !");
+            });
+        }
+        return false;
+    }
+
+    this.validateBook = function (book) {
+        if (book.id === null || book.id === '') {
+            return false;
+        }
+        if (book.title === null || book.title === '') {
+            return false;
+        }
+        if (book.author === null || book.author === '') {
+            return false;
+        }
+        if (book.price === null || book.price === '') {
+            return false;
+        }
+        return true;
+    }
+
     this.addOrUpdate = function () {
         var id = this._bookDetailId.value;
         var book = bookCache.findBook(id);
