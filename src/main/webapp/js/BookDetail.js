@@ -1,4 +1,5 @@
 var bookDetailFrame;
+
 window.addEventListener('load', function () {
     bookDetailFrame = new BookDetailFrame();
     bookDetailFrame.init();
@@ -20,6 +21,22 @@ function BookDetailFrame() {
     var _bookDetailImageUrl_input;
     var _bookDetailUrl_input;
     var _bookDetailIsbn;
+
+    this.addOrUpdate = function () {
+        var id = this._bookDetailId.value;
+        var book = bookCache.findBook(id);
+        if (book != null) {
+            var existedInDb = bookCache.getBookAttribute(book, "existedInDb");
+            if (existedInDb == true) {
+
+            } else {
+
+            }
+        } else {
+            alert("Đã xảy ra lỗi! Vui lòng thử lại sau!");
+        }
+        return false;
+    }
 
     this.init = function () {
         this.bookDetailModel = document.getElementById("book_detail_model");
@@ -58,17 +75,18 @@ function BookDetailFrame() {
     }
 
     this.showBookDetailModel = function (id) {
-        var book = findBook(id);
-        var author = getBookAttribute(book, "author");
-        var translator = getBookAttribute(book, "translator");
-        var size = getBookAttribute(book, "pageSize");
-        var pageNumber = getBookAttribute(book, "pageNumber");
-        var price = getBookAttribute(book, "price");
-        var description = getBookAttribute(book, "description");
-        var title = getBookAttribute(book, "title");
-        var imageUrl = getBookAttribute(book, "imageUrl");
-        var url = getBookAttribute(book, "url");
-        var isbn = getBookAttribute(book, "isbn");
+        var bookObj = bookCache.findBook(id);
+        console.log(bookObj.toXml());
+        var author = bookObj.author;
+        var translator = bookObj.translator;
+        var size = bookObj.pageSize;
+        var pageNumber = bookObj.pageNumber;
+        var price = bookObj.price;
+        var description = bookObj.description;
+        var title = bookObj.title;
+        var imageUrl = bookObj.imageUrl;
+        var url = bookObj.url;
+        var isbn = bookObj.isbn;
         this._bookDetailId.value = id;
         this._bookDetailAuthor.value = this.htmlEntitiesDecode(author);
         this._bookDetailTranslator.value = this.htmlEntitiesDecode(translator);
