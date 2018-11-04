@@ -29,24 +29,11 @@ public class CrawlServlet extends HttpServlet {
         PublisherCrawlingService crawlingService = new PublisherCrawlingService();
         List<Book> rs = null;
         String xmlData = "";
-        String cacheKey = request.getParameter("cache_key");
         if (tmp != null) {
             publisher = tmp;
         }
-        if (cacheKey != null) {
-            cacheKey = URLDecoder.decode(cacheKey, "UTF-8");
-            String[] keys = cacheKey.split("\n");
-            if (keys != null && "new".equals(keys[0])) {
-                try {
-                    request.setAttribute("page", keys[keys.length - 1]);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-            rs = crawlingService.getFromCache(cacheKey);
-        } else if (search != null) {
+        if (search != null) {
             rs = crawlingService.search(publisher, search);
-            cacheKey = crawlingService.buildSearchCacheKey(publisher, search);
         } else {
             String pageStr = request.getParameter("page");
             int page = 1;
@@ -62,7 +49,6 @@ public class CrawlServlet extends HttpServlet {
             }
             request.setAttribute("page", page);
             rs = crawlingService.getNewBook(publisher, page - 1, page);
-            cacheKey = crawlingService.buildGetNewBookCacheKey(publisher, page - 1, page);
         }
         if (rs != null) {
             try {
@@ -74,8 +60,6 @@ public class CrawlServlet extends HttpServlet {
         }
         request.setAttribute("books", rs);
         request.setAttribute("xmlData", xmlData);
-        request.setAttribute("cacheKey", URLEncoder.encode(cacheKey, "UTF-8"));
-
     }
 
 }
