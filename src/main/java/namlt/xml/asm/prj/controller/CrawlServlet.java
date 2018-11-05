@@ -24,27 +24,21 @@ public class CrawlServlet extends HttpServlet {
         String publisher = "nxb-nhanam";
         String search = request.getParameter("search");
         String tmp = request.getParameter("publisher");
-        PublisherCrawlingService crawlingService = new PublisherCrawlingService();
+        String categoryUrl = request.getParameter("categoryUrl");
         List<Book> rs = null;
+        int page = calculatePage(request.getParameter("page"));
         String xmlData = "";
         if (tmp != null) {
             publisher = tmp;
         }
-        if (search != null) {
+        
+        PublisherCrawlingService crawlingService = new PublisherCrawlingService();
+        if (categoryUrl != null && !"--".equals(categoryUrl)) {
+            request.setAttribute("page", page);
+            rs = crawlingService.getCategoryBook(categoryUrl, page - 1);
+        } else if (search != null) {
             rs = crawlingService.search(publisher, search);
         } else {
-            String pageStr = request.getParameter("page");
-            int page = 1;
-            if (pageStr != null && !"".equals(pageStr.trim())) {
-                try {
-                    page = Integer.parseInt(pageStr);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-            if (page <= 0) {
-                page = 1;
-            }
             request.setAttribute("page", page);
             rs = crawlingService.getNewBook(publisher, page - 1);
         }
@@ -58,6 +52,21 @@ public class CrawlServlet extends HttpServlet {
         }
         request.setAttribute("books", rs);
         request.setAttribute("xmlData", xmlData);
+    }
+
+    private int calculatePage(String pageStr) {
+        int page = 1;
+        if (pageStr != null && !"".equals(pageStr.trim())) {
+            try {
+                page = Integer.parseInt(pageStr);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        if (page <= 0) {
+            page = 1;
+        }
+        return page;
     }
 
 }

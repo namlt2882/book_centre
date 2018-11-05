@@ -14,26 +14,43 @@
         <script type="text/javascript" src="/js/CategoryCache.js"></script>
         <script>
             function getNewBook() {
-                var url = "http://" + window.location.hostname + ":" + window.location.port + "/admin/Publisher.jsp?publisher=";
+                var redirectUrl = "http://" + window.location.hostname + ":" + window.location.port + "/admin/Publisher.jsp?publisher=";
                 var element = document.getElementById("publisher");
-                url += element.value;
-                window.location.href = url;
+                redirectUrl += element.value;
+                var categoryUrl = document.getElementById("category");
+                if (categoryUrl !== null && categoryUrl.value !== '--') {
+                    redirectUrl += "&categoryUrl=" + categoryUrl.value;
+                }
+                window.location.href = redirectUrl;
                 return false;
             }
             var crawlCategoryCache;
             var categoryLayout;
-
+            const url = new URL(window.location.href);
             window.addEventListener('load', function () {
-            crawlCategoryCache = new CategoryCache();
-                    crawlCategoryCache.initData("crawlCategoryXmlData");
-                    categoryLayout = new CategoryLayout();
-                    if (crawlCategoryCache.xmlTree !== null) {
-            categoryLayout.initLayout("category", crawlCategoryCache.getAll(),
-            <c:choose>
-                <c:when test="${param.publisher!=null}">"${param.publisher}"</c:when>
-                <c:otherwise>"nxb-nhanam"</c:otherwise>
-            </c:choose>);
-            }
+                crawlCategoryCache = new CategoryCache();
+                crawlCategoryCache.initData("crawlCategoryXmlData");
+                categoryLayout = new CategoryLayout();
+                var publisher = "nxb-nhanam";
+                if (url.searchParams.get("publisher") !== null) {
+                    publisher = url.searchParams.get("publisher");
+                }
+                if (url.searchParams.get("categoryUrl") !== null) {
+                    var cat = crawlCategoryCache.findCategoryByUrl(url.searchParams.get('categoryUrl'));
+                    if (cat !== null) {
+                        var title = document.getElementById("title");
+                        title.innerHTML = title.innerHTML + " thuộc danh mục <a title='" + cat.name + "' target='_blank' href='"
+                                + cat.url + "'>" + cat.name + "</a>";
+                    }
+                }
+                if (crawlCategoryCache.xmlTree !== null) {
+                    categoryLayout.initLayout("category", crawlCategoryCache.getAll(), publisher,
+                            function (category) {
+                                var categoryUrl = url.searchParams.get("categoryUrl");
+                                var rs = category.url === categoryUrl;
+                                return rs;
+                            });
+                }
             }, false);
         </script>
         <c:if test='${not empty xmlData}'>
@@ -61,7 +78,10 @@
                                                         <div>
                                                             Chọn nhà xuất bản:
                                                             <select name="publisher" id="publisher" 
-                                                                    onchange="categoryLayout.initLayout('category', crawlCategoryCache.getAll(), this.value);">
+                                                                    onchange="categoryLayout.initLayout('category', crawlCategoryCache.getAll(), this.value, function (category) {
+                                                                                var categoryUrl = url.searchParams.get('categoryUrl');
+                                                                                return category.url === categoryUrl;
+                                                                            });">
                                                                 <option value="nxb-nhanam" <c:if test="${param.publisher=='nxb-nhanam'}">selected=""</c:if>>Nhã Nam</option>
                                                                 <option value="nxb-tre" <c:if test="${param.publisher=='nxb-tre'}">selected=""</c:if>>Trẻ</option>
                                                                 </select><br/>
@@ -75,7 +95,7 @@
                                                     </form>
                                                 </div>
                                                 <c:if test="${empty param.search}">
-                                                    <h2 class="block-title">Danh mục sản phẩm mới nhất 
+                                                    <h2 class="block-title" id="title">Sản phẩm mới nhất 
                                                         của nxb 
                                                         <c:if test="${empty param.publisher or param.publisher=='nxb-nhanam'}">Nhã Nam</c:if>
                                                         <c:if test="${param.publisher=='nxb-tre'}">Trẻ</c:if>
@@ -160,6 +180,9 @@
                                                                                <c:url value="/admin/Publisher.jsp">
                                                                                    <c:if test="${not empty param.publisher}">
                                                                                        <c:param name="publisher" value="${param.publisher}"/>
+                                                                                   </c:if>
+                                                                                   <c:if test="${not empty param.categoryUrl}">
+                                                                                       <c:param name="categoryUrl" value="${param.categoryUrl}"/>
                                                                                    </c:if>
                                                                                    <c:if test="${not empty page}">
                                                                                        <c:param name="page" value="${page + 1}"/>

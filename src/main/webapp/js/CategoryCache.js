@@ -1,5 +1,5 @@
 function CategoryLayout() {
-    this.initLayout = function (tagId, categories, publisher) {
+    this.initLayout = function (tagId, categories, publisher, isSelected) {
         var holder = document.getElementById(tagId);
         if (holder === null) {
             return;
@@ -14,6 +14,9 @@ function CategoryLayout() {
                 option = document.createElement("option");
                 option.textContent = category.name;
                 option.value = category.url;
+                if (isSelected !== null && isSelected(category)) {
+                    option.selected = true;
+                }
                 holder.appendChild(option);
             }
         }
@@ -47,6 +50,17 @@ function CategoryCache() {
         for (var i = 0; i < categories.length; i++) {
             var category = categories[i];
             if (publisher === category.getAttribute("publisher")) {
+                return this.transformCategoryToObject(category);
+            }
+        }
+        return null;
+    };
+
+    this.findCategoryByUrl = function (url) {
+        var categories = this.xmlTree.getElementsByTagName("category");
+        for (var i = 0; i < categories.length; i++) {
+            var category = categories[i];
+            if (url === this.getCategoryAttribute(category, "url")) {
                 return this.transformCategoryToObject(category);
             }
         }
