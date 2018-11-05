@@ -146,7 +146,7 @@ public class ParserHelper extends BaseParser {
             return counter;
         }
         int eventType = reader.getEventType();
-        if (eventType == START_ELEMENT && reader.getLocalName().equals(tagName)) {
+        if (eventType == START_ELEMENT && tagName.equals(reader.getLocalName())) {
             return counter;
         }
         boolean readAllText = sb != null;
@@ -162,7 +162,7 @@ public class ParserHelper extends BaseParser {
             }
             if (eventType == START_ELEMENT) {
                 counterIncrement();
-                if (reader.getLocalName().equals(tagName)) {
+                if (tagName.equals(reader.getLocalName())) {
                     break;
                 }
             } else if (eventType == END_ELEMENT) {
@@ -236,6 +236,10 @@ public class ParserHelper extends BaseParser {
         }
         fw.flush();
         fw.close();
+    }
+
+    public int getCounter() {
+        return counter;
     }
 
 }

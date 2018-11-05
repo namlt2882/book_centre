@@ -1,5 +1,6 @@
 package namlt.xml.asm.prj.crawler;
 
+import java.io.IOException;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -14,6 +15,7 @@ import namlt.xml.asm.prj.parser.BaseParser;
 import namlt.xml.asm.prj.parser.ParserHelper;
 import static javax.xml.stream.XMLStreamConstants.START_ELEMENT;
 import namlt.xml.asm.prj.model.Book;
+import namlt.xml.asm.prj.model.Category;
 import namlt.xml.asm.prj.parser.BoundReachedException;
 import static namlt.xml.asm.prj.utils.CommonUtils.parseInt;
 import static namlt.xml.asm.prj.utils.CommonUtils.parseDouble;
@@ -21,6 +23,7 @@ import static namlt.xml.asm.prj.utils.CommonUtils.parseDouble;
 public class NhaNamCrawler extends BaseParser implements BookCrawler {
 
     private XMLInputFactory inputFactory = XMLInputFactory.newFactory();
+    public static final String HOME_PAGE = "http://nhanam.com.vn/";
 
     public NhaNamCrawler() {
         inputFactory.setProperty(
@@ -33,8 +36,60 @@ public class NhaNamCrawler extends BaseParser implements BookCrawler {
 //        crawler.crawlNewBookUrls("http://nhanam.com.vn/sach-moi-xuat-ban?page=1").forEach(System.out::println);
 //        System.out.println(crawler.crawlBookPage("http://nhanam.com.vn/sach/16684/gau-a-cau-on-chu"));
 //        List<String> books = crawler.crawlNextNewBookUrls(0, 5);
-        List<String> books = crawler.search("Mẹ");
-        crawler.crawlBookPages(books).forEach(System.out::println);
+//        List<String> books = crawler.search("Mẹ");
+//        crawler.crawlBookPages(books).forEach(System.out::println);
+        List<Category> categories = crawler.crawlCategoryUrls();
+        categories.forEach(System.out::println);
+    }
+
+    public List<Category> crawlCategoryUrls() {
+        List<Category> rs = new ArrayList<>();
+        try {
+            String htmlSource = getHtmlSource(HOME_PAGE);
+            XMLStreamReader reader = inputFactory.createXMLStreamReader(new StringReader(htmlSource));
+            ParserHelper fragmentParser = new ParserHelper(reader);
+            ParserHelper detailParser = new ParserHelper(reader);
+            int eventType;
+            while (reader.hasNext()) {
+                eventType = reader.next();
+                if (eventType == START_ELEMENT) {
+                    if (isTag("ul", reader) && equalClasses(reader, "", "menu")) {
+                        fragmentParser.mark();
+                        fragmentParser.skipTo("li");
+                        fragmentParser.mark();
+                        fragmentParser.skipToWithClassName("ul", "submenu");
+                        fragmentParser.mark();
+                        String name, url;
+                        Category category;
+                        while (true) {
+                            try {
+                                fragmentParser.skipTo("li");
+                            } catch (BoundReachedException e) {
+                                break;
+                            }
+                            try {
+                                detailParser.mark();
+                                detailParser.skipTo("a");
+                                url = reader.getAttributeValue("", "href");
+                                detailParser.skipToCharacter();
+                                name = detailParser.readTextInside();
+                                url = "http://nhanam.com.vn" + url;
+                                category = new Category(name.trim(), url);
+                                rs.add(category);
+                                detailParser.skipToBound(null);
+                            } catch (BoundReachedException e) {
+                            } finally {
+                                fragmentParser.addCounter(-1);
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            System.out.println("[ERROR]: " + ex.getMessage());
+        }
+        return rs;
     }
 
     @Override

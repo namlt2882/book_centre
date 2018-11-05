@@ -1,14 +1,16 @@
 package namlt.xml.asm.prj.crawler;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import namlt.xml.asm.prj.model.Book;
+import namlt.xml.asm.prj.model.Category;
 import namlt.xml.asm.prj.parser.NestedTagResolver;
 import static namlt.xml.asm.prj.utils.InternetUtils.crawl;
 
 public interface BookCrawler {
+
+    List<Category> crawlCategoryUrls();
 
     Book crawlBookPage(String url);
 

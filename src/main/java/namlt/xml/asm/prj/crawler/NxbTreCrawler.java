@@ -16,12 +16,14 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 import static javax.xml.stream.XMLStreamConstants.START_ELEMENT;
 import namlt.xml.asm.prj.model.Book;
+import namlt.xml.asm.prj.model.Category;
 import static namlt.xml.asm.prj.utils.CommonUtils.parseInt;
 import static namlt.xml.asm.prj.utils.CommonUtils.parseDouble;
 
 public class NxbTreCrawler extends BaseParser implements BookCrawler {
 
     private XMLInputFactory inputFactory = XMLInputFactory.newFactory();
+    public static final String HOME_PAGE = "https://www.nxbtre.com.vn/";
 
     public NxbTreCrawler() {
         inputFactory.setProperty(
@@ -34,8 +36,10 @@ public class NxbTreCrawler extends BaseParser implements BookCrawler {
 //        Book book = crawler.crawlBookPage("https://www.nxbtre.com.vn/sach/24269.html");
 //        System.out.println(book);
 //        List<String> books = crawler.crawlNextNewBookUrls(2, 5);
-        List<String> books = crawler.search("Hoàng tử bé");
-        crawler.crawlBookPages(books).forEach(System.out::println);
+//        List<String> books = crawler.search("Hoàng tử bé");
+//        crawler.crawlBookPages(books).forEach(System.out::println);
+        List<Category> categories = crawler.crawlCategoryUrls();
+        categories.forEach(System.out::println);
 
     }
 
@@ -212,6 +216,82 @@ public class NxbTreCrawler extends BaseParser implements BookCrawler {
         List<String> urls = new ArrayList<>();
         crawlNewBookUrls(tmp).forEach(u -> urls.add(u));
         return urls;
+    }
+
+    @Override
+    public List<Category> crawlCategoryUrls() {
+        List<Category> rs = new ArrayList<>();
+        try {
+            String htmlSource = getHtmlSource(HOME_PAGE);
+            XMLStreamReader reader = inputFactory.createXMLStreamReader(new StringReader(htmlSource));
+            ParserHelper fragmentParser = new ParserHelper(reader);
+            ParserHelper detailParser = new ParserHelper(reader);
+            ParserHelper.writeToFile(htmlSource);
+            int eventType;
+            while (reader.hasNext()) {
+                eventType = reader.next();
+                if (eventType == START_ELEMENT) {
+                    if (isTag("ul", reader) && equalClasses(reader, "", "navbar")) {
+                        fragmentParser.mark();
+                        boolean found = false;
+                        //skip to specific li tag
+                        while (true) {
+                            try {
+                                fragmentParser.skipToWithClassName("li","drops");
+                            } catch (BoundReachedException e) {
+                                e.printStackTrace();
+                                break;
+                            }
+                            try {
+                                detailParser.mark();
+                                detailParser.skipTo("a");
+                                String href = reader.getAttributeValue("", "href");
+                                if ("/tu-sach/".equals(href)) {
+                                    found = true;
+                                    break;
+                                }
+                                detailParser.skipToBound(null);
+                            } catch (BoundReachedException e) {
+                                e.printStackTrace();
+                            } finally {
+                                fragmentParser.addCounter(-1);
+                            }
+                        }
+                        //parse detail if found=true
+                        if (found) {
+                            detailParser.skipToWithClassName("div", "mega-row");
+                            fragmentParser.mark();
+                            String name, url;
+                            Category category;
+                            while (true) {
+                                try {
+                                    fragmentParser.skipTo("li");
+                                } catch (BoundReachedException e) {
+                                    break;
+                                }
+                                try {
+                                    detailParser.mark();
+                                    detailParser.skipTo("a");
+                                    url = reader.getAttributeValue("", "href");
+                                    detailParser.skipToCharacter();
+                                    name = detailParser.readTextInside();
+                                    category = new Category(name.trim(), "https://www.nxbtre.com.vn" + url);
+                                    rs.add(category);
+                                    detailParser.skipToBound(null);
+                                } catch (BoundReachedException e) {
+                                } finally {
+                                    fragmentParser.addCounter(-1);
+                                }
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("[ERROR]: " + e.getMessage());
+        }
+        return rs;
     }
 
 }
