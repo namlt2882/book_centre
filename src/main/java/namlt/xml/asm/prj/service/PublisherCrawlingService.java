@@ -92,6 +92,9 @@ public class PublisherCrawlingService {
             i++;
             List<Book> cacheData = getFromCache(keyCode);
             int cacheDataSize = cacheData.size();
+            if (cacheDataSize == 0) {
+                return rs;
+            }
             if (skipCounter - cacheDataSize <= 0) {
                 int position = skipCounter + 1;
                 while (position <= cacheDataSize) {
@@ -110,6 +113,9 @@ public class PublisherCrawlingService {
             String keyCode = newBookUrlsCacheKey(publisher, i, (i + 1));
             i++;
             List<Book> cacheData = getFromCache(keyCode);
+            if (cacheData.size() == 0) {
+                return rs;
+            }
             for (Book book : cacheData) {
                 if (rs.size() >= MAX_NEW_PAGE_QUANTITY) {
                     break;
