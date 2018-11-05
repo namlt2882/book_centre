@@ -2,6 +2,7 @@
 <%@ page session="false" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <jsp:include page="/crawl"/>
+<jsp:include page="/category_crawling_servlet"/>
 <!DOCTYPE html>
 <html>
     <head>
@@ -10,6 +11,7 @@
         <script type="text/javascript" src="/js/Common.js"></script>
         <script type="text/javascript" src="/js/BookController.js"></script>
         <script type="text/javascript" src="/js/BookCache.js"></script>
+        <script type="text/javascript" src="/js/CategoryCache.js"></script>
         <script>
             function getNewBook() {
                 var url = "http://" + window.location.hostname + ":" + window.location.port + "/admin/Publisher.jsp?publisher=";
@@ -18,9 +20,27 @@
                 window.location.href = url;
                 return false;
             }
+            var crawlCategoryCache;
+            var categoryLayout;
+
+            window.addEventListener('load', function () {
+            crawlCategoryCache = new CategoryCache();
+                    crawlCategoryCache.initData("crawlCategoryXmlData");
+                    categoryLayout = new CategoryLayout();
+                    if (crawlCategoryCache.xmlTree !== null) {
+            categoryLayout.initLayout("category", crawlCategoryCache.getAll(),
+            <c:choose>
+                <c:when test="${param.publisher!=null}">"${param.publisher}"</c:when>
+                <c:otherwise>"nxb-nhanam"</c:otherwise>
+            </c:choose>);
+            }
+            }, false);
         </script>
         <c:if test='${not empty xmlData}'>
             <script id="xmlData" type="text/xmldata">${xmlData}</script>
+        </c:if>
+        <c:if test='${not empty crawlCategoryXmlData}'>
+            <script id="crawlCategoryXmlData" type="text/xmldata">${crawlCategoryXmlData}</script>
         </c:if>
     </head>
     <body class="html front not-logged-in one-sidebar sidebar-second site-name-hidden browserChrome browserChrome6">
@@ -40,9 +60,13 @@
                                                     <form action="Publisher.jsp" style="margin-left: 500px;">
                                                         <div>
                                                             Chọn nhà xuất bản:
-                                                            <select name="publisher" id="publisher">
+                                                            <select name="publisher" id="publisher" 
+                                                                    onchange="categoryLayout.initLayout('category', crawlCategoryCache.getAll(), this.value);">
                                                                 <option value="nxb-nhanam" <c:if test="${param.publisher=='nxb-nhanam'}">selected=""</c:if>>Nhã Nam</option>
                                                                 <option value="nxb-tre" <c:if test="${param.publisher=='nxb-tre'}">selected=""</c:if>>Trẻ</option>
+                                                                </select><br/>
+                                                                Danh mục:
+                                                                <select name="category" id="category">
                                                                 </select>
                                                                 <button onclick="return getNewBook()">Sản phẩm mới</button>
                                                             </div>

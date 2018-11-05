@@ -24,6 +24,7 @@ public class NxbTreCrawler extends BaseParser implements BookCrawler {
 
     private XMLInputFactory inputFactory = XMLInputFactory.newFactory();
     public static final String HOME_PAGE = "https://www.nxbtre.com.vn/";
+    public static final String CODE = "nxb-tre";
 
     public NxbTreCrawler() {
         inputFactory.setProperty(
@@ -38,10 +39,10 @@ public class NxbTreCrawler extends BaseParser implements BookCrawler {
 //        List<String> books = crawler.crawlNextNewBookUrls(2, 5);
 //        List<String> books = crawler.search("Hoàng tử bé");
 //        crawler.crawlBookPages(books).forEach(System.out::println);
-//        List<Category> categories = crawler.crawlCategoryUrls();
-//        categories.forEach(System.out::println);
-        List<String> books = crawler.crawlNextCategoryBookUrls("https://www.nxbtre.com.vn/tu-sach/chinh-tri/", 0, 5);
-        books.stream().map(str -> crawler.crawlBookPage(str)).forEach(System.out::println);
+        List<Category> categories = crawler.crawlCategoryUrls();
+        categories.forEach(System.out::println);
+//        List<String> books = crawler.crawlNextCategoryBookUrls("https://www.nxbtre.com.vn/tu-sach/chinh-tri/", 0, 5);
+//        books.stream().map(str -> crawler.crawlBookPage(str)).forEach(System.out::println);
     }
 
     @Override
@@ -276,7 +277,7 @@ public class NxbTreCrawler extends BaseParser implements BookCrawler {
                                     url = reader.getAttributeValue("", "href");
                                     detailParser.skipToCharacter();
                                     name = detailParser.readTextInside();
-                                    category = new Category(name.trim(), "https://www.nxbtre.com.vn" + url);
+                                    category = new Category(name.trim(), "https://www.nxbtre.com.vn" + url, CODE);
                                     rs.add(category);
                                     detailParser.skipToBound(null);
                                 } catch (BoundReachedException e) {

@@ -8,6 +8,15 @@ window.addEventListener('load', function () {
 }, false);
 
 var AJAZZ;
+function Utility() {
+    this.htmlEntitiesDecode = function (s) {
+        var e = document.createElement("div");
+        e.innerHTML = s;
+        var rs = e.innerHTML;
+        return rs;
+    }
+}
+
 function AjaxRequest() {
     this.getXMLHttpRequest = function () {
         var xhr;

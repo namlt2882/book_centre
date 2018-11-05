@@ -1,6 +1,7 @@
 package namlt.xml.asm.prj.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -8,6 +9,7 @@ import jersey.repackaged.com.google.common.cache.CacheBuilder;
 import jersey.repackaged.com.google.common.cache.CacheLoader;
 import jersey.repackaged.com.google.common.cache.LoadingCache;
 import namlt.xml.asm.prj.crawler.BookCrawler;
+import namlt.xml.asm.prj.crawler.CrawlerProvider;
 import namlt.xml.asm.prj.model.Book;
 import static namlt.xml.asm.prj.crawler.CrawlerProvider.getCrawler;
 
@@ -38,7 +40,12 @@ public class PublisherCrawlingService {
         return key;
     }
 
-    public List<Book> getNewBook(String publisher, int start) {
+    private String buildCategoryBookUrlsCacheKey(String url, int start, int time) {
+        String key = PREFIX_CRAWL_CATEGORY + '\n' + url + '\n' + start + '\n' + time;
+        return key;
+    }
+
+    private List<Book> getBook(CacheKeyBuider cacheKeyBuider, int start, Object... arguments) {
         if (start < 0) {
             start = 0;
         }
@@ -46,8 +53,12 @@ public class PublisherCrawlingService {
         int skipCounter = MAX_NEW_PAGE_QUANTITY * start;
         //skip to specific cache
         int i = 0;
+        List tmpList;
         while (true) {
-            String keyCode = buildNewBookUrlsCacheKey(publisher, i, (i + 1));
+            tmpList = new ArrayList(Arrays.asList(arguments));
+            tmpList.add(i);
+            tmpList.add((i + 1));
+            String keyCode = cacheKeyBuider.getKey(tmpList.toArray());
             i++;
             List<Book> cacheData = getFromCache(keyCode);
             int cacheDataSize = cacheData.size();
@@ -69,7 +80,10 @@ public class PublisherCrawlingService {
             }
         }
         while (rs.size() < MAX_NEW_PAGE_QUANTITY) {
-            String keyCode = buildNewBookUrlsCacheKey(publisher, i, (i + 1));
+            tmpList = new ArrayList(Arrays.asList(arguments));
+            tmpList.add(i);
+            tmpList.add((i + 1));
+            String keyCode = cacheKeyBuider.getKey(tmpList.toArray());
             i++;
             List<Book> cacheData = getFromCache(keyCode);
             if (cacheData.size() == 0) {
@@ -83,6 +97,18 @@ public class PublisherCrawlingService {
             }
         }
         return rs;
+    }
+
+    public List<Book> getCategoryBook(String url, int start) {
+        return getBook((Object... arr) -> {
+            return buildCategoryBookUrlsCacheKey((String) arr[0], (Integer) arr[1], (Integer) arr[2]);
+        }, start, url);
+    }
+
+    public List<Book> getNewBook(String publisher, int start) {
+        return getBook((Object... arr) -> {
+            return buildNewBookUrlsCacheKey((String) arr[0], (Integer) arr[1], (Integer) arr[2]);
+        }, start, publisher);
     }
 
     public List<Book> search(String publisher, String search) {
@@ -116,14 +142,29 @@ public class PublisherCrawlingService {
                         System.out.println("[WARNNING] [" + date + "] Crawling new book urls from " + tmp[1]);
                         rs = getNewBook(tmp[1], Integer.parseInt(tmp[2]), Integer.parseInt(tmp[3]));
                         break;
-                    case "search":
+                    case PREFIX_CRAWL_SEARCH:
                         System.out.println("[WARNNING] [" + date + "] Crawling book urls according to search '"
                                 + tmp[2] + "' result from " + tmp[1]);
                         rs = search(tmp[1], tmp[2]);
                         break;
+                    case PREFIX_CRAWL_CATEGORY:
+                        System.out.println("[WARNNING] [" + date + "] Crawling category urls from " + tmp[1]);
+                        rs = getCategoryBook(tmp[1], Integer.parseInt(tmp[2]), Integer.parseInt(tmp[3]));
+                        break;
                 }
             }
             if (rs == null) {
+                rs = new ArrayList<>();
+            }
+            return rs;
+        }
+
+        public List<String> getCategoryBook(String url, int start, int time) {
+            List<String> rs = null;
+            BookCrawler crawler = CrawlerProvider.identifyCrawlerByUrl(url);
+            if (crawler != null) {
+                rs = crawler.crawlNextCategoryBookUrls(url, start, time);
+            } else {
                 rs = new ArrayList<>();
             }
             return rs;

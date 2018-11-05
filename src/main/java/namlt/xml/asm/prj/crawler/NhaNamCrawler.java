@@ -24,6 +24,7 @@ public class NhaNamCrawler extends BaseParser implements BookCrawler {
 
     private XMLInputFactory inputFactory = XMLInputFactory.newFactory();
     public static final String HOME_PAGE = "http://nhanam.com.vn/";
+    public static final String CODE = "nxb-nhanam";
 
     public NhaNamCrawler() {
         inputFactory.setProperty(
@@ -76,7 +77,7 @@ public class NhaNamCrawler extends BaseParser implements BookCrawler {
                                 detailParser.skipToCharacter();
                                 name = detailParser.readTextInside();
                                 url = "http://nhanam.com.vn" + url;
-                                category = new Category(name.trim(), url);
+                                category = new Category(name.trim(), url, CODE);
                                 rs.add(category);
                                 detailParser.skipToBound(null);
                             } catch (BoundReachedException e) {

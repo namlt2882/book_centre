@@ -132,13 +132,7 @@ tổng số " + books.length + " sản phẩm có thể thêm. Hành động nà
         this._bookDetailSubmit = document.getElementById("book_detail_submit");
     }
 
-    this.htmlEntitiesDecode = function (s) {
-        var e = document.createElement("div");
-        e.innerHTML = s;
-        var rs = e.innerHTML;
-        return rs;
 
-    }
 
     this.isNullOrEmpty = function (s) {
         return (s != null && s !== "") ? false : true;
@@ -162,18 +156,20 @@ tổng số " + books.length + " sản phẩm có thể thêm. Hành động nà
         } else {
             this._bookDetailSubmit.value = "Thêm sản phẩm";
         }
+        var utitlity = new Utility();
+
         this._bookDetailId.value = id;
-        this._bookDetailAuthor.value = this.htmlEntitiesDecode(author);
-        this._bookDetailTranslator.value = this.htmlEntitiesDecode(translator);
+        this._bookDetailAuthor.value = utitlity.htmlEntitiesDecode(author);
+        this._bookDetailTranslator.value = utitlity.htmlEntitiesDecode(translator);
         this._bookDetailSize.value = size;
         this._bookDetailPageNumber.value = pageNumber;
         this._bookDetailPrice.value = price;
         this._bookDetailIsbn.value = isbn;
-        this._bookDetailDescription.innerHTML = this.htmlEntitiesDecode(description);
-        this._bookDetailTitle.textContent = this.htmlEntitiesDecode(title);
+        this._bookDetailDescription.innerHTML = utitlity.htmlEntitiesDecode(description);
+        this._bookDetailTitle.textContent = utitlity.htmlEntitiesDecode(title);
         this._bookDetailImageUrl.src = imageUrl;
         this._bookDetailUrl.href = url;
-        this._bookDetailTitle_input.value = this.htmlEntitiesDecode(title);
+        this._bookDetailTitle_input.value = utitlity.htmlEntitiesDecode(title);
         this._bookDetailImageUrl_input.value = imageUrl;
         this._bookDetailUrl_input.value = url;
         this.bookDetailModel.style.display = "block";
