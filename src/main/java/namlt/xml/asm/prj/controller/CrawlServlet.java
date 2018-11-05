@@ -1,8 +1,6 @@
 package namlt.xml.asm.prj.controller;
 
 import java.io.IOException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -48,7 +46,7 @@ public class CrawlServlet extends HttpServlet {
                 page = 1;
             }
             request.setAttribute("page", page);
-            rs = crawlingService.getNewBook(publisher, page - 1, page);
+            rs = crawlingService.getNewBook(publisher, page - 1);
         }
         if (rs != null) {
             try {

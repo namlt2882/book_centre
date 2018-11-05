@@ -1,25 +1,21 @@
 package namlt.xml.asm.prj.controller;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
-import javax.naming.NamingException;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 import namlt.xml.asm.prj.model.Book;
 import namlt.xml.asm.prj.model.BookList;
+import namlt.xml.asm.prj.service.BookDetailCrawlingService;
 import namlt.xml.asm.prj.service.BookService;
-import namlt.xml.asm.prj.service.PublisherCrawlingService;
+import namlt.xml.asm.prj.service.BookUtilityService;
 
 @Path("/product")
 public class ProductController extends BaseController {
@@ -41,8 +37,8 @@ public class ProductController extends BaseController {
             try {
                 Book rs = bookService.add(book);
                 //edit status of book in cache
-                PublisherCrawlingService.editBookFromCache(rs.getUrl(), b -> {
-                    BookService.copyBook(rs, b);
+                BookDetailCrawlingService.editBookFromCache(rs.getUrl(), b -> {
+                    BookUtilityService.copyBook(rs, b);
                     b.setExistedInDb(true);
                 });
                 successCase++;
@@ -67,8 +63,8 @@ public class ProductController extends BaseController {
         }
         if (rs != null) {
             //edit status of book in cache
-            PublisherCrawlingService.editBookFromCache(rs.getUrl(), book -> {
-                BookService.copyBook(rs, book);
+            BookDetailCrawlingService.editBookFromCache(rs.getUrl(), book -> {
+                BookUtilityService.copyBook(rs, book);
                 book.setExistedInDb(true);
             });
             return Response.ok(b.getId()).build();
@@ -88,8 +84,8 @@ public class ProductController extends BaseController {
             return Response.status(404).entity(ex.getMessage()).build();
         }
         //edit status of book in cache
-        PublisherCrawlingService.editBookFromCache(b.getUrl(), book -> {
-            BookService.copyBook(b, book);
+        BookDetailCrawlingService.editBookFromCache(b.getUrl(), book -> {
+            BookUtilityService.copyBook(b, book);
             book.setExistedInDb(true);
         });
         return Response.ok(b.getId()).build();

@@ -10,6 +10,7 @@ import javax.naming.NamingException;
 import namlt.xml.asm.prj.common.BookCommon;
 import namlt.xml.asm.prj.model.Book;
 import namlt.xml.asm.prj.repository.BookRepository;
+import static namlt.xml.asm.prj.service.BookUtilityService.copyBook;
 
 public class BookService implements BookCommon {
     
@@ -27,18 +28,7 @@ public class BookService implements BookCommon {
         repository.update(origin);
     }
     
-    public static void copyBook(Book src, Book des) {
-        des.setTitle(src.getTitle());
-        des.setIsbn(src.getIsbn());
-        des.setAuthor(src.getAuthor());
-        des.setTranslator(src.getTranslator());
-        des.setPageSize(src.getPageSize());
-        des.setPageNumber(src.getPageNumber());
-        des.setPrice(src.getPrice());
-        des.setUrl(src.getUrl());
-        des.setImageUrl(src.getImageUrl());
-        des.setDescription(src.getDescription());
-    }
+    
     
     public Book get(String id) {
         try {

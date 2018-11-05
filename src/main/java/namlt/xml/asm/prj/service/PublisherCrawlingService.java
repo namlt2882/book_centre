@@ -4,23 +4,20 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import jersey.repackaged.com.google.common.cache.CacheBuilder;
 import jersey.repackaged.com.google.common.cache.CacheLoader;
 import jersey.repackaged.com.google.common.cache.LoadingCache;
 import namlt.xml.asm.prj.crawler.BookCrawler;
-import namlt.xml.asm.prj.crawler.NhaNamCrawler;
-import namlt.xml.asm.prj.crawler.NxbTreCrawler;
 import namlt.xml.asm.prj.model.Book;
-import namlt.xml.asm.prj.utils.InternetUtils;
+import static namlt.xml.asm.prj.crawler.CrawlerProvider.getCrawler;
 
 public class PublisherCrawlingService {
 
     private static LoadingCache<String, List<String>> pageCache;
-    private static LoadingCache<String, Book> bookDetailCache;
+
     public static final String PREFIX_CRAWL_NEW = "crawl-new";
     public static final String PREFIX_CRAWL_SEARCH = "search";
+    public static final String PREFIX_CRAWL_CATEGORY = "category";
     public static final int MAX_NEW_PAGE_QUANTITY = 20;
 
     static {
@@ -28,58 +25,20 @@ public class PublisherCrawlingService {
                 .maximumSize(100)
                 .expireAfterWrite(15, TimeUnit.MINUTES)
                 .build(new PageCacheLoader());
-        bookDetailCache = CacheBuilder.newBuilder()
-                .maximumSize(500)
-                .expireAfterWrite(30, TimeUnit.MINUTES)
-                .build(new BookDetailCacheLoader());
+
     }
 
-    public String buildSearchCacheKey(String publisher, String search) {
+    private String buildSearchCacheKey(String publisher, String search) {
         String key = PREFIX_CRAWL_SEARCH + "\n" + publisher + '\n' + search;
         return key;
     }
 
-    public String buildGetNewBookCacheKey(String publisher, int start, int time) {
-        String key = "new\n" + publisher + '\n' + start + '\n' + time;
-        return key;
-    }
-
-    private String newBookUrlsCacheKey(String publisher, int start, int time) {
+    private String buildNewBookUrlsCacheKey(String publisher, int start, int time) {
         String key = PREFIX_CRAWL_NEW + '\n' + publisher + '\n' + start + '\n' + time;
         return key;
     }
 
-    public static void removeBookFromCache(String url) {
-        if (url == null || "".equals(url)) {
-            return;
-        }
-        bookDetailCache.invalidate(url);
-    }
-
-    public static boolean editBookFromCache(String key, Consumer<Book> consumer) {
-        Book book = bookDetailCache.getIfPresent(key);
-        if (book != null) {
-            consumer.accept(book);
-            return true;
-        }
-        return false;
-    }
-
-    private List<Book> getBookFromUrls(List<String> url) {
-        return url.parallelStream()
-                .map(u -> {
-                    try {
-                        return bookDetailCache.apply(u);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    return null;
-                })
-                .filter(b -> b != null)
-                .collect(Collectors.toList());
-    }
-
-    public List<Book> getNewBook(String publisher, int start, int time) {
+    public List<Book> getNewBook(String publisher, int start) {
         if (start < 0) {
             start = 0;
         }
@@ -88,7 +47,7 @@ public class PublisherCrawlingService {
         //skip to specific cache
         int i = 0;
         while (true) {
-            String keyCode = newBookUrlsCacheKey(publisher, i, (i + 1));
+            String keyCode = buildNewBookUrlsCacheKey(publisher, i, (i + 1));
             i++;
             List<Book> cacheData = getFromCache(keyCode);
             int cacheDataSize = cacheData.size();
@@ -110,7 +69,7 @@ public class PublisherCrawlingService {
             }
         }
         while (rs.size() < MAX_NEW_PAGE_QUANTITY) {
-            String keyCode = newBookUrlsCacheKey(publisher, i, (i + 1));
+            String keyCode = buildNewBookUrlsCacheKey(publisher, i, (i + 1));
             i++;
             List<Book> cacheData = getFromCache(keyCode);
             if (cacheData.size() == 0) {
@@ -130,15 +89,11 @@ public class PublisherCrawlingService {
         return getFromCache(buildSearchCacheKey(publisher, search));
     }
 
-    public List<Book> getFromCache(String key) {
+    private List<Book> getFromCache(String key) {
         List<Book> rs = null;
-        String[] keys = key.split("\n");
-        if (keys != null && "new".equals(keys[0])) {
-            return getNewBook(keys[1], Integer.parseInt(keys[2]), Integer.parseInt(keys[3]));
-        }
         try {
             List<String> urls = pageCache.apply(key);
-            rs = getBookFromUrls(urls);
+            rs = BookDetailCrawlingService.getBooks(urls);
         } catch (Exception e) {
             System.out.println("[ERROR]: " + e.getMessage());
         }
@@ -146,29 +101,6 @@ public class PublisherCrawlingService {
             return new ArrayList<>();
         }
         return rs;
-    }
-
-    private static class BookDetailCacheLoader extends CacheLoader<String, Book> {
-
-        private CommonCacheService commonCacheService = new CommonCacheService();
-
-        @Override
-        public Book load(String url) throws Exception {
-            String host = InternetUtils.identifyHost(url);
-            BookCrawler crawler = getCrawler(host);
-            if (crawler == null) {
-                throw new Exception("Not found crawler for host '" + host + "'");
-            }
-            System.out.println("[WARNING] [" + new Date() + "] Crawling book detail from '" + url + "'");
-            Book rs = crawler.crawlBookPage(url);
-            if (rs == null) {
-                throw new Exception("[ERROR] [" + new Date() + "] Fail to parse book detail from url '" + url + "'");
-            }
-            boolean isExisted = commonCacheService.isBookExisted(rs.getId());
-            rs.setExistedInDb(isExisted);
-            return rs;
-        }
-
     }
 
     private static class PageCacheLoader extends CacheLoader<String, List<String>> {
@@ -221,19 +153,4 @@ public class PublisherCrawlingService {
 
     }
 
-    private static BookCrawler getCrawler(String publisher) {
-        switch (publisher) {
-            case "nxb-nhanam":
-                return new NhaNamCrawler();
-            case "nhanam.com.vn":
-                return new NhaNamCrawler();
-            case "nxb-tre":
-                return new NxbTreCrawler();
-            case "nxbtre.com.vn":
-                return new NxbTreCrawler();
-            case "www.nxbtre.com.vn":
-                return new NxbTreCrawler();
-        }
-        return null;
-    }
 }
