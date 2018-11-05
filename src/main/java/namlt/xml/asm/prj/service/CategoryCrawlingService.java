@@ -11,21 +11,22 @@ import namlt.xml.asm.prj.model.Category;
 import static namlt.xml.asm.prj.crawler.CrawlerProvider.getCrawler;
 
 public class CategoryCrawlingService {
-
+    
     private static LoadingCache<String, List<Category>> categoryCache;
-
+    
     static {
         categoryCache = CacheBuilder.newBuilder()
                 .expireAfterWrite(30, TimeUnit.MINUTES)
                 .build(new CategoryCacheLoader());
     }
-
+    
     public static List<Category> getAllCategories() {
-        List<Category> rs = getNhaNamCategories();
+        List<Category> rs = new ArrayList<>();
+        getNhaNamCategories().forEach(c -> rs.add(c));
         getTreCategories().forEach(c -> rs.add(c));
         return rs;
     }
-
+    
     public static List<Category> getNhaNamCategories() {
         try {
             List<Category> rs = categoryCache.apply("nxb-nhanam");
@@ -35,7 +36,7 @@ public class CategoryCrawlingService {
         }
         return new ArrayList<>();
     }
-
+    
     public static List<Category> getTreCategories() {
         try {
             List<Category> rs = categoryCache.apply("nxb-tre");
@@ -45,9 +46,9 @@ public class CategoryCrawlingService {
         }
         return new ArrayList<>();
     }
-
+    
     private static class CategoryCacheLoader extends CacheLoader<String, List<Category>> {
-
+        
         @Override
         public List<Category> load(String publisher) throws Exception {
             BookCrawler crawler = getCrawler(publisher);
@@ -57,6 +58,6 @@ public class CategoryCrawlingService {
             List<Category> rs = crawler.crawlCategoryUrls();
             return rs;
         }
-
+        
     }
 }

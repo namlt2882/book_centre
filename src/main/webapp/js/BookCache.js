@@ -15,13 +15,6 @@ function BookCache() {
         var xmlData = holder.text;
         var parser = new DOMParser();
         this.xmlTree = parser.parseFromString(xmlData, "text/xml");
-        console.log("Quantity of book=" + this.xmlTree.getElementsByTagName("book").length);
-        var books = this.xmlTree.getElementsByTagName("book");
-        for (var i = 0; i < books.length; i++) {
-            var book = books[i];
-            console.log("[id=" + book.getAttribute("id") + "]"
-                    + "[title=" + this.getBookAttribute(book, "title") + "]")
-        }
     }
 
     this.getAll = function () {

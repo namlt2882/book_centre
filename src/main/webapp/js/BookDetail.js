@@ -140,7 +140,6 @@ tổng số " + books.length + " sản phẩm có thể thêm. Hành động nà
 
     this.showBookDetailModel = function (id) {
         var bookObj = bookCache.findBook(id);
-        console.log(bookObj.toXml());
         var author = bookObj.author;
         var translator = bookObj.translator;
         var size = bookObj.pageSize;
