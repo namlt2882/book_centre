@@ -12,21 +12,21 @@ import namlt.xml.asm.prj.model.Book;
 import namlt.xml.asm.prj.repository.BookRepository;
 
 public class BookService implements BookCommon {
-
+    
     public Book add(Book b) throws NamingException, SQLException {
         b.setStatus(STATUS_ACTIVE);
         b.setQuantity(0);
         b.setInsertDate(new Date());
         return new BookRepository().insert(b);
     }
-
+    
     public void update(Book b) throws NamingException, SQLException {
         BookRepository repository = new BookRepository();
         Book origin = repository.get(b.getId());
         copyBook(b, origin);
         repository.update(origin);
     }
-
+    
     public static void copyBook(Book src, Book des) {
         des.setTitle(src.getTitle());
         des.setIsbn(src.getIsbn());
@@ -39,16 +39,29 @@ public class BookService implements BookCommon {
         des.setImageUrl(src.getImageUrl());
         des.setDescription(src.getDescription());
     }
-
+    
     public Book get(String id) {
         try {
-            return new BookRepository().get(id);
+            Book rs = new BookRepository().get(id);
+            if (rs != null) {
+                rs.setExistedInDb(true);
+            }
+            return rs;
         } catch (Exception ex) {
             Logger.getLogger(BookService.class.getName()).log(Level.SEVERE, null, ex);
             return null;
         }
     }
-
+    
+    public static void checkBooksExisted(List<Book> books) {
+        if (books == null) {
+            return;
+        }
+        books.parallelStream().forEach(book -> {
+            book.setExistedInDb(true);
+        });
+    }
+    
     public List<Book> getNew(Integer startAt, Integer nextRow) {
         List<Book> rs = null;
         if (startAt == null || nextRow == null) {
@@ -57,13 +70,14 @@ public class BookService implements BookCommon {
         }
         try {
             rs = new BookRepository().getNew(startAt, nextRow);
+            checkBooksExisted(rs);
         } catch (Exception ex) {
             Logger.getLogger(BookService.class.getName()).log(Level.SEVERE, null, ex);
             rs = new ArrayList<>();
         }
         return rs;
     }
-
+    
     public List<Book> search(String search, Integer startAt, Integer nextRow) {
         List<Book> rs = null;
         if (startAt == null || nextRow == null) {
@@ -72,13 +86,14 @@ public class BookService implements BookCommon {
         }
         try {
             rs = new BookRepository().find(search, startAt, nextRow);
+            checkBooksExisted(rs);
         } catch (Exception ex) {
             Logger.getLogger(BookService.class.getName()).log(Level.SEVERE, null, ex);
             rs = new ArrayList<>();
         }
         return rs;
     }
-
+    
     public List<Book> getOutOfStock(Integer startAt, Integer nextRow) {
         List<Book> rs = null;
         if (startAt == null || nextRow == null) {
@@ -87,13 +102,14 @@ public class BookService implements BookCommon {
         }
         try {
             rs = new BookRepository().getOutOfStock(startAt, nextRow);
+            checkBooksExisted(rs);
         } catch (Exception ex) {
             Logger.getLogger(BookService.class.getName()).log(Level.SEVERE, null, ex);
             rs = new ArrayList<>();
         }
         return rs;
     }
-
+    
     public List<Book> getDisable(Integer startAt, Integer nextRow) {
         List<Book> rs = null;
         if (startAt == null || nextRow == null) {
@@ -102,13 +118,14 @@ public class BookService implements BookCommon {
         }
         try {
             rs = new BookRepository().getDisable(startAt, nextRow);
+            checkBooksExisted(rs);
         } catch (Exception ex) {
             Logger.getLogger(BookService.class.getName()).log(Level.SEVERE, null, ex);
             rs = new ArrayList<>();
         }
         return rs;
     }
-
+    
     public int count() {
         try {
             return new BookRepository().count();
@@ -117,7 +134,7 @@ public class BookService implements BookCommon {
         }
         return 0;
     }
-
+    
     public int countActive() {
         try {
             return new BookRepository().countActive();
@@ -126,7 +143,7 @@ public class BookService implements BookCommon {
         }
         return 0;
     }
-
+    
     public int countOutOfStock() {
         try {
             return new BookRepository().countOutOfStock();
@@ -135,7 +152,7 @@ public class BookService implements BookCommon {
         }
         return 0;
     }
-
+    
     public int countDisable() {
         try {
             return new BookRepository().countDisable();
@@ -144,7 +161,7 @@ public class BookService implements BookCommon {
         }
         return 0;
     }
-
+    
     public int countSearch(String s) {
         try {
             return new BookRepository().countSearch(s);

@@ -7,6 +7,9 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Kho sách</title>
+        <script type="text/javascript" src="/js/Common.js"></script>
+        <script type="text/javascript" src="/js/BookController.js"></script>
+        <script type="text/javascript" src="/js/BookCache.js"></script>
         <script>
             function filterByType() {
                 var url = "http://" + window.location.hostname + ":" + window.location.port + "/admin/Home.jsp?type=";
@@ -16,8 +19,12 @@
                 return false;
             }
         </script>
+        <c:if test='${not empty xmlData}'>
+            <script id="xmlData" type="text/xmldata">${xmlData}</script>
+        </c:if>
     </head>
     <body class="html front not-logged-in one-sidebar sidebar-second site-name-hidden browserChrome browserChrome6">
+        <jsp:include page="BookDetail.jsp"/>
         <div id="page" class="container">
             <jsp:include page="AdminPageHeader.jsp"/>
             <div id="columns">
@@ -57,7 +64,7 @@
                                                                                     <div class="field-content">
                                                                                         <div style="width: 100px;height: 250px;">
                                                                                             <img src="${book.imageUrl}" style="max-width: 100%;max-height: 100%;margin: 0px;"
-                                                                                                 class="book_detail_trigger" onclick="showBookDetailModel('${book.id}');">
+                                                                                                 class="book_detail_trigger" onclick="bookDetailFrame.showBookDetailModel('${book.id}');">
                                                                                         </div>
                                                                                     </div>  
                                                                                 </div>  

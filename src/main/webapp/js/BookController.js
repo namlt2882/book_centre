@@ -15,9 +15,9 @@ function BookController() {
         AJAZZ.postRequest("/rest/product/list", function (xhr) {
             xhr.setRequestHeader("Content-Type", "application/xml");
         }, function (xhr) {
-            if (xhr.readyState == XMLHttpRequest.DONE && xhr.status === 200) {
+            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
                 successCallBack(xhr);
-            } else if (xhr.readyState == XMLHttpRequest.DONE && xhr.status === 404) {
+            } else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status !== 200) {
                 failCallBack(xhr);
             }
         }, data);
@@ -27,9 +27,9 @@ function BookController() {
         AJAZZ.postRequest("/rest/product", function (xhr) {
             xhr.setRequestHeader("Content-Type", "application/xml");
         }, function (xhr) {
-            if (xhr.readyState == XMLHttpRequest.DONE && xhr.status === 200) {
+            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
                 successCallBack(xhr);
-            } else if (xhr.readyState == XMLHttpRequest.DONE && xhr.status === 404) {
+            } else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status !== 200) {
                 failCallBack(xhr);
             }
         }, "<?xml version='1.0'?>" + book.toXml());
@@ -39,9 +39,9 @@ function BookController() {
         AJAZZ.sendRequest("PUT", "/rest/product", function (xhr) {
             xhr.setRequestHeader("Content-Type", "application/xml");
         }, function (xhr) {
-            if (xhr.readyState == XMLHttpRequest.DONE && xhr.status === 200) {
+            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
                 successCallBack(xhr);
-            } else if (xhr.readyState == XMLHttpRequest.DONE && xhr.status === 404) {
+            } else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status !== 200) {
                 failCallBack(xhr);
             }
         }, "<?xml version='1.0'?>" + book.toXml());
