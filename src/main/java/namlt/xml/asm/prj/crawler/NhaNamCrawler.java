@@ -38,8 +38,10 @@ public class NhaNamCrawler extends BaseParser implements BookCrawler {
 //        List<String> books = crawler.crawlNextNewBookUrls(0, 5);
 //        List<String> books = crawler.search("Mẹ");
 //        crawler.crawlBookPages(books).forEach(System.out::println);
-        List<Category> categories = crawler.crawlCategoryUrls();
-        categories.forEach(System.out::println);
+//        List<Category> categories = crawler.crawlCategoryUrls();
+//        categories.forEach(System.out::println);
+        List<String> books = crawler.crawlNextCategoryBookUrls("http://nhanam.com.vn/chuyen-muc/1/van-hoc-viet-nam", 0, 5);
+        books.stream().map(str -> crawler.crawlBookPage(str)).forEach(System.out::println);
     }
 
     public List<Category> crawlCategoryUrls() {
@@ -210,7 +212,7 @@ public class NhaNamCrawler extends BaseParser implements BookCrawler {
     }
 
     @Override
-    public List<String> crawlNewBookUrls(String url) {
+    public List<String> crawlBookUrls(String url) {
         List<String> rs = new ArrayList<>();
         try {
             String htmlSource = getHtmlSource(url);
@@ -240,7 +242,6 @@ public class NhaNamCrawler extends BaseParser implements BookCrawler {
 
     @Override
     public List<String> crawlNextNewBookUrls(int start, int time) {
-        List<Book> rs = new ArrayList<>();
         String tmp = "http://nhanam.com.vn/sach-moi-xuat-ban?page=";
         List<String> urls = new ArrayList<>();
         if (start < 0) {
@@ -248,7 +249,7 @@ public class NhaNamCrawler extends BaseParser implements BookCrawler {
         }
         for (int i = start; i < time; i++) {
             String url = tmp + (i + 1);
-            crawlNewBookUrls(url).forEach(s -> urls.add(s));
+            crawlBookUrls(url).forEach(s -> urls.add(s));
         }
         return urls;
     }
@@ -262,7 +263,7 @@ public class NhaNamCrawler extends BaseParser implements BookCrawler {
             Logger.getLogger(NxbTreCrawler.class.getName()).log(Level.SEVERE, null, ex);
         }
         List<String> urls = new ArrayList<>();
-        crawlNewBookUrls(tmp).forEach(u -> urls.add(u));
+        crawlBookUrls(tmp).forEach(u -> urls.add(u));
         return urls;
     }
 
@@ -300,6 +301,20 @@ public class NhaNamCrawler extends BaseParser implements BookCrawler {
             return null;
         }
         return "nxbnhanam-" + b.getId();
+    }
+
+    @Override
+    public List<String> crawlNextCategoryBookUrls(String categoryUrl, int start, int time) {
+        categoryUrl += "?page=";
+        List<String> urls = new ArrayList<>();
+        if (start < 0) {
+            start = 0;
+        }
+        for (int i = start; i < time; i++) {
+            String url = categoryUrl + (i + 1);
+            crawlBookUrls(url).forEach(s -> urls.add(s));
+        }
+        return urls;
     }
 
 }

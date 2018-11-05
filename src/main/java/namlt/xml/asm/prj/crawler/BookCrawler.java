@@ -12,9 +12,11 @@ public interface BookCrawler {
 
     List<Category> crawlCategoryUrls();
 
+    List<String> crawlNextCategoryBookUrls(String categoryUrl, int start, int time);
+
     Book crawlBookPage(String url);
 
-    List<String> crawlNewBookUrls(String url);
+    List<String> crawlBookUrls(String url);
 
     List<String> crawlNextNewBookUrls(int start, int time);
 

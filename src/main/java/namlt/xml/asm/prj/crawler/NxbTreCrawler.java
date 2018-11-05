@@ -38,9 +38,10 @@ public class NxbTreCrawler extends BaseParser implements BookCrawler {
 //        List<String> books = crawler.crawlNextNewBookUrls(2, 5);
 //        List<String> books = crawler.search("Hoàng tử bé");
 //        crawler.crawlBookPages(books).forEach(System.out::println);
-        List<Category> categories = crawler.crawlCategoryUrls();
-        categories.forEach(System.out::println);
-
+//        List<Category> categories = crawler.crawlCategoryUrls();
+//        categories.forEach(System.out::println);
+        List<String> books = crawler.crawlNextCategoryBookUrls("https://www.nxbtre.com.vn/tu-sach/chinh-tri/", 0, 5);
+        books.stream().map(str -> crawler.crawlBookPage(str)).forEach(System.out::println);
     }
 
     @Override
@@ -148,7 +149,7 @@ public class NxbTreCrawler extends BaseParser implements BookCrawler {
     }
 
     @Override
-    public List<String> crawlNewBookUrls(String url) {
+    public List<String> crawlBookUrls(String url) {
         if (url == null) {
             return new ArrayList<>();
         }
@@ -188,7 +189,7 @@ public class NxbTreCrawler extends BaseParser implements BookCrawler {
         }
         for (int i = start; i < time; i++) {
             String url = tmp + (i + 1) + '/';
-            crawlNewBookUrls(url).forEach(s -> urls.add(s));
+            crawlBookUrls(url).forEach(s -> urls.add(s));
         }
         return urls;
     }
@@ -214,7 +215,7 @@ public class NxbTreCrawler extends BaseParser implements BookCrawler {
             Logger.getLogger(NxbTreCrawler.class.getName()).log(Level.SEVERE, null, ex);
         }
         List<String> urls = new ArrayList<>();
-        crawlNewBookUrls(tmp).forEach(u -> urls.add(u));
+        crawlBookUrls(tmp).forEach(u -> urls.add(u));
         return urls;
     }
 
@@ -237,7 +238,7 @@ public class NxbTreCrawler extends BaseParser implements BookCrawler {
                         //skip to specific li tag
                         while (true) {
                             try {
-                                fragmentParser.skipToWithClassName("li","drops");
+                                fragmentParser.skipToWithClassName("li", "drops");
                             } catch (BoundReachedException e) {
                                 e.printStackTrace();
                                 break;
@@ -292,6 +293,20 @@ public class NxbTreCrawler extends BaseParser implements BookCrawler {
             System.out.println("[ERROR]: " + e.getMessage());
         }
         return rs;
+    }
+
+    @Override
+    public List<String> crawlNextCategoryBookUrls(String categoryUrl, int start, int time) {
+        categoryUrl += "trang-";
+        List<String> urls = new ArrayList<>();
+        if (start < 0) {
+            start = 0;
+        }
+        for (int i = start; i < time; i++) {
+            String url = categoryUrl + (i + 1) + '/';
+            crawlBookUrls(url).forEach(s -> urls.add(s));
+        }
+        return urls;
     }
 
 }
