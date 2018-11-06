@@ -1,7 +1,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page session="false" %>
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ page contentType="text/html" pageEncoding="UTF-8"%>
 <link type="text/css" rel="stylesheet" href="/css/Custom.css">
+<script type="text/javascript" src="/js/Login.js"></script>
 <div class="region region-leaderboard">
     <div id="block-block-3" class="block block-block ">
         <div class="block-inner clearfix">
@@ -39,6 +40,19 @@
                                                     <div class="field-item even">
                                                         <div>
                                                             <h1>Quản lí nhà sách</h1>
+                                                            <%
+                                                                HttpSession httpSession = request.getSession(false);
+                                                                if (httpSession != null && httpSession.getAttribute("USER") != null) {
+                                                            %>
+                                                            <button onclick="logout();">Đăng xuất</button>
+                                                            <%
+                                                            } else {
+                                                            %>
+                                                            <script>window.location.href="/";</script>
+                                                            <%
+                                                                }
+                                                            %>
+
                                                         </div>
                                                     </div>
                                                 </div>

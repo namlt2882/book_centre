@@ -4,6 +4,7 @@
 <link type="text/css" rel="stylesheet" href="/css/Custom.css">
 <script type="text/javascript" src="/js/Cart.js"></script>
 <script type="text/javascript" src="/js/Common.js"></script>
+<script type="text/javascript" src="/js/Login.js"></script>
 <div class="region region-leaderboard">
     <div id="block-block-3" class="block block-block ">
         <div class="block-inner clearfix">
@@ -57,9 +58,7 @@
                     %>
                     <br/>
                     <h4>Chào <%= httpSession.getAttribute("USERNAME")%>, chúc một ngày tốt lành!</h4>
-                    <form action="Logout" method="POST">
-                        <input type="submit" value="Đăng xuất">
-                    </form>
+                    <button onclick="logout();">Đăng xuất</button>
                     <%
                     } else {
                     %>

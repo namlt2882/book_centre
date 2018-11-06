@@ -18,3 +18,12 @@ function login() {
     }, data);
     return false;
 }
+
+function logout() {
+    AJAZZ.postRequest("/rest/auth/Logout", null, function (xhr) {
+        if (xhr.readyState == XMLHttpRequest.DONE) {
+            window.location.href = "/";
+            document.cookie = 'JSESSIONID=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+        }
+    }, null);
+}

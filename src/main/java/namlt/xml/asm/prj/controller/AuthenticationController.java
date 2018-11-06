@@ -70,4 +70,15 @@ public class AuthenticationController extends BaseController {
         return Response.ok().build();
     }
 
+    @POST
+    @Path("/Logout")
+    public Response logout() {
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            return Response.status(401).build();
+        } else {
+            session.invalidate();
+            return Response.ok().build();
+        }
+    }
 }
