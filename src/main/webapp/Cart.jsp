@@ -41,7 +41,7 @@
                                 HttpSession httpSession = request.getSession(false);
                                 if (httpSession != null && httpSession.getAttribute("USER") != null) {
                             %>
-                            <button style="float: right;" onclick="checkout();">Đặt hàng</button>
+                            <button style="float: right;" onclick="cartView.checkout();">Đặt hàng</button>
                             <%
                             } else {
                             %>

@@ -68,7 +68,7 @@
                                                                         <div class="field-items">
                                                                             <div class="field-item even">
                                                                                 <div class="buttom-buy">
-                                                                                    <button onclick="addProduct('${book.id}','${book.author}','${book.title}',${book.price},'${book.imageUrl}')">Thêm vào giỏ hàng</button>
+                                                                                    <button onclick="productService.addProduct('${book.id}','${book.author}','${book.title}',${book.price},'${book.imageUrl}')">Thêm vào giỏ hàng</button>
                                                                                 </div>
                                                                             </div>
                                                                         </div>

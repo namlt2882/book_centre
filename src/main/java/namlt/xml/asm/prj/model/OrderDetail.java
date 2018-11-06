@@ -1,26 +1,61 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package namlt.xml.asm.prj.model;
 
 import java.io.Serializable;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlSchemaType;
+import javax.xml.bind.annotation.XmlType;
 
-/**
- *
- * @author ADMIN
- */
-@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement(name = "orderDetail")
+@XmlType(name = "OrderDetail", propOrder = {
+    "orderId", "bookId", "author",
+    "title", "imageUrl", "quantity", "itemPrice"})
 public class OrderDetail implements Serializable {
 
-    private int orderId;
+    @XmlElement(name = "orderId", required = false)
+    private Integer orderId;
+    @XmlElement(name = "bookId")
     private String bookId;
+    @XmlElement(name = "author")
+    private String author;
+    @XmlElement(name = "title")
+    private String title;
+    @XmlElement(name = "imageUrl")
+    private String imageUrl;
+    @XmlSchemaType(name = "positiveInteger")
+    @XmlElement(name = "quantity")
     private int quantity;
+    @XmlElement(name = "itemPrice")
     private double itemPrice;
 
     public OrderDetail() {
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public int getQuantity() {

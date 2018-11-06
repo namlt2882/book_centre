@@ -1,180 +1,301 @@
-var sumOfAllTag;
 var productService;
+var cartView;
 window.addEventListener("load", function () {
     productService = new ProductService();
-    initData();
-    initLayout();
+    productService.initData();
+    cartView = new CartView();
+    cartView.initLayout();
 }, false);
 
-function initLayout() {
-    var cartContainer = document.getElementById("cart_container");
-    if (cartContainer === null) {
-        return;
-    }
-    cartContainer.innerHTML = "";
-    var tr, td, book, sum, input, button;
-    for (var i = 0; i < productService.productList.length; i++) {
-        book = productService.productList[i];
-        //create tr and append to context
+function CartView() {
+    this.sumOfAllTag;
+    this.initLayout = function () {
+        const view = this;
+        var cartContainer = document.getElementById("cart_container");
+        if (cartContainer === null) {
+            return;
+        }
+        cartContainer.innerHTML = "";
+        var tr, td, book, sum, input, button;
+        for (var i = 0; i < productService.productList.orderDetails.length; i++) {
+            book = productService.productList.orderDetails[i];
+            //create tr and append to context
+            tr = document.createElement("tr");
+            cartContainer.appendChild(tr);
+            //id
+            td = document.createElement("td");
+            td.textContent = book.bookId;
+            tr.appendChild(td);
+            //title
+            td = document.createElement("td");
+            td.textContent = book.title;
+            tr.appendChild(td);
+            //author
+            td = document.createElement("td");
+            td.textContent = book.author;
+            tr.appendChild(td);
+            //price
+            td = document.createElement("td");
+            td.textContent = book.price;
+            tr.appendChild(td);
+            //sum
+            sum = document.createElement("td");
+            sum.textContent = book.price * book.quantity;
+            //quantity
+            td = document.createElement("td");
+            input = document.createElement("input");
+            input.type = "number";
+            input.min = 1;
+            input.value = book.quantity;
+            input.book_id = book.bookId;
+            input.sum = sum;
+            input.onchange = function () {
+                productService.changeProductQuantity(this.book_id, this.value, this.sum);
+                view.countSumOfAll();
+            };
+            td.appendChild(input);
+            tr.appendChild(td);
+            tr.appendChild(sum);
+            //actions
+            //remove this product
+            td = document.createElement("td");
+            button = document.createElement("button");
+            button.textContent = "Xóa";
+            button.book_id = book.bookId;
+            button.onclick = function () {
+                productService.removeProduct(this.book_id);
+                view.initLayout();
+            };
+            td.appendChild(button);
+            tr.appendChild(td);
+        }
+        //sum of all
         tr = document.createElement("tr");
         cartContainer.appendChild(tr);
-        //id
+
         td = document.createElement("td");
-        td.textContent = book.id;
+        td.setAttribute("colspan", "5");
+        td.setAttribute("style", "text-align:right;");
+        td.textContent = "Tổng cộng";
         tr.appendChild(td);
-        //title
         td = document.createElement("td");
-        td.textContent = book.title;
+        this.sumOfAllTag = td;
         tr.appendChild(td);
-        //author
-        td = document.createElement("td");
-        td.textContent = book.author;
-        tr.appendChild(td);
-        //price
-        td = document.createElement("td");
-        td.textContent = book.price;
-        tr.appendChild(td);
-        //sum
-        sum = document.createElement("td");
-        sum.textContent = book.price * book.quantity;
-        //quantity
-        td = document.createElement("td");
-        input = document.createElement("input");
-        input.type = "number";
-        input.value = book.quantity;
-        input.book_id = book.id;
-        input.sum = sum;
-        input.onchange = function () {
-            changeProductQuantity(this.book_id, this.value, this.sum);
+        this.countSumOfAll();
+    };
+
+    this.checkout = function () {
+        if (confirm("Chắc chứ?")) {
+            localStorage.removeItem("productList");
+            window.location.reload();
         }
-        td.appendChild(input);
-        tr.appendChild(td);
-        tr.appendChild(sum);
-        //actions
-        //remove this product
-        td = document.createElement("td");
-        button = document.createElement("button");
-        button.textContent = "Xóa";
-        button.book_id = book.id;
-        button.onclick = function () {
-            productService.removeProduct(this.book_id);
-        };
-        td.appendChild(button);
-        tr.appendChild(td);
-    }
-    //sum of all
-    tr = document.createElement("tr");
-    cartContainer.appendChild(tr);
+    };
 
-    td = document.createElement("td");
-    td.setAttribute("colspan", "5");
-    td.setAttribute("style", "text-align:right;");
-    td.textContent = "Tổng cộng";
-    tr.appendChild(td);
-    td = document.createElement("td");
-    sumOfAllTag = td;
-    tr.appendChild(td);
-    countSumOfAll();
-}
+    this.countSumOfAll = function () {
+        this.sumOfAllTag.textContent = productService.calculateSum();
+    };
 
-function checkout() {
-    if (confirm("Chắc chứ?")) {
-        localStorage.removeItem("productList");
-        window.location.reload();
-    }
-}
-
-function countSumOfAll() {
-    sumOfAllTag.textContent = productService.calculateSum();
-}
-
-
-function changeProductQuantity(id, quantity, sumTag) {
-    initData();
-    var product = productService.getProduct(id);
-    if (product !== null) {
-        if (quantity <= 0) {
-            productService.removeProduct(id);
-        } else {
-            product.quantity = quantity;
-            productService.saveProductList();
-            //update price
-            sumTag.textContent = product.price * product.quantity;
-            countSumOfAll();
-        }
-    }
-}
-
-function initData() {
-    var productList = localStorage.getItem("productList");
-    if (productList === null || productList === "undefined") {
-        productList = new Array();
-        productService.saveProductList();
-    } else {
-        productList = JSON.parse(productList);
-    }
-    productService.productList = productList;
-}
-
-function addProduct(id, author, title, price, imageUrl) {
-    initData();
-    var product = productService.getProduct(id);
-    if (product != null) {
-        product.quantity++;
-    } else {
-        product = {
-            id: id,
-            author: author,
-            title: title,
-            price: price,
-            imageUrl: imageUrl,
-            quantity: 1
-        }
-        productService.productList.push(product);
-    }
-    productService.saveProductList();
-    alert("Đã thêm giỏ hàng!");
 }
 
 function ProductService() {
     this.productList;
+
+    this.changeProductQuantity = function (id, quantity, sumTag) {
+        this.initData();
+        var orderDetail = this.getProduct(id);
+        if (orderDetail !== null) {
+            if (quantity <= 0) {
+                this.removeProduct(id);
+            } else {
+                orderDetail.quantity = quantity;
+                this.saveProductList();
+                //update price
+                sumTag.textContent = orderDetail.price * orderDetail.quantity;
+            }
+        }
+    };
+
+    this.addProduct = function (id, author, title, price, imageUrl) {
+        this.initData();
+        var orderDetail = this.getProduct(id);
+        if (orderDetail !== null) {
+            orderDetail.quantity++;
+        } else {
+            this.productList.addOrderDetail(id, author, title, price, imageUrl, 1);
+        }
+        this.saveProductList();
+        alert("Đã thêm giỏ hàng!");
+    };
+
+    this.initData = function () {
+        var order = localStorage.getItem("productList");
+        if (order === null || order === "undefined") {
+            this.productList = new Order();
+            this.saveProductList();
+        } else {
+            order = new OrderUnmarshaller().parseOrder(order);
+            this.productList = order;
+        }
+    };
+
     this.calculateSum = function calculateSum() {
-        var book;
+        var orderDetails = this.productList.orderDetails;
+        var orderDetail;
         var sum = 0;
-        for (var i = 0; i < this.productList.length; i++) {
-            book = this.productList[i];
-            if (book !== null) {
-                sum += book.price * book.quantity;
+        for (var i = 0; i < orderDetails.length; i++) {
+            orderDetail = orderDetails[i];
+            if (orderDetail !== null) {
+                sum += orderDetail.price * orderDetail.quantity;
             }
         }
         return sum;
     };
 
     this.removeProduct = function removeProduct(id) {
-        initData();
-        var book;
-        for (var i = 0; i < this.productList.length; i++) {
-            book = this.productList[i];
-            if (book != null && book.id === id) {
-                this.productList.splice(i, 1);
+        id = id.trim();
+        this.initData();
+        var orderDetails = this.productList.orderDetails;
+        var orderDetail;
+        for (var i = 0; i < orderDetails.length; i++) {
+            orderDetail = orderDetails[i];
+            if (orderDetail !== null && orderDetail.bookId === id) {
+                orderDetails.splice(i, 1);
                 this.saveProductList();
-                initLayout();
             }
         }
     };
 
     this.getProduct = function getProduct(id) {
-        var book;
-        for (var i = 0; i < this.productList.length; i++) {
-            book = this.productList[i];
-            if (book.id === id) {
-                return book;
+        id = id.trim();
+        var orderDetail;
+        var orderDetails = this.productList.orderDetails;
+        for (var i = 0; i < orderDetails.length; i++) {
+            orderDetail = orderDetails[i];
+            if (orderDetail.bookId === id) {
+                return orderDetail;
             }
         }
         return null;
     };
 
     this.saveProductList = function saveProductList() {
-        localStorage.setItem("productList", JSON.stringify(this.productList));
+        localStorage.setItem("productList", "<?xml version=\"1.0\"?>" + this.productList.toXml());
+    };
+}
+
+function Order() {
+    this.id = null;
+    this.customerId = null;
+    this.status = null;
+    this.orderDetails = [];
+
+    this.addOrderDetail = function (id, author, title, price, imageUrl, quantity) {
+        if (this.orderDetails === null) {
+            this.orderDetails = [];
+        }
+        var orderDetail = new OrderDetail();
+        orderDetail.orderId = this.id;
+        orderDetail.bookId = id;
+        orderDetail.author = author;
+        orderDetail.title = title;
+        orderDetail.price = price;
+        orderDetail.imageUrl = imageUrl;
+        orderDetail.quantity = quantity;
+        this.orderDetails.push(orderDetail);
+        return orderDetail;
+    };
+
+    this.toXml = function () {
+        var rs = "<order id=\"" + (this.id === null ? "" : this.id) + "\">";
+        rs += "<customerId>" + (this.customerId === null ? "" : this.customerId) + "</customerId>";
+        rs += "<status>" + (this.status === null ? "" : this.status) + "</status>";
+        rs += "<orderDetails>";
+        for (var i = 0; i < this.orderDetails.length; i++) {
+            var orderDetail = this.orderDetails[i];
+            rs += orderDetail.toXml();
+        }
+        rs += "</orderDetails>";
+        rs += "</order>";
+        return rs;
+    };
+
+}
+
+function OrderUnmarshaller() {
+    this.getAttribute = function (node, attributeName) {
+        var attr = node.getElementsByTagName(attributeName)[0];
+        if (attr === null) {
+            return null;
+        }
+        var childNode = attr.childNodes[0];
+        if (childNode === null || typeof childNode === "undefined") {
+            return "";
+        }
+        return childNode.nodeValue;
+    };
+
+    this.parseOrder = function (xmlData) {
+        var rs;
+        var xmlTree = new DOMParser().parseFromString(xmlData, "text/xml");
+        var order = xmlTree.getElementsByTagName("order");
+        if (order === null) {
+            return null;
+        }
+        order = order[0];
+        rs = new Order();
+        rs.id = order.getAttribute("id").trim();
+        rs.customerId = this.getAttribute(order, "customerId").trim();
+        rs.status = this.getAttribute(order, "status").trim();
+        var orderDetails = order.getElementsByTagName("orderDetails");
+        if (orderDetails === null) {
+            rs.orderDetails = [];
+        } else {
+            rs.orderDetails = this.parseOrderDetails(orderDetails[0]);
+        }
+        return rs;
+    };
+
+    this.parseOrderDetails = function (xmlFragments) {
+        var fragments = xmlFragments.getElementsByTagName("orderDetail");
+        if (fragments === null) {
+            return [];
+        }
+        var rs = [];
+        for (var i = 0; i < fragments.length; i++) {
+            var fragment = fragments[i];
+            var orderDetail = new OrderDetail();
+            orderDetail.orderId = this.getAttribute(fragment, "orderId");
+            orderDetail.bookId = this.getAttribute(fragment, "bookId");
+            orderDetail.author = this.getAttribute(fragment, "author");
+            orderDetail.title = this.getAttribute(fragment, "title");
+            orderDetail.imageUrl = this.getAttribute(fragment, "imageUrl");
+            orderDetail.quantity = this.getAttribute(fragment, "quantity");
+            orderDetail.price = this.getAttribute(fragment, "price");
+            rs.push(orderDetail);
+        }
+        return rs;
+    };
+}
+
+function OrderDetail() {
+    this.orderId = null;
+    this.bookId = null;
+    this.author = null;
+    this.title = null;
+    this.imageUrl = null;
+    this.quantity = null;
+    this.price = null;
+
+    this.toXml = function () {
+        var rs = "<orderDetail>";
+        rs += "<orderId>" + (this.orderId === null ? "" : this.orderId.trim()) + "</orderId>";
+        rs += "<bookId>" + (this.bookId === null ? "" : this.bookId.trim()) + "</bookId>";
+        rs += "<author>" + (this.author === null ? "" : this.author.trim()) + "</author>";
+        rs += "<title>" + (this.title === null ? "" : this.title.trim()) + "</title>";
+        rs += "<imageUrl>" + (this.imageUrl === null ? "" : this.imageUrl.trim()) + "</imageUrl>";
+        rs += "<quantity>" + (this.quantity === null ? "" : this.quantity) + "</quantity>";
+        rs += "<price>" + (this.price === null ? "" : this.price) + "</price>";
+        rs += "</orderDetail>";
+        return rs;
     };
 }
