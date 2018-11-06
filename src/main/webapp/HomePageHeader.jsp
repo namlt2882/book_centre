@@ -61,7 +61,11 @@
                         <input type="submit" value="Đăng xuất">
                     </form>
                     <%
-                        }
+                    } else {
+                    %>
+                    <a href="/Login.jsp">Đăng nhập</a>
+                    <%
+                            }
                     %>
                     <div id="search-form">
 
@@ -122,6 +126,13 @@
                                                                                             </ul>
                                                                                         </li>-->
                                             <li class="odd "><a href="/Cart.jsp">Giỏ hàng</a></li>
+                                                <%
+                                                    if (httpSession != null && httpSession.getAttribute("USER") != null) {
+                                                %>
+                                            <li class="odd "><a href="/Order.jsp">Đơn hàng của tôi</a></li>
+                                                <%
+                                                    }
+                                                %>
                                         </ul>
                                     </div>
                                 </div>

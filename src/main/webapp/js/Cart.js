@@ -236,7 +236,10 @@ function OrderUnmarshaller() {
         if (attr === null) {
             return null;
         }
-        var childNode = attr.childNodes[0];
+        var childNode = null;
+        if (attr.childNodes !== null && attr.childNodes.length > 0) {
+            childNode = attr.childNodes[0];
+        }
         if (childNode === null || typeof childNode === "undefined") {
             return "";
         }
@@ -279,7 +282,7 @@ function OrderUnmarshaller() {
             orderDetail.title = this.getAttribute(fragment, "title");
             orderDetail.imageUrl = this.getAttribute(fragment, "imageUrl");
             orderDetail.quantity = this.getAttribute(fragment, "quantity");
-            orderDetail.price = this.getAttribute(fragment, "price");
+            orderDetail.price = this.getAttribute(fragment, "itemPrice");
             rs.push(orderDetail);
         }
         return rs;
@@ -303,7 +306,7 @@ function OrderDetail() {
         rs += "<title>" + (this.title === null ? "" : this.title.trim()) + "</title>";
         rs += "<imageUrl>" + (this.imageUrl === null ? "" : this.imageUrl.trim()) + "</imageUrl>";
         rs += "<quantity>" + (this.quantity === null ? "" : this.quantity) + "</quantity>";
-        rs += "<price>" + (this.price === null ? "" : this.price) + "</price>";
+        rs += "<itemPrice>" + (this.price === null ? "" : this.price) + "</itemPrice>";
         rs += "</orderDetail>";
         return rs;
     };

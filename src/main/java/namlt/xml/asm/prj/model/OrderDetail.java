@@ -9,10 +9,10 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlRootElement(name = "orderDetail")
 @XmlType(name = "OrderDetail", propOrder = {
     "orderId", "bookId", "author",
     "title", "imageUrl", "quantity", "itemPrice"})
+@XmlRootElement(name = "orderDetail")
 public class OrderDetail implements Serializable {
 
     @XmlElement(name = "orderId", required = false)

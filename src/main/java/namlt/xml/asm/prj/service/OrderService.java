@@ -1,7 +1,10 @@
 package namlt.xml.asm.prj.service;
 
+import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import javax.naming.NamingException;
 import namlt.xml.asm.prj.common.OrderCommon;
 import namlt.xml.asm.prj.model.Order;
 import namlt.xml.asm.prj.model.OrderDetail;
@@ -9,7 +12,7 @@ import namlt.xml.asm.prj.repository.OrderDetailRepository;
 import namlt.xml.asm.prj.repository.OrderRepository;
 
 public class OrderService implements OrderCommon {
-    
+
     public Order addOrder(Order o) throws Exception {
         o.setStatus(STATUS_ORDER_NEW);
         o.setInsertDate(new Date());
@@ -27,5 +30,16 @@ public class OrderService implements OrderCommon {
             orderDetailRepository.insert(orderDetail);
         }
         return newOrder;
+    }
+
+    public List<Order> getOrderByCustomerId(String customerId) throws NamingException, SQLException {
+        List<Order> rs = new OrderRepository().getByCustomerId(customerId.trim());
+        List<OrderDetail> orderDetails;
+        OrderDetailRepository orderDetailRepository = new OrderDetailRepository();
+        for (Order r : rs) {
+            orderDetails = orderDetailRepository.getByOrderId(r.getId());
+            r.setOrderDetails(orderDetails);
+        }
+        return rs;
     }
 }
