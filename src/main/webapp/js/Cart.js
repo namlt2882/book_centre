@@ -86,8 +86,17 @@ function CartView() {
 
     this.checkout = function () {
         if (confirm("Chắc chứ?")) {
-            localStorage.removeItem("productList");
-            window.location.reload();
+            AJAZZ.postRequest("/rest/order", function (xhr) {
+                xhr.setRequestHeader("Content-Type", "application/xml");
+            }, function (xhr) {
+                if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                    alert("Tạo đơn hàng thành công! Trạng thái đơn hàng: MỚI");
+                    localStorage.removeItem("productList");
+                    window.location.reload();
+                } else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status !== 200) {
+                    alert("Có lỗi xảy ra. Xin thử lại sau!");
+                }
+            }, localStorage.getItem("productList"));
         }
     };
 

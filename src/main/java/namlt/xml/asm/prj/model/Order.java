@@ -1,6 +1,7 @@
 package namlt.xml.asm.prj.model;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -24,7 +25,9 @@ public class Order implements Serializable {
     private Integer status;
     @XmlElementWrapper(name = "orderDetails")
     @XmlElement(name = "orderDetail", required = false)
-    private List<OrderDetail> orderDetailList;
+    private List<OrderDetail> orderDetails;
+    @XmlTransient
+    private Date insertDate;
 
     public Order() {
     }
@@ -46,11 +49,11 @@ public class Order implements Serializable {
         this.id = id;
     }
 
-    public int getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(int status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 
@@ -62,13 +65,20 @@ public class Order implements Serializable {
         this.customerId = customerId;
     }
 
-    @XmlTransient
-    public List<OrderDetail> getOrderDetailList() {
-        return orderDetailList;
+    public List<OrderDetail> getOrderDetails() {
+        return orderDetails;
     }
 
-    public void setOrderDetailList(List<OrderDetail> orderDetailList) {
-        this.orderDetailList = orderDetailList;
+    public void setOrderDetails(List<OrderDetail> orderDetails) {
+        this.orderDetails = orderDetails;
+    }
+
+    public Date getInsertDate() {
+        return insertDate;
+    }
+
+    public void setInsertDate(Date insertDate) {
+        this.insertDate = insertDate;
     }
 
 }
