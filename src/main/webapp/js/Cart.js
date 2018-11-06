@@ -85,6 +85,12 @@ function CartView() {
     };
 
     this.checkout = function () {
+        productService.initData();
+        var order = productService.productList;
+        if (order.orderDetails.length === 0) {
+            alert("Quý khách không có sản phẩm trong giỏ hàng!");
+            return;
+        }
         if (confirm("Chắc chứ?")) {
             AJAZZ.postRequest("/rest/order", function (xhr) {
                 xhr.setRequestHeader("Content-Type", "application/xml");
