@@ -14,6 +14,8 @@ public class OrderRepository extends Repository<Integer, Order> {
             + "[Order](CustomerId, InsertDate, Status) "
             + "VALUES(?,?,?)";
     public static final String QUERY_BY_CUSTOMER_ID = "SELECT * FROM [Order] WHERE CustomerId=? ORDER BY InsertDate DESC";
+    public static final String QUERY_BY_ID = "SELECT * FROM [Order] WHERE Id=?";
+    public static final String UPDATE_QUERY = "UPDATE [Order] SET [Status]=? WHERE Id=?";
 
     @Override
     public Order insert(Order t) throws Exception {
@@ -42,12 +44,37 @@ public class OrderRepository extends Repository<Integer, Order> {
 
     @Override
     public void update(Order t) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        synchronized (TRANSACTION_KEY) {
+            try {
+                preparedStatement = newPreparedStatement(UPDATE_QUERY);
+                preparedStatement.setInt(1, t.getStatus());
+                preparedStatement.setInt(2, t.getId());
+                int rs = preparedStatement.executeUpdate();
+                if (rs <= 0) {
+                    throw new Exception("Fail to update order with id=" + t.getId());
+                }
+            } finally {
+                closeResources();
+            }
+        }
     }
 
     @Override
     public Order get(Integer key) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        synchronized (TRANSACTION_KEY) {
+            try {
+                preparedStatement = newPreparedStatement(QUERY_BY_ID);
+                preparedStatement.setInt(1, key);
+                resultSet = preparedStatement.executeQuery();
+                List<Order> rs = extractDataFromResultSet();
+                if (rs.size() > 0) {
+                    return rs.get(0);
+                }
+            } finally {
+                closeResources();
+            }
+        }
+        return null;
     }
 
     public List<Order> getByCustomerId(String customerId) throws NamingException, SQLException {

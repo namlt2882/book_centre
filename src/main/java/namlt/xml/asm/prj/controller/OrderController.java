@@ -2,9 +2,12 @@ package namlt.xml.asm.prj.controller;
 
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import namlt.xml.asm.prj.model.Order;
@@ -30,6 +33,23 @@ public class OrderController extends BaseController {
             }
         } else {
             return Response.status(401).build();
+        }
+    }
+
+    @POST
+    @Path("/{orderId}/cancel")
+    public Response cancelOrder(@PathParam("orderId") Integer orderId) {
+        try {
+            OrderService service = new OrderService();
+            boolean success = service.cancelOrder(orderId);
+            if (success) {
+                return Response.ok().build();
+            } else {
+                throw new Exception();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(404).entity(e.getMessage()).build();
         }
     }
 }

@@ -2,6 +2,7 @@
 <%@page import="namlt.xml.asm.prj.model.Order"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <jsp:include page="/my_order"/>
 <!DOCTYPE html>
@@ -9,6 +10,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Đơn hàng của tôi</title>
+        <script src="/js/OrderController.js"></script>
         <c:if test="${not empty orderXmlData}">
             <script id="orderXmlData">${orderXmlData}</script>
         </c:if>
@@ -23,7 +25,9 @@
                         <div class="content-inner">
                             <c:forEach items="${orders}" var="order">
                                 <div style="padding: 30px;border: #000 2px dotted;margin-top: 30px;">
-                                    <h3>Đơn hàng gồm ${fn:length(order.orderDetails)} sản phẩm vào lúc ${order.insertDate}</h3>
+                                    <h3>Đơn hàng gồm ${fn:length(order.orderDetails)} sản phẩm vào lúc 
+                                        <fmt:formatDate pattern="hh:mm 'ngày' dd 'tháng' MM 'năm' YYYY" value="${order.insertDate}"/>
+                                    </h3>
                                     <h4>Trạng thái: 
                                         <c:choose>
                                             <c:when test="${order.status==1}">
@@ -68,7 +72,8 @@
                                         </tr>
                                     </table>
                                     <c:if test="${order.status==1}">
-                                        <button style="float: right">Hủy đơn hàng</button>
+                                        <button style="float: right" 
+                                                onclick="orderController.cancelOrder('${order.id}')">Hủy đơn hàng</button>
                                     </c:if>
                                 </div>
                             </c:forEach>

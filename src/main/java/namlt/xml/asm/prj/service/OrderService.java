@@ -1,7 +1,6 @@
 package namlt.xml.asm.prj.service;
 
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import javax.naming.NamingException;
@@ -30,6 +29,17 @@ public class OrderService implements OrderCommon {
             orderDetailRepository.insert(orderDetail);
         }
         return newOrder;
+    }
+
+    public boolean cancelOrder(int id) throws Exception {
+        OrderRepository repository = new OrderRepository();
+        Order order = repository.get(id);
+        if (order == null) {
+            return false;
+        }
+        order.setStatus(STATUS_ORDER_CANCEL);
+        repository.update(order);
+        return true;
     }
 
     public List<Order> getOrderByCustomerId(String customerId) throws NamingException, SQLException {
