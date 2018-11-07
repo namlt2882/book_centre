@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ page session="false" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <jsp:include page="/crawl"/>
@@ -21,6 +22,18 @@
                 if (categoryUrl !== null && categoryUrl.value !== '--') {
                     redirectUrl += "&categoryUrl=" + categoryUrl.value;
                 }
+                window.location.href = redirectUrl;
+                return false;
+            }
+            function searchBook() {
+                var redirectUrl = "http://" + window.location.hostname + ":" + window.location.port + "/admin/Publisher.jsp?publisher=";
+                var element = document.getElementById("publisher");
+                redirectUrl += element.value;
+                var search = document.getElementById("searchTxt");
+                if (search !== null) {
+                    redirectUrl += "&search=" + search.value;
+                }
+                console.log(redirectUrl);
                 window.location.href = redirectUrl;
                 return false;
             }
@@ -90,8 +103,8 @@
                                                                 </select>
                                                                 <button onclick="return getNewBook()">Sản phẩm mới</button>
                                                             </div>
-                                                            <input type="text" name="search" value="${param.search}"/>
-                                                        <input type="submit" value="Tìm kiếm"/>
+                                                            <input type="text" name="search" value="${param.search}" id="searchTxt"/>
+                                                        <button onclick="return searchBook();">Tìm kiếm</button>
                                                     </form>
                                                 </div>
                                                 <c:if test="${empty param.search}">
@@ -117,43 +130,48 @@
                                                 <div class="block-content content">
                                                     <div class="view view-sach-moi view-id-sach_moi view-display-id-block view-dom-id-4d0e7c14c2df0334da04712bf6aed109">
                                                         <div class="view-content">
-                                                            <div class="item-list-sm">  
-                                                                <c:if test="${not empty books}">
-                                                                    <ul>
-                                                                        <c:forEach items="${books}" var="book">
-                                                                            <li class="views-row">  
-                                                                                <div class="views-field views-field-field-sach-anh-dai-dien">        
-                                                                                    <div class="field-content">
-                                                                                        <div style="width: 100px;height: 250px;">
-                                                                                            <img src="${book.imageUrl}" style="max-width: 100%;max-height: 100%;margin: 0px;"
-                                                                                                 class="book_detail_trigger" onclick="bookDetailFrame.showBookDetailModel('${book.id}');">
-                                                                                        </div>
+                                                            <div class="item-list-sm">
+                                                                <c:choose>
+                                                                    <c:when test="${not empty books and fn:length(books)>0}">
+                                                                        <ul>
+                                                                            <c:forEach items="${books}" var="book">
+                                                                                <li class="views-row">  
+                                                                                    <div class="views-field views-field-field-sach-anh-dai-dien">        
+                                                                                        <div class="field-content">
+                                                                                            <div style="width: 100px;height: 250px;">
+                                                                                                <img src="${book.imageUrl}" style="max-width: 100%;max-height: 100%;margin: 0px;"
+                                                                                                     class="book_detail_trigger" onclick="bookDetailFrame.showBookDetailModel('${book.id}');">
+                                                                                            </div>
+                                                                                        </div>  
                                                                                     </div>  
-                                                                                </div>  
-                                                                                <div class="views-field views-field-nothing">        
-                                                                                    <span class="field-content">
-                                                                                        <div>
-                                                                                            <div style="margin-bottom: 20px;">
-                                                                                                <font style="color: #00562f"><b>${book.title}</b></font>
-                                                                                            </div>
+                                                                                    <div class="views-field views-field-nothing">        
+                                                                                        <span class="field-content">
                                                                                             <div>
-                                                                                                <b>Tác giả:</b> ${book.author}
-                                                                                            </div>
-                                                                                            <div>
-                                                                                                <b>Giá bìa:</b> ${book.price} VND
-                                                                                            </div>
-                                                                                            <c:if test="${book.existedInDb}">
-                                                                                                <div>
-                                                                                                    <font style="color: red">Đã tồn tại</font>
+                                                                                                <div style="margin-bottom: 20px;">
+                                                                                                    <font style="color: #00562f"><b>${book.title}</b></font>
                                                                                                 </div>
-                                                                                            </c:if>
-                                                                                        </div>
-                                                                                    </span>  
-                                                                                </div>
-                                                                            </li>
-                                                                        </c:forEach>
-                                                                    </ul>
-                                                                </c:if>
+                                                                                                <div>
+                                                                                                    <b>Tác giả:</b> ${book.author}
+                                                                                                </div>
+                                                                                                <div>
+                                                                                                    <b>Giá bìa:</b> ${book.price} VND
+                                                                                                </div>
+                                                                                                <c:if test="${book.existedInDb}">
+                                                                                                    <div>
+                                                                                                        <font style="color: red">Đã tồn tại</font>
+                                                                                                    </div>
+                                                                                                </c:if>
+                                                                                            </div>
+                                                                                        </span>  
+                                                                                    </div>
+                                                                                </li>
+                                                                            </c:forEach>
+                                                                        </ul>
+                                                                    </c:when>
+                                                                    <c:otherwise>
+                                                                        <h3>Không tìm thấy kết quả phù hợp</h3>
+                                                                    </c:otherwise>
+                                                                </c:choose>
                                                             </div>
                                                             <c:if test="${not empty param.page and empty page}">
                                                                 <c:set var="page" value="${param.page}"/>

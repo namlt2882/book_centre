@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ page session="false" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <jsp:include page="/product_data"/>
@@ -15,6 +16,10 @@
                 var url = "http://" + window.location.hostname + ":" + window.location.port + "/admin/Home.jsp?type=";
                 var element = document.getElementById("type");
                 url += element.value;
+                var search = document.getElementById("searchTxt");
+                if (search !== null && search.value.trim() !== '') {
+                    url += "&search=" + search.value;
+                }
                 window.location.href = url;
                 return false;
             }
@@ -46,7 +51,7 @@
                                                             </select>
                                                             <button onclick="return filterByType()">Lọc</button>
                                                         </div>
-                                                        <input type="text" name="search" value="${param.search}"/>
+                                                        <input type="text" name="search" value="${param.search}" id="searchTxt"/>
                                                     <input type="submit" value="Tìm kiếm"/>
                                                 </form>
                                             </div>
@@ -56,40 +61,45 @@
                                                     <div class="view view-sach-moi view-id-sach_moi view-display-id-block view-dom-id-4d0e7c14c2df0334da04712bf6aed109">
                                                         <div class="view-content">
                                                             <div class="item-list-sm">  
-                                                                <c:if test="${not empty books}">
-                                                                    <ul>
-                                                                        <c:forEach items="${books}" var="book">
-                                                                            <li class="views-row">  
-                                                                                <div class="views-field views-field-field-sach-anh-dai-dien">        
-                                                                                    <div class="field-content">
-                                                                                        <div style="width: 100px;height: 250px;">
-                                                                                            <img src="${book.imageUrl}" style="max-width: 100%;max-height: 100%;margin: 0px;"
-                                                                                                 class="book_detail_trigger" onclick="bookDetailFrame.showBookDetailModel('${book.id}');">
-                                                                                        </div>
+                                                                <c:choose>
+                                                                    <c:when test="${not empty books and fn:length(books)>0}">
+                                                                        <ul>
+                                                                            <c:forEach items="${books}" var="book">
+                                                                                <li class="views-row">  
+                                                                                    <div class="views-field views-field-field-sach-anh-dai-dien">        
+                                                                                        <div class="field-content">
+                                                                                            <div style="width: 100px;height: 250px;">
+                                                                                                <img src="${book.imageUrl}" style="max-width: 100%;max-height: 100%;margin: 0px;"
+                                                                                                     class="book_detail_trigger" onclick="bookDetailFrame.showBookDetailModel('${book.id}');">
+                                                                                            </div>
+                                                                                        </div>  
                                                                                     </div>  
-                                                                                </div>  
-                                                                                <div class="views-field views-field-nothing">        
-                                                                                    <span class="field-content">
-                                                                                        <div>
-                                                                                            <div style="margin-bottom: 20px;">
-                                                                                                <font style="color: #00562f"><b>${book.title}</b></font>
-                                                                                            </div>
+                                                                                    <div class="views-field views-field-nothing">        
+                                                                                        <span class="field-content">
                                                                                             <div>
-                                                                                                <b>Tác giả:</b> ${book.author}
+                                                                                                <div style="margin-bottom: 20px;">
+                                                                                                    <font style="color: #00562f"><b>${book.title}</b></font>
+                                                                                                </div>
+                                                                                                <div>
+                                                                                                    <b>Tác giả:</b> ${book.author}
+                                                                                                </div>
+                                                                                                <div>
+                                                                                                    <b>Giá bìa:</b> ${book.price} VND
+                                                                                                </div>
+                                                                                                <div>
+                                                                                                    <b>Số lượng trong kho:</b> ${book.quantity}
+                                                                                                </div>
                                                                                             </div>
-                                                                                            <div>
-                                                                                                <b>Giá bìa:</b> ${book.price} VND
-                                                                                            </div>
-                                                                                            <div>
-                                                                                                <b>Số lượng trong kho:</b> ${book.quantity}
-                                                                                            </div>
-                                                                                        </div>
-                                                                                    </span>  
-                                                                                </div>
-                                                                            </li>
-                                                                        </c:forEach>
-                                                                    </ul>
-                                                                </c:if>
+                                                                                        </span>  
+                                                                                    </div>
+                                                                                </li>
+                                                                            </c:forEach>
+                                                                        </ul>
+                                                                    </c:when>
+                                                                    <c:otherwise>
+                                                                        <h3>Không tìm thấy kết quả phù hợp</h3>
+                                                                    </c:otherwise>
+                                                                </c:choose>
                                                             </div>
                                                             <h2 class="element-invisible">Trang</h2>
                                                             <div class="item-list">
