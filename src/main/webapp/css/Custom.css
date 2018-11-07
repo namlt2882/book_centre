@@ -1,3 +1,41 @@
+.book_item {
+    position: relative;
+}
+.book_item:hover .book_actions_container{
+    display: block;
+}
+.book_actions_container{
+    background-color: white;
+    position: absolute;
+    max-width: 100px;
+    height: 100%;
+    padding: 20px;
+    border: 1px dotted #000;
+    top: 0px;
+    right: -130px;
+    z-index: 10;
+    display: none;
+}
+.book_actions_container *{
+    margin-top: 20px;
+}
+.book_action_button{
+    border-radius: 5px;
+    min-width: 100px;
+    padding: 5px;
+}
+.book_action_button_green{
+    color: white;
+    background-color: #00562f;    
+}
+.book_action_button_orange{
+    color: white;
+    background-color: orange;    
+}
+.book_action_button_red{
+    color: white;
+    background-color: red;
+}
 .img-size-150{
     width: 125px;
     height: 116px;

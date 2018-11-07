@@ -65,7 +65,26 @@
                                                                     <c:when test="${not empty books and fn:length(books)>0}">
                                                                         <ul>
                                                                             <c:forEach items="${books}" var="book">
-                                                                                <li class="views-row">  
+                                                                                <li class="views-row book_item">
+                                                                                    <div class="book_actions_container">
+                                                                                        <c:choose>
+                                                                                            <c:when test="${book.status==1}">
+                                                                                                <button class="book_action_button book_action_button_green">Thêm sản phẩm</button>
+                                                                                                <button class="book_action_button book_action_button_orange" 
+                                                                                                        onclick="bookController.setOutOfStockBook('${book.id}')">Hết hàng</button>
+                                                                                                <button class="book_action_button book_action_button_red" 
+                                                                                                        onclick="bookController.setDisableBook('${book.id}')">Ngừng kinh doanh</button>
+                                                                                            </c:when>
+                                                                                            <c:when test="${book.status==0 || book.status==2}">
+                                                                                                <button class="book_action_button book_action_button_green" 
+                                                                                                        onclick="bookController.setActiveBook('${book.id}')">Kinh doanh sản phẩm</button>
+                                                                                                <c:if test="${book.status==2}">
+                                                                                                    <button class="book_action_button book_action_button_red" 
+                                                                                                            onclick="bookController.setDisableBook('${book.id}')">Ngừng kinh doanh</button>
+                                                                                                </c:if>
+                                                                                            </c:when>
+                                                                                        </c:choose>
+                                                                                    </div>
                                                                                     <div class="views-field views-field-field-sach-anh-dai-dien">        
                                                                                         <div class="field-content">
                                                                                             <div style="width: 100px;height: 250px;">
@@ -87,7 +106,21 @@
                                                                                                     <b>Giá bìa:</b> ${book.price} VND
                                                                                                 </div>
                                                                                                 <div>
-                                                                                                    <b>Số lượng trong kho:</b> ${book.quantity}
+                                                                                                    <b>Số lượng:</b> ${book.quantity}
+                                                                                                </div>
+                                                                                                <div>
+                                                                                                    <b>Trạng thái:</b> 
+                                                                                                    <c:choose>
+                                                                                                        <c:when test="${book.status==1}">
+                                                                                                            <font style="color: green"><b>Kinh doanh</b></font>
+                                                                                                        </c:when>
+                                                                                                        <c:when test="${book.status==2}">
+                                                                                                            <font style="color: orange"><b>Hết hàng</b></font>
+                                                                                                        </c:when>
+                                                                                                        <c:otherwise>
+                                                                                                            <font style="color: red"><b>Ngừng kinh doanh</b></font>
+                                                                                                        </c:otherwise>
+                                                                                                    </c:choose>
                                                                                                 </div>
                                                                                             </div>
                                                                                         </span>  

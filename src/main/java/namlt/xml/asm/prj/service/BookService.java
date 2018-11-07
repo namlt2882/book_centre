@@ -184,4 +184,30 @@ public class BookService implements BookCommon {
         return 0;
     }
 
+    public boolean setActiveBook(String id){
+        return changeBookStatus(id, STATUS_ACTIVE);
+    }
+    public boolean setDisableBook(String id){
+        return changeBookStatus(id, STATUS_DISABLE);
+    }
+    public boolean setOutOfStockBook(String id){
+        return changeBookStatus(id, STATUS_OUT_OF_STOCK);
+    }
+    
+    private boolean changeBookStatus(String id, int status) {
+        BookRepository repository = new BookRepository();
+        try {
+            Book book = repository.get(id);
+            if (book == null) {
+                return false;
+            }
+            book.setStatus(status);
+            repository.update(book);
+            return true;
+        } catch (Exception ex) {
+            Logger.getLogger(BookService.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }
+    }
+
 }

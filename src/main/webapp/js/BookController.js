@@ -47,4 +47,49 @@ function BookController() {
         }, "<?xml version='1.0'?>" + book.toXml());
     }
 
+    this.setActiveBook = function (id) {
+        id = id.trim();
+        if (confirm("Sản phẩm có mã '" + id + "' sẽ được kinh doanh trở lại. Xác nhận?")) {
+            AJAZZ.postRequest("/rest/product/" + id + "/SetActive", null,
+                    function (xhr) {
+                        if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                            alert("Thành công");
+                            window.location.reload();
+                        } else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status !== 200) {
+                            alert("Thao tác thất bại! Vui lòng thử lại sau!");
+                        }
+                    }, null);
+        }
+    };
+
+    this.setDisableBook = function (id) {
+        id = id.trim();
+        if (confirm("Sản phẩm có mã '" + id + "' sẽ ngừng kinh doanh. Xác nhận?")) {
+            AJAZZ.postRequest("/rest/product/" + id + "/SetDisable", null,
+                    function (xhr) {
+                        if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                            alert("Thành công");
+                            window.location.reload();
+                        } else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status !== 200) {
+                            alert("Thao tác thất bại! Vui lòng thử lại sau!");
+                        }
+                    }, null);
+        }
+    };
+
+    this.setOutOfStockBook = function (id) {
+        id = id.trim();
+        if (confirm("Sản phẩm có mã '" + id + "' tạm thời hết hàng. Xác nhận?")) {
+            AJAZZ.postRequest("/rest/product/" + id + "/SetOutOfStock", null,
+                    function (xhr) {
+                        if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                            alert("Thành công");
+                            window.location.reload();
+                        } else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status !== 200) {
+                            alert("Thao tác thất bại! Vui lòng thử lại sau!");
+                        }
+                    }, null);
+        }
+    };
+
 }

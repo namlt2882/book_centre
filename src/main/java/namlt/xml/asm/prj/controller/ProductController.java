@@ -8,6 +8,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -89,6 +90,48 @@ public class ProductController extends BaseController {
             book.setExistedInDb(true);
         });
         return Response.ok(b.getId()).build();
+    }
+
+    @POST
+    @Path("/{id}/SetActive")
+    public Response setActiveBook(@PathParam("id") String id) {
+        try {
+            boolean rs = new BookService().setActiveBook(id);
+            if (!rs) {
+                throw new Exception();
+            }
+            return Response.ok().build();
+        } catch (Exception e) {
+            return Response.status(404).build();
+        }
+    }
+
+    @POST
+    @Path("/{id}/SetDisable")
+    public Response setDisableBook(@PathParam("id") String id) {
+        try {
+            boolean rs = new BookService().setDisableBook(id);
+            if (!rs) {
+                throw new Exception();
+            }
+            return Response.ok().build();
+        } catch (Exception e) {
+            return Response.status(404).build();
+        }
+    }
+
+    @POST
+    @Path("/{id}/SetOutOfStock")
+    public Response setOutOfStockBook(@PathParam("id") String id) {
+        try {
+            boolean rs = new BookService().setOutOfStockBook(id);
+            if (!rs) {
+                throw new Exception();
+            }
+            return Response.ok().build();
+        } catch (Exception e) {
+            return Response.status(404).build();
+        }
     }
 
 }
