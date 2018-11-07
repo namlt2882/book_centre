@@ -13,23 +13,21 @@ import namlt.xml.asm.prj.repository.BookRepository;
 import static namlt.xml.asm.prj.service.BookUtilityService.copyBook;
 
 public class BookService implements BookCommon {
-    
+
     public Book add(Book b) throws NamingException, SQLException {
         b.setStatus(STATUS_ACTIVE);
         b.setQuantity(0);
         b.setInsertDate(new Date());
         return new BookRepository().insert(b);
     }
-    
+
     public void update(Book b) throws NamingException, SQLException {
         BookRepository repository = new BookRepository();
         Book origin = repository.get(b.getId());
         copyBook(b, origin);
         repository.update(origin);
     }
-    
-    
-    
+
     public Book get(String id) {
         try {
             Book rs = new BookRepository().get(id);
@@ -42,7 +40,7 @@ public class BookService implements BookCommon {
             return null;
         }
     }
-    
+
     public static void checkBooksExisted(List<Book> books) {
         if (books == null) {
             return;
@@ -51,7 +49,7 @@ public class BookService implements BookCommon {
             book.setExistedInDb(true);
         });
     }
-    
+
     public List<Book> getNew(Integer startAt, Integer nextRow) {
         List<Book> rs = null;
         if (startAt == null || nextRow == null) {
@@ -67,7 +65,7 @@ public class BookService implements BookCommon {
         }
         return rs;
     }
-    
+
     public List<Book> search(String search, Integer startAt, Integer nextRow) {
         List<Book> rs = null;
         if (startAt == null || nextRow == null) {
@@ -83,7 +81,7 @@ public class BookService implements BookCommon {
         }
         return rs;
     }
-    
+
     public List<Book> getOutOfStock(Integer startAt, Integer nextRow) {
         List<Book> rs = null;
         if (startAt == null || nextRow == null) {
@@ -99,7 +97,7 @@ public class BookService implements BookCommon {
         }
         return rs;
     }
-    
+
     public List<Book> getDisable(Integer startAt, Integer nextRow) {
         List<Book> rs = null;
         if (startAt == null || nextRow == null) {
@@ -115,7 +113,7 @@ public class BookService implements BookCommon {
         }
         return rs;
     }
-    
+
     public int count() {
         try {
             return new BookRepository().count();
@@ -124,7 +122,7 @@ public class BookService implements BookCommon {
         }
         return 0;
     }
-    
+
     public int countActive() {
         try {
             return new BookRepository().countActive();
@@ -133,7 +131,7 @@ public class BookService implements BookCommon {
         }
         return 0;
     }
-    
+
     public int countOutOfStock() {
         try {
             return new BookRepository().countOutOfStock();
@@ -142,7 +140,7 @@ public class BookService implements BookCommon {
         }
         return 0;
     }
-    
+
     public int countDisable() {
         try {
             return new BookRepository().countDisable();
@@ -151,7 +149,7 @@ public class BookService implements BookCommon {
         }
         return 0;
     }
-    
+
     public int countSearch(String s) {
         try {
             return new BookRepository().countSearch(s);
@@ -160,4 +158,30 @@ public class BookService implements BookCommon {
         }
         return 0;
     }
+
+    public List<Book> searchByTitleAndType(String search, int type, Integer startAt, Integer nextRow) {
+        List<Book> rs = null;
+        if (startAt == null || nextRow == null) {
+            startAt = 0;
+            nextRow = 10;
+        }
+        try {
+            rs = new BookRepository().findByTitleAndType(search, type, startAt, nextRow);
+            checkBooksExisted(rs);
+        } catch (Exception ex) {
+            Logger.getLogger(BookService.class.getName()).log(Level.SEVERE, null, ex);
+            rs = new ArrayList<>();
+        }
+        return rs;
+    }
+
+    public int countSearchByTitleAndType(String s, int type) {
+        try {
+            return new BookRepository().countSearchByTitleAndType(s, type);
+        } catch (Exception ex) {
+            Logger.getLogger(BookService.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return 0;
+    }
+
 }

@@ -35,6 +35,11 @@ public class BookRepository extends Repository<String, Book> implements BookComm
     public static final String QUERY_BOOK_BY_TITLE = "SELECT * FROM Book WHERE Title LIKE ? ORDER BY InsertDate DESC "
             + "OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
     public static final String QUERY_COUNT_BOOK_BY_TITLE = "SELECT COUNT(*) AS 'COUNT' FROM Book WHERE Title LIKE ?";
+    public static final String QUERY_BOOK_BY_TITLE_AND_STATUS = "SELECT * FROM Book "
+            + "WHERE Title LIKE ? AND [Status]=? "
+            + "ORDER BY InsertDate DESC OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+    public static final String QUERY_COUNT_BOOK_BY_TITLE_AND_STATUS = "SELECT COUNT(*) AS 'COUNT' FROM Book "
+            + "WHERE Title LIKE ? AND [Status]=?";
 
     @Override
     public Book insert(Book b) throws NamingException, SQLException {
@@ -157,7 +162,7 @@ public class BookRepository extends Repository<String, Book> implements BookComm
         return getBookByQuery(QUERY_GET_DISABLE_BOOK, startAt, nextRow);
     }
 
-    public List<Book> getBookByQuery(String query, int startAt, int nextRow) throws Exception {
+    private List<Book> getBookByQuery(String query, int startAt, int nextRow) throws Exception {
         List<Book> rs = null;
         synchronized (TRANSACTION_KEY) {
             try {
@@ -268,4 +273,38 @@ public class BookRepository extends Repository<String, Book> implements BookComm
         return 0;
     }
 
+    public List<Book> findByTitleAndType(String s, int type, Integer startAt, Integer nextRow) throws Exception {
+        List<Book> rs = null;
+        synchronized (TRANSACTION_KEY) {
+            try {
+                preparedStatement = newPreparedStatement(QUERY_BOOK_BY_TITLE_AND_STATUS);
+                preparedStatement.setString(1, '%' + s + '%');
+                preparedStatement.setInt(2, type);
+                preparedStatement.setInt(3, startAt);
+                preparedStatement.setInt(4, nextRow);
+                resultSet = preparedStatement.executeQuery();
+                rs = extractDataFromResultSet();
+            } finally {
+                closeResources();
+            }
+        }
+        return rs;
+    }
+
+    public int countSearchByTitleAndType(String s, int type) throws Exception {
+        synchronized (TRANSACTION_KEY) {
+            try {
+                preparedStatement = newPreparedStatement(QUERY_COUNT_BOOK_BY_TITLE);
+                preparedStatement.setString(1, '%' + s + '%');
+                preparedStatement.setInt(2, type);
+                resultSet = preparedStatement.executeQuery();
+                if (resultSet.next()) {
+                    return resultSet.getInt("COUNT");
+                }
+            } finally {
+                closeResources();
+            }
+        }
+        return 0;
+    }
 }
