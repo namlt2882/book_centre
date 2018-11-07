@@ -6,22 +6,19 @@ window.addEventListener('load', function () {
 }, false);
 
 function BookDetailFrame() {
-    var bookDetailModel;
-    var _bookDetailId;
-    var _bookDetailAuthor;
-    var _bookDetailTranslator;
-    var _bookDetailSize;
-    var _bookDetailPageNumber;
-    var _bookDetailPrice;
-    var _bookDetailDescription;
-    var _bookDetailTitle;
-    var _bookDetailImageUrl;
-    var _bookDetailUrl;
-    var _bookDetailTitle_input;
-    var _bookDetailImageUrl_input;
-    var _bookDetailUrl_input;
-    var _bookDetailIsbn;
-    var _bookDetailSubmit;
+    this.bookDetailModel;
+    this._bookDetailId;
+    this._bookDetailAuthor;
+    this._bookDetailTranslator;
+    this._bookDetailSize;
+    this._bookDetailPageNumber;
+    this._bookDetailPrice;
+    this._bookDetailDescription;
+    this._bookDetailTitle;
+    this._bookDetailImageUrl;
+    this._bookDetailUrl;
+    this._bookDetailIsbn;
+    this._bookDetailSubmit;
 
     this.addAllBook = function () {
         var tmp = bookCache.getAll();
@@ -52,7 +49,7 @@ tổng số " + books.length + " sản phẩm có thể thêm. Hành động nà
             });
         }
         return false;
-    }
+    };
 
     this.validateBook = function (book) {
         if (book.id === null || book.id === '') {
@@ -68,7 +65,7 @@ tổng số " + books.length + " sản phẩm có thể thêm. Hành động nà
             return false;
         }
         return true;
-    }
+    };
 
     this.addOrUpdate = function () {
         var id = this._bookDetailId.value;
@@ -95,7 +92,7 @@ tổng số " + books.length + " sản phẩm có thể thêm. Hành động nà
             alert("Đã xảy ra lỗi! Vui lòng thử lại sau!");
         }
         return false;
-    }
+    };
 
     this.updateBookObj = function (book) {
         book.isbn = this._bookDetailIsbn.value;
@@ -105,7 +102,7 @@ tổng số " + books.length + " sản phẩm có thể thêm. Hành động nà
         book.pageNumber = this._bookDetailPageNumber.value;
         book.price = this._bookDetailPrice.value;
         book.description = this._bookDetailDescription.value;
-    }
+    };
 
     this.init = function () {
         this.bookDetailModel = document.getElementById("book_detail_model");
@@ -125,18 +122,13 @@ tổng số " + books.length + " sản phẩm có thể thêm. Hành động nà
         this._bookDetailTitle = document.getElementById("book_detail_title");
         this._bookDetailImageUrl = document.getElementById("book_detail_imageUrl");
         this._bookDetailUrl = document.getElementById("book_detail_url");
-        this._bookDetailTitle_input = document.getElementById("book_detail_title_input");
-        this._bookDetailImageUrl_input = document.getElementById("book_detail_imageUrl_input");
-        this._bookDetailUrl_input = document.getElementById("book_detail_url_input");
         //error
         this._bookDetailSubmit = document.getElementById("book_detail_submit");
-    }
-
-
+    };
 
     this.isNullOrEmpty = function (s) {
         return (s != null && s !== "") ? false : true;
-    }
+    };
 
     this.showBookDetailModel = function (id) {
         var bookObj = bookCache.findBook(id);
@@ -158,21 +150,18 @@ tổng số " + books.length + " sản phẩm có thể thêm. Hành động nà
         var utitlity = new Utility();
 
         this._bookDetailId.value = id;
-        this._bookDetailAuthor.value = utitlity.htmlEntitiesDecode(author);
-        this._bookDetailTranslator.value = utitlity.htmlEntitiesDecode(translator);
+        this._bookDetailAuthor.value = utitlity.utf8Decode(author);
+        this._bookDetailTranslator.value = utitlity.utf8Decode(translator);
         this._bookDetailSize.value = size;
         this._bookDetailPageNumber.value = pageNumber;
         this._bookDetailPrice.value = price;
         this._bookDetailIsbn.value = isbn;
         this._bookDetailDescription.innerHTML = utitlity.htmlEntitiesDecode(description);
-        this._bookDetailTitle.textContent = utitlity.htmlEntitiesDecode(title);
+        this._bookDetailTitle.innerHTML = utitlity.htmlEntitiesDecode(title);
         this._bookDetailImageUrl.src = imageUrl;
         this._bookDetailUrl.href = url;
-        this._bookDetailTitle_input.value = utitlity.htmlEntitiesDecode(title);
-        this._bookDetailImageUrl_input.value = imageUrl;
-        this._bookDetailUrl_input.value = url;
         this.bookDetailModel.style.display = "block";
-    }
+    };
 }
 
 

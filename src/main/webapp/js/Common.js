@@ -14,7 +14,14 @@ function Utility() {
         e.textContent = s;
         var rs = e.textContent;
         return rs;
-    }
+    };
+
+    this.utf8Decode = function (s) {
+        var e = document.createElement("div");
+        e.innerHTML = s;
+        var rs = e.innerHTML;
+        return rs;
+    };
 }
 
 function AjaxRequest() {

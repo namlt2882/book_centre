@@ -12,7 +12,7 @@ function CategoryLayout() {
             var category = categories[i];
             if (publisher === category.publisher) {
                 option = document.createElement("option");
-                option.textContent = category.name;
+                option.innerHTML = category.name;
                 option.value = category.url;
                 if (isSelected !== null && isSelected(category)) {
                     option.selected = true;
@@ -95,7 +95,7 @@ function CategoryCache() {
         var utility = new Utility();
         rs.id = category.getAttribute("id");
         rs.publisher = category.getAttribute("publisher");
-        rs.name = utility.htmlEntitiesDecode(this.getCategoryAttribute(category, "name"));
+        rs.name = this.getCategoryAttribute(category, "name");
         rs.url = this.getCategoryAttribute(category, "url");
         return rs;
     };
@@ -108,9 +108,10 @@ function Category() {
     var url;
 
     this.toXml = function () {
+        var utility = new Utility();
         var rs = "<category id=\"" + (this.id === null ? "" : this.id) +
                 "\" publisher=\"" + (this.publisher == null ? "" : this.publisher) + "\">";
-        rs += "<name>" + (this.name === null ? "" : this.name) + "</name>";
+        rs += "<name>" + (this.name === null ? "" : utility.htmlEntitiesDecode(this.name)) + "</name>";
         rs += "<url>" + (this.url === null ? "" : this.url) + "</url>";
         rs += "</category>"
         return rs;

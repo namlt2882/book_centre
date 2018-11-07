@@ -305,11 +305,12 @@ function OrderDetail() {
     this.price = null;
 
     this.toXml = function () {
+        var utility = new Utility();
         var rs = "<orderDetail>";
         rs += "<orderId>" + (this.orderId === null ? "" : this.orderId.trim()) + "</orderId>";
         rs += "<bookId>" + (this.bookId === null ? "" : this.bookId.trim()) + "</bookId>";
-        rs += "<author>" + (this.author === null ? "" : this.author.trim()) + "</author>";
-        rs += "<title>" + (this.title === null ? "" : this.title.trim()) + "</title>";
+        rs += "<author>" + (this.author === null ? "" : utility.htmlEntitiesDecode(this.author).trim()) + "</author>";
+        rs += "<title>" + (this.title === null ? "" : utility.htmlEntitiesDecode(this.title).trim()) + "</title>";
         rs += "<imageUrl>" + (this.imageUrl === null ? "" : this.imageUrl.trim()) + "</imageUrl>";
         rs += "<quantity>" + (this.quantity === null ? "" : this.quantity) + "</quantity>";
         rs += "<itemPrice>" + (this.price === null ? "" : this.price) + "</itemPrice>";
