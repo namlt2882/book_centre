@@ -77,7 +77,7 @@
                                                             </fieldset>
                                                             <fieldset class="field-group-fieldset">
                                                                 <h3>Giới thiệu sách:</h3>
-                                                                <p>${book.description}}</p>
+                                                                <p>${book.description}</p>
                                                             </fieldset>
                                                         </div>
                                                     </article>

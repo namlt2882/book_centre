@@ -11,8 +11,8 @@ var AJAZZ;
 function Utility() {
     this.htmlEntitiesDecode = function (s) {
         var e = document.createElement("div");
-        e.innerHTML = s;
-        var rs = e.innerHTML;
+        e.textContent = s;
+        var rs = e.textContent;
         return rs;
     }
 }

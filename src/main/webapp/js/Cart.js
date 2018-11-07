@@ -194,7 +194,7 @@ function ProductService() {
     };
 
     this.saveProductList = function saveProductList() {
-        localStorage.setItem("productList", "<?xml version=\"1.0\"?>" + this.productList.toXml());
+        localStorage.setItem("productList", "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + this.productList.toXml());
     };
 }
 

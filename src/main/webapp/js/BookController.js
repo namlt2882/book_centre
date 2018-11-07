@@ -7,7 +7,7 @@ window.addEventListener('load', function () {
 function BookController() {
 
     this.addListBook = function (books, successCallBack, failCallBack) {
-        var data = "<?xml version='1.0'?><books>";
+        var data = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><books>";
         for (var i = 0; i < books.length; i++) {
             data += books[i].toXml();
         }
@@ -32,7 +32,7 @@ function BookController() {
             } else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status !== 200) {
                 failCallBack(xhr);
             }
-        }, "<?xml version='1.0'?>" + book.toXml());
+        }, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + book.toXml());
     }
 
     this.update = function (book, successCallBack, failCallBack) {
@@ -44,7 +44,7 @@ function BookController() {
             } else if (xhr.readyState === XMLHttpRequest.DONE && xhr.status !== 200) {
                 failCallBack(xhr);
             }
-        }, "<?xml version='1.0'?>" + book.toXml());
+        }, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" + book.toXml());
     }
 
     this.setActiveBook = function (id) {

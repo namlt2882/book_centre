@@ -87,11 +87,12 @@ function Book() {
     var description;
 
     this.toXml = function () {
+        var utitlity = new Utility();
         var rs = "<book id=\"" + (this.id === null ? "" : this.id) + "\">";
-        rs += "<title>" + (this.title === null ? "" : this.title) + "</title>";
-        rs += "<author>" + (this.author === null ? "" : this.author) + "</author>";
+        rs += "<title>" + (this.title === null ? "" : utitlity.htmlEntitiesDecode(this.title)) + "</title>";
+        rs += "<author>" + (this.author === null ? "" : utitlity.htmlEntitiesDecode(this.author)) + "</author>";
         rs += "<isbn>" + (this.isbn === null ? "" : this.isbn) + "</isbn>";
-        rs += "<translator>" + (this.translator === null ? "" : this.translator) + "</translator>";
+        rs += "<translator>" + (this.translator === null ? "" : utitlity.htmlEntitiesDecode(this.translator)) + "</translator>";
         rs += "<pageSize>" + (this.pageSize === null ? "" : this.pageSize) + "</pageSize>";
         rs += "<pageNumber>" + (this.pageNumber === null ? "" : this.pageNumber) + "</pageNumber>";
         rs += "<price>" + (this.price === null ? "" : this.price) + "</price>";
@@ -100,7 +101,8 @@ function Book() {
         rs += "<status>" + (this.status === null ? "" : this.status) + "</status>";
         rs += "<quantity>" + (this.quantity === null ? "" : this.quantity) + "</quantity>";
         rs += "<existedInDb>" + (this.existedInDb === null ? "" : this.existedInDb) + "</existedInDb>";
-        rs += "<description>" + (this.description === null ? "" : this.description) + "</description>";
+        var description = (this.description === null ? "" : utitlity.htmlEntitiesDecode(this.description));
+        rs += "<description>" + description + "</description>";
         rs += "</book>"
         return rs;
     }
