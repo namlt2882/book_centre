@@ -21,22 +21,26 @@ public class UserRepository extends Repository<String, User> implements UserComm
     @Override
     public User insert(User t) throws Exception {
         synchronized (TRANSACTION_KEY) {
-            preparedStatement = newPreparedStatement(INSERT_QUERY);
-            preparedStatement.setString(1, t.getUsername());
-            preparedStatement.setString(2, t.getPassword());
-            preparedStatement.setString(3, t.getName());
-            preparedStatement.setString(4, t.getAddress());
-            if (t.getBirthday() != null) {
-                preparedStatement.setDate(5, new Date(t.getBirthday().getTime()));
-            } else {
-                preparedStatement.setNull(5, Types.DATE);
-            }
-            preparedStatement.setString(6, t.getPhone());
-            preparedStatement.setInt(7, t.getStatus());
-            preparedStatement.setInt(8, t.getRole());
-            int status = preparedStatement.executeUpdate();
-            if (status <= 0) {
-                throw new SQLException("INSERT user fail with username='" + t.getUsername() + "'");
+            try {
+                preparedStatement = newPreparedStatement(INSERT_QUERY);
+                preparedStatement.setString(1, t.getUsername());
+                preparedStatement.setString(2, t.getPassword());
+                preparedStatement.setString(3, t.getName());
+                preparedStatement.setString(4, t.getAddress());
+                if (t.getBirthday() != null) {
+                    preparedStatement.setDate(5, new Date(t.getBirthday().getTime()));
+                } else {
+                    preparedStatement.setNull(5, Types.DATE);
+                }
+                preparedStatement.setString(6, t.getPhone());
+                preparedStatement.setInt(7, t.getStatus());
+                preparedStatement.setInt(8, t.getRole());
+                int status = preparedStatement.executeUpdate();
+                if (status <= 0) {
+                    throw new SQLException("INSERT user fail with username='" + t.getUsername() + "'");
+                }
+            } finally {
+                closeResources();
             }
         }
         return t;
@@ -51,12 +55,16 @@ public class UserRepository extends Repository<String, User> implements UserComm
     public User get(String key) throws Exception {
         User rs = null;
         synchronized (TRANSACTION_KEY) {
-            preparedStatement = newPreparedStatement(QUERY_GET_BY_ID);
-            preparedStatement.setString(1, key);
-            resultSet = preparedStatement.executeQuery();
-            List<User> resultList = extractDataFromResultSet();
-            if (resultList.size() > 0) {
-                rs = resultList.get(0);
+            try {
+                preparedStatement = newPreparedStatement(QUERY_GET_BY_ID);
+                preparedStatement.setString(1, key);
+                resultSet = preparedStatement.executeQuery();
+                List<User> resultList = extractDataFromResultSet();
+                if (resultList.size() > 0) {
+                    rs = resultList.get(0);
+                }
+            } finally {
+                closeResources();
             }
         }
         return rs;
@@ -65,13 +73,17 @@ public class UserRepository extends Repository<String, User> implements UserComm
     public User getByUsernameAndPassword(String username, String password) throws SQLException, NamingException {
         User rs = null;
         synchronized (TRANSACTION_KEY) {
-            preparedStatement = newPreparedStatement(QUERY_GET_BY_USERNAME_AND_PASSWORD);
-            preparedStatement.setString(1, username);
-            preparedStatement.setString(2, password);
-            resultSet = preparedStatement.executeQuery();
-            List<User> resultList = extractDataFromResultSet();
-            if (resultList.size() > 0) {
-                rs = resultList.get(0);
+            try {
+                preparedStatement = newPreparedStatement(QUERY_GET_BY_USERNAME_AND_PASSWORD);
+                preparedStatement.setString(1, username);
+                preparedStatement.setString(2, password);
+                resultSet = preparedStatement.executeQuery();
+                List<User> resultList = extractDataFromResultSet();
+                if (resultList.size() > 0) {
+                    rs = resultList.get(0);
+                }
+            } finally {
+                closeResources();
             }
         }
         return rs;
