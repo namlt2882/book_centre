@@ -17,71 +17,84 @@ function CartView() {
         }
         cartContainer.innerHTML = "";
         var tr, td, book, sum, input, button;
-        for (var i = 0; i < productService.productList.orderDetails.length; i++) {
-            book = productService.productList.orderDetails[i];
-            //create tr and append to context
+        var orderDetails = productService.productList.orderDetails;
+        if (orderDetails.length > 0) {
+            for (var i = 0; i < orderDetails.length; i++) {
+                book = orderDetails[i];
+                //create tr and append to context
+                tr = document.createElement("tr");
+                cartContainer.appendChild(tr);
+                //id
+                td = document.createElement("td");
+                td.textContent = book.bookId;
+                tr.appendChild(td);
+                //title
+                td = document.createElement("td");
+                td.textContent = book.title;
+                tr.appendChild(td);
+                //author
+                td = document.createElement("td");
+                td.textContent = book.author;
+                tr.appendChild(td);
+                //price
+                td = document.createElement("td");
+                td.textContent = book.price;
+                tr.appendChild(td);
+                //sum
+                sum = document.createElement("td");
+                sum.textContent = book.price * book.quantity;
+                //quantity
+                td = document.createElement("td");
+                input = document.createElement("input");
+                input.type = "number";
+                input.min = 1;
+                input.value = book.quantity;
+                input.book_id = book.bookId;
+                input.sum = sum;
+                input.onchange = function () {
+                    productService.changeProductQuantity(this.book_id, this.value, this.sum);
+                    view.countSumOfAll();
+                };
+                td.appendChild(input);
+                tr.appendChild(td);
+                tr.appendChild(sum);
+                //actions
+                //remove this product
+                td = document.createElement("td");
+                button = document.createElement("button");
+                button.textContent = "Xóa";
+                button.book_id = book.bookId;
+                button.onclick = function () {
+                    productService.removeProduct(this.book_id);
+                    view.initLayout();
+                };
+                td.appendChild(button);
+                tr.appendChild(td);
+            }
+            //sum of all
             tr = document.createElement("tr");
             cartContainer.appendChild(tr);
-            //id
+
             td = document.createElement("td");
-            td.textContent = book.bookId;
+            td.setAttribute("colspan", "5");
+            td.setAttribute("style", "text-align:right;");
+            td.textContent = "Tổng cộng";
             tr.appendChild(td);
-            //title
             td = document.createElement("td");
-            td.textContent = book.title;
+            this.sumOfAllTag = td;
             tr.appendChild(td);
-            //author
+            this.countSumOfAll();
+        } else {
+            //sum of all
+            tr = document.createElement("tr");
+            cartContainer.appendChild(tr);
+
             td = document.createElement("td");
-            td.textContent = book.author;
-            tr.appendChild(td);
-            //price
-            td = document.createElement("td");
-            td.textContent = book.price;
-            tr.appendChild(td);
-            //sum
-            sum = document.createElement("td");
-            sum.textContent = book.price * book.quantity;
-            //quantity
-            td = document.createElement("td");
-            input = document.createElement("input");
-            input.type = "number";
-            input.min = 1;
-            input.value = book.quantity;
-            input.book_id = book.bookId;
-            input.sum = sum;
-            input.onchange = function () {
-                productService.changeProductQuantity(this.book_id, this.value, this.sum);
-                view.countSumOfAll();
-            };
-            td.appendChild(input);
-            tr.appendChild(td);
-            tr.appendChild(sum);
-            //actions
-            //remove this product
-            td = document.createElement("td");
-            button = document.createElement("button");
-            button.textContent = "Xóa";
-            button.book_id = book.bookId;
-            button.onclick = function () {
-                productService.removeProduct(this.book_id);
-                view.initLayout();
-            };
-            td.appendChild(button);
+            td.setAttribute("colspan", "6");
+            td.setAttribute("style", "text-align:center;");
+            td.innerHTML = "<h3>Không có sản phẩm trong giỏ hàng</h3>";
             tr.appendChild(td);
         }
-        //sum of all
-        tr = document.createElement("tr");
-        cartContainer.appendChild(tr);
-
-        td = document.createElement("td");
-        td.setAttribute("colspan", "5");
-        td.setAttribute("style", "text-align:right;");
-        td.textContent = "Tổng cộng";
-        tr.appendChild(td);
-        td = document.createElement("td");
-        this.sumOfAllTag = td;
-        tr.appendChild(td);
-        this.countSumOfAll();
     };
 
     this.checkout = function () {
