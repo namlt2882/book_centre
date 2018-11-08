@@ -17,11 +17,11 @@
                 <table>
                     <tr>
                         <td>Username:</td>
-                        <td><input type="text" name="username" id="register_username" required="true"></td>
+                        <td><input type="text" name="username" id="register_username" required="true" maxlength="30" minlength="5"></td>
                     </tr>
                     <tr>
                         <td>Mật khẩu:</td>
-                        <td><input type="password" name="password" id="register_password" required="true"></td>
+                        <td><input type="password" name="password" id="register_password" required="true" maxlength="50" minlength="5"></td>
                     </tr>
                     <tr>
                         <td>Nhập lại:</td>
@@ -29,11 +29,11 @@
                     </tr>
                     <tr>
                         <td>Tên:</td>
-                        <td><input type="text" name="name" id="register_name" required="true"></td>
+                        <td><input type="text" name="name" id="register_name" required="true" maxlength="200"></td>
                     </tr>
                     <tr>
                         <td>Địa chỉ giao hàng:</td>
-                        <td><input type="text" name="address" id="register_address" required="true"></td>
+                        <td><input type="text" name="address" id="register_address" required="true" maxlength="200"></td>
                     </tr>
                     <tr>
                         <td>Số điện thoại:</td>

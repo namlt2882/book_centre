@@ -22,8 +22,9 @@ function register() {
         AJAZZ.postRequest("/rest/auth/Register", null, function (xhr) {
             if (xhr.readyState == XMLHttpRequest.DONE && xhr.status === 200) {
                 var link = redirectLink.href;
+                alert("Đăng kí thành công!");
                 window.location.href = link;
-            } else if (xhr.readyState == XMLHttpRequest.DONE && xhr.status === 404) {
+            } else if (xhr.readyState == XMLHttpRequest.DONE && xhr.status !== 200) {
                 alert("Đăng kí thất bại, xin thử lại!");
             }
         }, data);
