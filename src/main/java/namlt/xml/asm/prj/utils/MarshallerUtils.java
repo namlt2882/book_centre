@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package namlt.xml.asm.prj.utils;
 
 import java.io.StringWriter;
@@ -13,24 +8,16 @@ import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
 import namlt.xml.asm.prj.model.Book;
 
-/**
- *
- * @author ADMIN
- */
 public class MarshallerUtils {
 
     public static void main(String[] args) throws JAXBException {
         System.out.println(MarshallerUtils.marshall(new Book("abc")));
     }
 
-    public static <T> String marshall(Object objs) throws JAXBException {
-        return marshall(objs, null);
-    }
-
     public static <T> String marshall(Object objs, Class... clazz) throws JAXBException {
         StringWriter sb = new StringWriter();
         Class[] objectClass;
-        if (clazz == null) {
+        if (clazz.length <= 0) {
             objectClass = new Class[]{objs.getClass()};
         } else {
             objectClass = clazz;
