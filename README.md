@@ -7,4 +7,4 @@ Back-end is built on **Java servlet**, **Jersey**. This project uses Java built-
 Web front-end is pure **HTML**, **CSS**, **JS**.
 
 ## Usage
-Open by *Netbean*, *Elipse* or what ever you want, build to *jar* file then deploy with *Apache Tomcat*
+Open by *Netbean*, *Elipse* or what ever you want, build to *jar* file then deploy with *Apache Tomcat*.
